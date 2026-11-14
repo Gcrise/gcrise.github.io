@@ -37,7 +37,7 @@ body{padding:env(safe-area-inset-top,0px) 0 calc(48px + env(safe-area-inset-bott
 
 header{position:sticky;top:0;z-index:5;background:var(--bg);
   border-bottom:1px solid var(--rule);padding:12px 0 0}
-.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .brand b{font-size:19px;letter-spacing:.16em;font-weight:700}
 .brand span{font-size:11.5px;letter-spacing:.09em;color:var(--ink3);text-transform:uppercase}
 .tabs{display:flex;gap:6px;margin:12px -16px 0;padding:0 16px 10px;
@@ -162,13 +162,39 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
   .co{color:#fff;text-shadow:0 0 1px rgba(0,0,0,.35)}
 }
 
+
+/* ---- layout switch: the usual list, or rows on a time ruler ---- */
+.vsw{margin-left:auto;display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+.vsw button{appearance:none;border:0;background:transparent;color:var(--ink3);font:inherit;
+  font-size:11px;font-weight:700;letter-spacing:.1em;padding:6px 11px;cursor:pointer}
+.vsw button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.rvw{display:grid;grid-template-columns:40px 1fr 1fr;gap:0 6px;margin-top:4px}
+.rvh{position:sticky;top:var(--hdr,96px);z-index:3;background:var(--bg);font-size:11px;font-weight:800;
+  letter-spacing:.13em;padding:8px 0 6px;border-bottom:2px solid var(--rule)}
+.rvh.c{color:var(--accent)} .rvh.d{color:var(--warn)}
+.rvax,.rvln{position:relative;margin-top:9px}
+.rvax .hr{position:absolute;left:0;right:0;font-size:10.5px;font-weight:700;color:var(--ink3);
+  font-variant-numeric:tabular-nums;transform:translateY(-6px)}
+.rvln{border-left:1px solid var(--rule);
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% var(--hr)}
+.rvln .rb{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,var(--stopbg) 0 6px,transparent 6px 11px);
+  border-top:1px solid var(--stopline);border-bottom:1px solid var(--stopline);
+  font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--stop);padding:2px 5px;overflow:hidden}
+.rvln .bk{position:absolute;border-radius:4px;background:var(--card);border:1px solid var(--rule);
+  border-left:5px solid var(--tc);padding:2px 5px;overflow:hidden;font-size:11px;line-height:1.25}
+.rvln .bk.req{border-style:dashed;border-left-style:solid}
+.rvln .bk b{font-variant-numeric:tabular-nums;margin-right:4px}
+.rvln .bk .cc{display:inline-block;font-size:9.5px;font-weight:800;padding:0 4px;border-radius:3px;
+  background:var(--tc);color:#17150F;margin-right:4px}
+.rvln .bk .q{color:var(--ink3);font-size:10px}
+.rvnow{position:absolute;left:0;right:0;height:0;border-top:2px solid var(--accent);z-index:2}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 </style></head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><b>ELISE</b><span>Lifts &amp; deliveries &middot; 3 Twenty Fifth Ave</span></div>
+    <div class="brand"><b>ELISE</b><span>Lifts &amp; deliveries</span><div class="vsw" id="vsw" role="group" aria-label="Layout"><button type="button" data-lay="list">List</button><button type="button" data-lay="rows">Rows</button></div></div>
     <div class="tabs" id="tabs" role="tablist"></div>
   </header>
   <div id="now"></div>
@@ -453,6 +479,13 @@ function render(){
     return;
   }
   nowNext();
+  paintSwitch();
+  if(layout==="rows"){
+    var hd=document.querySelector("header");
+    if(hd) document.documentElement.style.setProperty("--hdr",hd.offsetHeight+"px");
+    list.innerHTML=rowsHtml(lifts,dels);
+    return;
+  }
   list.innerHTML =
     group("lift","Crane lifts",lifts,
           nLift+(nLift===1?" lift":" lifts")+" · "+Math.floor(hook/60)+"h "+p2(hook%60)+"m",true)+
@@ -468,6 +501,70 @@ function render(){
     });
   });
 }
+
+var layout="list";
+try{ if(localStorage.getItem("elise.lifts.layout")==="rows") layout="rows"; }catch(e){}
+
+/* Rows: crane and deliveries side by side on one time ruler, ten minutes a
+   notch, so you can see where the gaps and the clashes are. */
+function rowsHtml(lifts, dels){
+  var PX=1.7, brks=breaksFor(lifts);
+  var all_=lifts.concat(dels);
+  var lo=Math.min((cfg&&+cfg.open)||360, Math.min.apply(null,all_.map(function(r){return +r.start_min;})));
+  var hi=Math.max((cfg&&+cfg.close)||1080, Math.max.apply(null,all_.map(function(r){return +r.start_min+(+r.dur||20);})));
+  lo=Math.floor(lo/60)*60; hi=Math.ceil(hi/60)*60;
+  var H=(hi-lo)*PX;
+  function y(m){ return ((m-lo)*PX).toFixed(1)+"px"; }
+  function lane(rows){
+    var ev=rows.map(function(r){var s=+r.start_min,d=Math.max(+r.dur||0,r.type==="del"?20:10);return {r:r,s:s,e:s+d};})
+      .sort(function(a,b){return a.s-b.s;});
+    /* side-by-side columns only where bookings overlap */
+    var cl=[],cur=null;
+    ev.forEach(function(x){ if(!cur||x.s>=cur.end){cur={items:[],end:x.e};cl.push(cur);} cur.items.push(x); cur.end=Math.max(cur.end,x.e); });
+    var h="";
+    cl.forEach(function(c){
+      var cols=[];
+      c.items.forEach(function(x){
+        var k=0; while(cols[k]!=null&&cols[k]>x.s)k++; cols[k]=x.e; x.k=k;
+      });
+      var n=cols.length;
+      c.items.forEach(function(x){
+        var r=x.r, tr=trade(r.co), qty=+r.qty||0;
+        var ht=Math.max(15,(x.e-x.s)*PX-2);
+        h+='<div class="bk'+(r.status==="req"?" req":"")+'" style="--tc:'+esc(tr.colour)+
+          ';top:'+y(x.s)+';height:'+ht.toFixed(1)+'px;left:calc('+(100*x.k/n)+'% + 2px);width:calc('+(100/n)+'% - 4px)">'+
+          '<b>'+hhmm(+r.start_min)+'</b><span class="cc" style="background:'+esc(chipBg(r))+'">'+esc(chipTxt(r))+'</span>'+
+          esc(r.descr||"")+(r.type==="lift"&&qty>1?' <span class="q">· '+qty+' lifts</span>':'')+
+          (r.status==="req"?' <span class="q">· TBC</span>':'')+'</div>';
+      });
+    });
+    return h;
+  }
+  var ax="";
+  for(var m=lo;m<=hi;m+=60) ax+='<span class="hr" style="top:'+y(m)+'">'+hhmm(m)+'</span>';
+  var br=brks.map(function(b){
+    return '<div class="rb" style="top:'+y(b[0])+';height:'+(b[1]*PX).toFixed(1)+'px">Break</div>';}).join("");
+  var nowL="";
+  if(day===0){ var d=new Date(), nm=d.getHours()*60+d.getMinutes();
+    if(nm>=lo&&nm<=hi) nowL='<div class="rvnow" style="top:'+y(nm)+'"></div>'; }
+  var st='style="height:'+H.toFixed(0)+'px;--hr:'+(60*PX)+'px;background-position:0 0"';
+  return '<div class="rvw">'+
+    '<span class="rvh"></span><span class="rvh c">Crane</span><span class="rvh d">Deliveries</span>'+
+    '<div class="rvax" style="height:'+H.toFixed(0)+'px">'+ax+'</div>'+
+    '<div class="rvln" '+st+'>'+br+lane(lifts)+nowL+'</div>'+
+    '<div class="rvln" '+st+'>'+lane(dels)+nowL+'</div></div>';
+}
+function paintSwitch(){
+  Array.prototype.forEach.call(document.querySelectorAll("#vsw [data-lay]"),function(b){
+    b.setAttribute("aria-pressed",b.getAttribute("data-lay")===layout?"true":"false");
+  });
+}
+document.getElementById("vsw").addEventListener("click",function(e){
+  var b=e.target.closest("[data-lay]"); if(!b) return;
+  layout=b.getAttribute("data-lay");
+  try{ localStorage.setItem("elise.lifts.layout",layout); }catch(_){}
+  paintSwitch(); render();
+});
 
 function paintTabs(){
   var box=document.getElementById("tabs");
