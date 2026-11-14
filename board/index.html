@@ -7158,7 +7158,7 @@ function camLiveLoad(){
   var src=im.getAttribute("data-src")+"?t="+Date.now();
   var pre=new Image();
   pre.onload=function(){ im.src=pre.src; var n=new Date();
-    if(el("camMeta")) el("camMeta").textContent="Latest photo \u00b7 checked "+fmtClock(n.getHours()*60+n.getMinutes()); };
+    if(el("camMeta")) el("camMeta").textContent="Checked "+fmtClock(n.getHours()*60+n.getMinutes()); };
   pre.onerror=function(){ if(el("camMeta")) el("camMeta").textContent="Couldn\u2019t reach the camera \u2014 trying again shortly"; };
   pre.src=src;
 }
