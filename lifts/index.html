@@ -200,6 +200,10 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
 .thbtn{appearance:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--rule);background:transparent;
   color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
 .thbtn svg{width:17px;height:17px}
+
+/* iPhone zooms the page into any text box set smaller than 16px - keep every
+   box at 16px on touch screens so typing never zooms */
+@media (pointer:coarse){input,textarea,select,[contenteditable="true"]{font-size:16px!important}}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 </style>

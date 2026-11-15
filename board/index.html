@@ -529,6 +529,10 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:
   -webkit-mask:url(elise-logo.png) no-repeat left center/contain;mask:url(elise-logo.png) no-repeat left center/contain;
   color:transparent;overflow:hidden;white-space:nowrap;vertical-align:middle;flex:none}
 .mast .elogo{width:92px;height:24px}
+
+/* iPhone zooms the page into any text box set smaller than 16px - keep every
+   box at 16px on touch screens so typing never zooms */
+@media (pointer:coarse){input,textarea,select,[contenteditable="true"]{font-size:16px!important}}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 
@@ -1963,7 +1967,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 14:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 15:58</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
