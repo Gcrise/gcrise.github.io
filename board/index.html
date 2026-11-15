@@ -787,6 +787,10 @@ input,textarea,select,option{text-transform:none}
 .joblist .jgroup .item{padding-left:12px;padding-right:4px}
 .joblist .jgroup .item.pri{box-shadow:none;border-left:0}
 .joblist .jgroup .item:first-child{border-top:0}
+.item.hasph{flex-wrap:wrap}
+.jthumbs{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 2px 52px}
+.jthumbs img{width:76px;height:57px;object-fit:cover;border-radius:4px;border:1px solid var(--line-hard);cursor:zoom-in;background:var(--surface-2)}
+@media (max-width:620px){.jthumbs{padding-left:0}.jthumbs img{width:64px;height:48px}}
 .jobcol{min-width:0}
 .jobcols.paired{align-items:stretch;position:relative}
 /* a line down the middle between priority and non-priority */
@@ -2035,7 +2039,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 07:15</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 08:15</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5451,9 +5455,20 @@ function jobPhotos(j,sc){
   return SCOPE[sc].list().filter(function(p){return p[key]===j.id;});
 }
 var CAMICON='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.8 8.6h2.9l1.3-2h8l1.3 2h2.9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H3.8a1 1 0 0 1-1-1V9.6a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.2" r="3.1"/></svg>';
+function jobThumbs(j){
+  /* the job's photos, right under it - tap one for full screen */
+  if(!j||!j.id) return "";
+  var all=SCOPE.day.list(), out=[];
+  all.forEach(function(p,n){ if(p.job===j.id) out.push([p,n]); });
+  if(!out.length) return "";
+  return '<div class="jthumbs">'+out.map(function(x){
+    return '<img src="'+PHOTO(esc(x[0].id), x[0].bkt)+'" alt="'+esc(x[0].cap||"Job photo")+'" loading="lazy" data-zoom="day||'+x[1]+'"'+
+      (x[0].cap?' title="'+esc(x[0].cap)+'"':'')+'>';
+  }).join("")+'</div>';
+}
 function jobRow(j,i){
   var np=jobPhotos(j).length;
-  return '<div class="item'+(j.done?' done':'')+(j.pri?' pri':'')+'">'+
+  return '<div class="item'+(j.done?' done':'')+(j.pri?' pri':'')+(np?' hasph':'')+'">'+
     '<input type="checkbox" data-job="'+i+'"'+(j.done?' checked':'')+' aria-label="Done">'+
     '<button class="flag" data-pri="'+i+'" title="'+(j.pri?"Drop off priority":"Make priority")+'" aria-pressed="'+(!!j.pri)+'">'+(j.pri?"★":"☆")+'</button>'+
     '<span class="txt" contenteditable="true" data-jobtxt="'+i+'">'+esc(j.text)+'</span>'+
@@ -5464,7 +5479,7 @@ function jobRow(j,i){
         ? '<button class="cam'+(np?' has':'')+'" data-jobcam="'+i+'" title="'+(np?np+" photo"+(np>1?"s":"")+" on this job":"Add a photo for this job")+'">'+CAMICON+(np?'<b>'+np+'</b>':'')+'</button>'
         : '')+
       '<button class="del" data-del-job="'+i+'" title="Remove">&times;</button>'+
-    '</span></div>';
+    '</span>'+jobThumbs(j)+'</div>';
 }
 /* a job photo is that job's evidence: it goes when the job is ticked off */
 function clearJobPhotos(j,sc){
