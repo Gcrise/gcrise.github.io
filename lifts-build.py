@@ -477,9 +477,11 @@ function nowNext(){
     '<div class="hd"><span class="tag">UP NEXT</span>'+
       '<span class="cd">'+cdText(soon)+'</span></div>'+
     '<div class="slots">'+slot(hook,false)+slot(gate,true)+'</div>'+
-    (rest.length?'<div class="thenhd">THEN</div><ol>'+rest.map(function(x){
+    (rest.length?'<div class="thenhd">THEN</div><ol>'+rest.map(function(x,i){
       var label = x.p.of>1 ? ("Lift "+x.p.n+" of "+x.p.of+" \u00b7 "+x.r.descr) : x.r.descr;
-      var brkBefore = brkRows.filter(function(b){ return b[0]>mins && b[0]<=x.start; })[0];
+      /* a break shows once, between the item before it and the item after */
+      var prev = i ? rest[i-1].start : mins;
+      var brkBefore = brkRows.filter(function(b){ return b[0]>prev && b[0]<=x.start; })[0];
       return (brkBefore?'<li><span class="lt" style="color:var(--stop)">'+hhmm(brkBefore[0])+
                '</span><span></span><span class="ld" style="color:var(--stop)">Crane break</span></li>':'')+
              '<li><span class="lt">'+hhmm(x.start)+
