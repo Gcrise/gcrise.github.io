@@ -533,6 +533,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--surface)}
+html{background:var(--surface);overscroll-behavior-y:none}
 .gut{padding-left:var(--gut-l);padding-right:var(--gut-r)}
 button,input,select{font:inherit;color:inherit}
 [hidden]{display:none!important}
@@ -1957,7 +1958,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 13:35</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 13:58</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7561,28 +7562,60 @@ document.addEventListener("click",function(e){
   if(window.ResizeObserver){ var m=document.querySelector(".mast"); if(m) new ResizeObserver(fit).observe(m); }
 })();
 
-/* swipe left or right anywhere on the page to move between tabs - except
-   where a swipe already does something (the tab bar, day chips, tables,
-   the camera, the crane rows, text boxes) */
+/* swipe left or right anywhere on the page to move between tabs. The page
+   follows your finger, locks to sideways once it is clearly a swipe, and
+   slides the next tab in - except where a swipe already does something
+   (the tab bar, day chips, tables, the camera, the crane rows, text boxes) */
 (function(){
-  var x0=null,y0=0,t0=0,skip=false;
-  var NOSWIPE='input,textarea,select,[contenteditable="true"],.tabs,#tabs,.scroll-x,.cambox,.camlive,#cbapp .week,#cbapp .rv,#cbapp .sheet,.sheet,.lb,.mastmenu,.ltable,.wb-chart,svg.wind';
+  var main=document.querySelector("main"); if(!main) return;
+  var x0=null,y0=0,t0=0,dx=0,lock=0,skip=false,busy=false;
+  var NOSWIPE='input,textarea,select,[contenteditable="true"],.tabs,#tabs,.scroll-x,.cambox,.camlive,iframe,#cbapp .week,#cbapp .rv,#cbapp .sheet,.sheet,.lb,.mastmenu,.ltable';
+  function ids(){return VIEWS.map(function(v){return v[0];});}
+  function setX(x,anim){
+    main.style.transition=anim?"transform .18s cubic-bezier(.2,.7,.2,1), opacity .18s":"none";
+    main.style.transform=x?"translate3d("+x+"px,0,0)":"";
+    main.style.opacity=x?String(Math.max(.35,1-Math.abs(x)/600)):"";
+  }
   document.addEventListener("touchstart",function(e){
-    if(e.touches.length!==1){x0=null;return;}
+    if(busy||e.touches.length!==1){x0=null;return;}
     var t=e.target; skip=!!(t.closest&&t.closest(NOSWIPE));
     if(document.querySelector(".cambox.camfull,.scrim:not([hidden]),.lb:not([hidden])")) skip=true;
-    x0=e.touches[0].clientX; y0=e.touches[0].clientY; t0=Date.now();
+    x0=e.touches[0].clientX; y0=e.touches[0].clientY; t0=Date.now(); dx=0; lock=0;
   },{passive:true});
+  document.addEventListener("touchmove",function(e){
+    if(x0==null||skip) return;
+    var t=e.touches[0], mx=t.clientX-x0, my=t.clientY-y0;
+    if(!lock){
+      if(Math.abs(mx)<8&&Math.abs(my)<8) return;
+      lock = Math.abs(mx)>Math.abs(my)*1.3 ? 1 : -1;   /* 1 sideways, -1 scrolling */
+    }
+    if(lock!==1) return;
+    e.preventDefault();
+    var a=ids(), i=a.indexOf(state.view);
+    dx=mx;
+    /* resist at the first and last tab */
+    if((dx>0&&i===0)||(dx<0&&i===a.length-1)) dx=dx/4;
+    setX(dx,false);
+  },{passive:false});
   document.addEventListener("touchend",function(e){
-    if(x0==null||skip){x0=null;return;}
-    var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0; x0=null;
-    if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*2||dt>700) return;
-    var ids=VIEWS.map(function(v){return v[0];}), i=ids.indexOf(state.view);
-    var n=i+(dx<0?1:-1); if(n<0||n>=ids.length) return;
-    go(ids[n]);
-    var tab=document.querySelector('.tab[data-go="'+ids[n]+'"]');
-    if(tab&&tab.scrollIntoView) tab.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+    if(x0==null||skip||lock!==1){x0=null;return;}
+    x0=null;
+    var dt=Date.now()-t0, a=ids(), i=a.indexOf(state.view);
+    var fast=Math.abs(dx)>30&&dt<250, far=Math.abs(dx)>window.innerWidth*0.22;
+    var n=i+(dx<0?1:-1);
+    if(!(fast||far)||n<0||n>=a.length){ setX(0,true); return; }
+    busy=true;
+    var w=window.innerWidth;
+    setX(dx<0?-w*0.6:w*0.6,true);
+    setTimeout(function(){
+      go(a[n]);
+      setX(dx<0?w*0.35:-w*0.35,false);
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ setX(0,true); busy=false; }); });
+      var tab=document.querySelector('.tab[data-go="'+a[n]+'"]');
+      if(tab&&tab.scrollIntoView) tab.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+    },170);
   },{passive:true});
+  document.addEventListener("touchcancel",function(){ if(x0!=null){x0=null;setX(0,true);} },{passive:true});
 })();
 
 function renderNowStrip(){
