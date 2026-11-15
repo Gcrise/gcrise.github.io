@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Day Board">
-<meta name="theme-color" content="#1A1917">
+<meta name="theme-color" content="#23271A">
 <title>ELISE Day Board</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
@@ -392,18 +392,18 @@ window.eliseAuth = {
 <style>
 /* Layout: masthead, tab bar, day strip, one view at a time. Front page = four summary cards. */
 :root{
-  --paper:#EFEAE1;--surface:#FBF8F3;--surface-2:#E7E0D3;
-  --ink:#2B2926;--ink-2:#5C564D;--ink-3:#7A7366;
-  --line:#D9D1C2;--line-hard:#BFB49F;
-  --gold:#8C7B60;
+  --paper:#E8E2D8;--surface:#F5F1EA;--surface-2:#DCD5C7;
+  --ink:#2D3221;--ink-2:#4E5340;--ink-3:#717462;
+  --line:#D2CBBC;--line-hard:#B4B5A8;
+  --gold:#6F6A4C;
   --gut-l:max(16px,env(safe-area-inset-left,0px));
   --gut-r:max(16px,env(safe-area-inset-right,0px));
-  --ok:#3F6B46;--warn:#9C7220;--crit:#9E3F2B;--clock:#C2510A;--alarm:#C0210F;
+  --ok:#3F6B46;--warn:#9C7220;--crit:#9E3F2B;--clock:#2D3221;--alarm:#C0210F;
   --acc-today:#0D6377;--acc-labour:#8C6A2E;--acc-crane:#9A5A1E;
   --acc-safety:#9E3F2B;--acc-pour:#8A3C6B;--acc-log:#3F6B46;--acc:var(--gold);
   --acc-jobs:#2B5F8C;--acc-photos:#3F6B46;--acc-delays:#7A4FA3;--acc-carry:#8A6246;--acc-prestart:#3D4F99;
   --ok-bg:#DDE7DC;--warn-bg:#F0E4C9;--crit-bg:#F2DDD6;
-  --inverse-bg:#3A3835;--inverse-fg:#F2EDE4;--on-gold:#FBF8F3;
+  --inverse-bg:#2D3221;--inverse-fg:#F2EDE4;--on-gold:#FBF8F3;
   --tint:14%;--tint-bd:38%;
   --f-ui:'Archivo','Helvetica Neue',Arial,sans-serif;
   --f-cond:'Archivo Narrow',Arial Narrow,Arial,sans-serif;
@@ -412,29 +412,29 @@ window.eliseAuth = {
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --paper:#1A1917;--surface:#232220;--surface-2:#2D2B27;
-    --ink:#EDE8DE;--ink-2:#BBB3A6;--ink-3:#978F82;
-    --line:#35322D;--line-hard:#4A463F;--gold:#C3AC82;
-    --ok:#8FBF93;--warn:#DDB45F;--crit:#E08A72;--clock:#46BCCE;--alarm:#FF4A3A;
+    --paper:#23271A;--surface:#2D3221;--surface-2:#383E2B;
+    --ink:#E8E2D8;--ink-2:#C6C7B9;--ink-3:#9EA090;
+    --line:#3E4431;--line-hard:#575D47;--gold:#D4C6A6;
+    --ok:#8FBF93;--warn:#DDB45F;--crit:#E08A72;--clock:#DCCAA2;--alarm:#FF4A3A;
     --acc-today:#46BCCE;--acc-labour:#D7AE63;--acc-crane:#E09A5C;
     --acc-safety:#E08A72;--acc-pour:#D78FC0;--acc-log:#8FBF93;
     --acc-jobs:#7FB4E0;--acc-photos:#8FBF93;--acc-delays:#BE9BE6;--acc-carry:#CBA489;--acc-prestart:#8FA2F0;
     --ok-bg:#243024;--warn-bg:#33260D;--crit-bg:#3A221B;
-    --inverse-bg:#D8D2C7;--inverse-fg:#1A1917;--on-gold:#1A1917;
+    --inverse-bg:#E8E2D8;--inverse-fg:#23271A;--on-gold:#23271A;
     --tint:26%;--tint-bd:52%;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#1A1917;--surface:#232220;--surface-2:#2D2B27;
-  --ink:#EDE8DE;--ink-2:#BBB3A6;--ink-3:#978F82;
-  --line:#35322D;--line-hard:#4A463F;--gold:#C3AC82;
-  --ok:#8FBF93;--warn:#DDB45F;--crit:#E08A72;--clock:#46BCCE;--alarm:#FF4A3A;
+  --paper:#23271A;--surface:#2D3221;--surface-2:#383E2B;
+  --ink:#E8E2D8;--ink-2:#C6C7B9;--ink-3:#9EA090;
+  --line:#3E4431;--line-hard:#575D47;--gold:#D4C6A6;
+  --ok:#8FBF93;--warn:#DDB45F;--crit:#E08A72;--clock:#DCCAA2;--alarm:#FF4A3A;
   --acc-today:#46BCCE;--acc-labour:#D7AE63;--acc-crane:#E09A5C;
   --acc-safety:#E08A72;--acc-pour:#D78FC0;--acc-log:#8FBF93;
   --acc-jobs:#7FB4E0;--acc-photos:#8FBF93;--acc-delays:#BE9BE6;--acc-carry:#CBA489;--acc-prestart:#8FA2F0;
   --ok-bg:#243024;--warn-bg:#33260D;--crit-bg:#3A221B;
-  --inverse-bg:#D8D2C7;--inverse-fg:#1A1917;--on-gold:#1A1917;
+  --inverse-bg:#E8E2D8;--inverse-fg:#23271A;--on-gold:#23271A;
   --tint:26%;--tint-bd:52%;
   color-scheme:dark;
 }
@@ -1048,10 +1048,10 @@ footer{padding-block:18px;border-top:1px solid var(--line);margin-top:10px;font-
 #cbapp .top{top:calc(env(safe-area-inset-top,0px) + 73px)}
 #cbapp{display:block;margin:0 calc(-1 * var(--gut-r)) 0 calc(-1 * var(--gut-l))}
 #cbapp{
-  --bg:#EDE8DE; --panel:#F8F5EF; --panel-2:#FFFFFF;
-  --ink:#2E2C29; --ink-2:#5C564D; --ink-3:#7A7366;
-  --rule:#D8D1C3; --rule-soft:#E5DFD3;
-  --gold:#8C7B60; --gold-soft:#E3D9C7; --gold-ink:#6A5B42;
+  --bg:#E8E2D8; --panel:#F5F1EA; --panel-2:#FFFFFF;
+  --ink:#2D3221; --ink-2:#4E5340; --ink-3:#717462;
+  --rule:#D2CBBC; --rule-soft:#DFD9CD;
+  --gold:#6F6A4C; --gold-soft:#DCD5C2; --gold-ink:#545038;
   --ok:#2E7D4F; --ok-soft:#DCEFE2; --crit:#A32B22; --crit-soft:#F6DEDB;
   --brk:#B32218; --brk-soft:#F7D9D6;
   --shadow:0 1px 2px rgba(46,44,41,.12);
@@ -1059,20 +1059,20 @@ footer{padding-block:18px;border-top:1px solid var(--line);margin-top:10px;font-
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #cbapp{
-  --bg:#211F1C; --panel:#2A2825; --panel-2:#333029;
-  --ink:#EDE8DE; --ink-2:#BBB3A6; --ink-3:#978F82;
-  --rule:#3C3934; --rule-soft:#33302B;
-  --gold:#C7AD83; --gold-soft:#443B2C; --gold-ink:#DFC99F;
+  --bg:#23271A; --panel:#2D3221; --panel-2:#383E2B;
+  --ink:#E8E2D8; --ink-2:#C6C7B9; --ink-3:#9EA090;
+  --rule:#444A36; --rule-soft:#383E2B;
+  --gold:#D4C6A6; --gold-soft:#454A34; --gold-ink:#E3D6B8;
   --ok:#6FBE8C; --ok-soft:#1F3A2A; --crit:#E07065; --crit-soft:#43241F;
   --brk:#C8392E; --brk-soft:#4A1F1B;
   --shadow:0 1px 2px rgba(0,0,0,.4);
   color-scheme:dark;
 }}
 :root[data-theme="dark"] #cbapp{
-  --bg:#211F1C; --panel:#2A2825; --panel-2:#333029;
-  --ink:#EDE8DE; --ink-2:#BBB3A6; --ink-3:#978F82;
-  --rule:#3C3934; --rule-soft:#33302B;
-  --gold:#C7AD83; --gold-soft:#443B2C; --gold-ink:#DFC99F;
+  --bg:#23271A; --panel:#2D3221; --panel-2:#383E2B;
+  --ink:#E8E2D8; --ink-2:#C6C7B9; --ink-3:#9EA090;
+  --rule:#444A36; --rule-soft:#383E2B;
+  --gold:#D4C6A6; --gold-soft:#454A34; --gold-ink:#E3D6B8;
   --ok:#6FBE8C; --ok-soft:#1F3A2A; --crit:#E07065; --crit-soft:#43241F;
   --brk:#C8392E; --brk-soft:#4A1F1B;
   --shadow:0 1px 2px rgba(0,0,0,.4);
@@ -1927,7 +1927,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>

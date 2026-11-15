@@ -13,13 +13,13 @@ HTML = r"""<!doctype html>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Labour">
-<meta name="theme-color" content="#111110">
+<meta name="theme-color" content="#23271A">
 <meta name="robots" content="noindex,nofollow">
 <title>ELISE Jobs</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23141312'/><rect x='17' y='15' width='30' height='9' rx='2.5' fill='%23F2EDE4'/><rect x='17' y='27.5' width='23' height='9' rx='2.5' fill='%232FD44A'/><rect x='17' y='40' width='30' height='9' rx='2.5' fill='%23F2EDE4'/></svg>">
 <style>
-:root{--bg:#1B1A18;--card:#232120;--rule:#35322E;--ink:#F2EDE4;--ink2:#BBB3A6;
-  --ink3:#978F82;--accent:#46BCCE;--go:#2FD44A;--pri:#E0A33C;--stop:#FF6B6B}
+:root{--bg:#23271A;--card:#2D3221;--rule:#3E4431;--ink:#E8E2D8;--ink2:#C6C7B9;
+  --ink3:#9EA090;--accent:#DCCAA2;--go:#2FD44A;--pri:#E0A33C;--stop:#FF6B6B}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
@@ -238,8 +238,8 @@ label.btn{display:inline-flex;align-items:center;justify-content:center}
   overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .offscreen:focus-visible + label.btn{outline:2px solid var(--accent);outline-offset:2px}
 .msg{font-size:12.5px;color:var(--stop);margin-top:8px;min-height:16px}
-@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#F7F4EE;--card:#FFF;
-  --rule:#DED7C9;--ink:#1F1D1A;--ink2:#55504A;--ink3:#77706A;--stop:#B3261E}}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#E8E2D8;--card:#F5F1EA;
+  --rule:#D2CBBC;--ink:#2D3221;--ink2:#4E5340;--ink3:#717462;--stop:#B3261E;--accent:#2D3221}}
 
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
