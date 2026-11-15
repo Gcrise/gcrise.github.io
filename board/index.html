@@ -612,6 +612,24 @@ button,input,select{font:inherit;color:inherit}
   border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.55);color:#fff;font-size:24px;
   line-height:1;cursor:pointer;display:none}
 .cambox.camfull .camclose,.cambox:fullscreen .camclose{display:block}
+/* Eufy: one tile per camera - Eufy has no public feed, so each tile opens
+   the camera in Eufy's own web viewer or app, where you are signed in */
+a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
+.eufygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:12px 14px 14px}
+.eufycam{display:flex;flex-direction:column;border:1px solid var(--line-hard);border-radius:6px;overflow:hidden;background:var(--surface-2)}
+.eufycam .eh{display:flex;align-items:center;gap:10px;padding:14px 14px 10px}
+.eufycam .eico{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line-hard);color:var(--clock)}
+.eufycam .eico svg{width:20px;height:20px}
+.eufycam .en{font-family:var(--f-cond);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.eufycam .ea{font-size:11.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.eufycam .ep{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;color:var(--ink-3);padding:0 14px 10px;text-transform:uppercase;letter-spacing:.06em}
+.eufycam .ep span{border:1px solid var(--line);border-radius:10px;padding:2px 8px}
+.eufycam .eb{display:flex;border-top:1px solid var(--line);margin-top:auto}
+.eufycam .eb a{flex:1;text-align:center;padding:11px 6px;font-family:var(--f-cond);font-size:12.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink);text-decoration:none}
+.eufycam .eb a+a{border-left:1px solid var(--line)}
+.eufycam .eb a:first-child{color:var(--clock)}
 .camgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 14px 4px}
 @media (max-width:820px){ .camgrid{grid-template-columns:1fr;gap:12px} }
 .camcol{min-width:0}
@@ -1530,7 +1548,8 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
   <span class="mm-lab">Open</span>
   <a class="mm-it" id="lnkJobs" href="../jobs/" target="_blank" rel="noopener" role="menuitem"><span>Labour</span><i>&#8599;</i></a>
   <a class="mm-it" id="lnkLifts" href="../lifts/" target="_blank" rel="noopener" role="menuitem"><span>Lifts &amp; deliveries</span><i>&#8599;</i></a>
-  <button class="mm-it" type="button" data-go="camera" role="menuitem"><span>Live view</span><i>&rsaquo;</i></button>
+  <button class="mm-it" type="button" data-go="eufy" role="menuitem"><span>Eufy cameras</span></button>
+      <button class="mm-it" type="button" data-go="camera" role="menuitem"><span>Live view</span><i>&rsaquo;</i></button>
   <span class="mm-lab">Print</span>
   <button class="mm-it" type="button" id="pdfBtn" data-pdf="all" role="menuitem"><span>Site prestart</span><i>PDF</i></button>
   <button class="mm-it" type="button" data-pdf="team" role="menuitem"><span>Team prestart</span><i>PDF</i></button>
@@ -1934,6 +1953,15 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
   </div>
 </section>
 
+<section id="v-eufy" class="view" hidden>
+  <div class="panel">
+    <div class="phead" data-acc="camera"><h2>Eufy cameras</h2><span class="meta" id="eufyMeta"></span>
+      <span class="right"><a class="mini" href="https://mysecurity.eufylife.com/" target="_blank" rel="noopener">Eufy web</a></span>
+    </div>
+    <div class="eufygrid" id="eufyGrid"></div>
+  </div>
+</section>
+
 <section id="v-camera" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="camera"><h2>Live view</h2><span class="meta">myTikee &middot; ELISE deck</span>
@@ -1967,7 +1995,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 15:58</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 16:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4237,7 +4265,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["prestart","Prestart / Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
+var VIEWS=[["today","Today"],["prestart","Prestart / Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["weather","Weather"],["camera","Live view"],["eufy","Eufy"],["log","Completed works"]];
 var CUT=1260;      /* one cut a day, 9pm */
 var ROLLOVER=990;  /* 4:30pm - after knock-off you are planning tomorrow */
 /* the day the board opens on: today until 4:30pm, tomorrow after it */
@@ -4303,8 +4331,9 @@ function go(v){
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
   if(el("v-safety")) el("v-safety").hidden = v!=="prestart";
-  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera");
+  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy");
   if(v==="camera")camOpen();
+  if(v==="eufy")renderEufy();
   if(v==="crane"&&window.__cbRail)setTimeout(window.__cbRail,30);
   renderTabs();
   window.scrollTo(0,0);
@@ -7245,6 +7274,23 @@ if(el("camImg")) el("camImg").addEventListener("click",function(e){
 document.addEventListener("visibilitychange",function(){
   if(document.visibilityState==="visible"&&el("v-camera")&&!el("v-camera").hidden) camLiveLoad();
 });
+/* the site's Eufy cameras - add a line here for each new camera */
+var EUFY_CAMS=[
+  {name:"GF Lift Entry", area:"Ground floor \u00b7 lift entry", power:"Solar battery"},
+  {name:"B1 Office",     area:"Basement 1 \u00b7 office",      power:"Solar"}
+];
+function renderEufy(){
+  var g=el("eufyGrid"); if(!g) return;
+  var CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h11a2 2 0 0 1 2 2v1l3-2v6l-3-2v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"/><circle cx="9" cy="12" r="2"/></svg>';
+  g.innerHTML=EUFY_CAMS.map(function(c){
+    return '<div class="eufycam"><div class="eh"><span class="eico">'+CAM+'</span><div><div class="en">'+esc(c.name)+'</div>'+
+      '<div class="ea">'+esc(c.area)+'</div></div></div>'+
+      '<div class="ep"><span>'+esc(c.power)+'</span><span>Wi-Fi</span></div>'+
+      '<div class="eb"><a href="https://mysecurity.eufylife.com/" target="_blank" rel="noopener">Watch live</a>'+
+      '<a href="https://apps.apple.com/app/id1424956516" target="_blank" rel="noopener">Eufy app</a></div></div>';
+  }).join("");
+  if(el("eufyMeta")) el("eufyMeta").textContent=EUFY_CAMS.length+" camera"+(EUFY_CAMS.length===1?"":"s");
+}
 function camOpen(){
   camLiveLoad();
   if(!camTimer) camTimer=setInterval(function(){
