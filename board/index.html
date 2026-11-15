@@ -624,13 +624,20 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .eufytiles .eslot{position:relative;overflow:hidden;background:#fff;min-width:0;min-height:0}
 .cambox.eufybox .eufytiles iframe{position:absolute;left:0;top:0;width:1280px;height:800px;min-height:0;border:0;background:#fff;display:block;transform-origin:0 0}
 .eufytiles .eslot[hidden]{display:none}
+.eufytiles .eslot{background:#F2F2F2}
+/* tap the corner button to blow one square up to the whole panel - to sign
+   in or pick its camera - and again to put it back in the grid */
+.eexp{position:absolute;z-index:2;top:6px;right:6px;width:30px;height:30px;border-radius:50%;border:0;
+  background:rgba(0,0,0,.55);color:#fff;font-size:16px;line-height:30px;cursor:pointer;padding:0}
+.eufytiles:not(.g4) .eexp{display:none}
+.eufytiles.g4.focus{grid-template-columns:1fr;grid-template-rows:1fr}
+.eufytiles.g4.focus .eslot:not(.big){display:none}
 .eufysw{display:inline-flex;flex:none;margin-left:auto;border:1px solid var(--line-hard);border-radius:4px;overflow:hidden}
 .eufysw button{appearance:none;border:0;background:transparent;color:var(--ink-2);font-family:var(--f-cond);font-size:11px;font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;cursor:pointer}
 .eufysw button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .eufyhd .eufysw+.mini{margin-left:6px}
-#eufyReload{margin-left:auto}
-#eufyReload+.eufysw{margin-left:6px}
+
 .cambox.eufybox.camfull{margin:0!important}
 .eufygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:12px 14px 14px}
 .eufycam{display:flex;flex-direction:column;border:1px solid var(--line-hard);border-radius:6px;overflow:hidden;background:var(--surface-2)}
@@ -1976,12 +1983,11 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <span class="right"><a class="mini" href="https://mysecurity.eufylife.com/" target="_blank" rel="noopener">Eufy web</a></span>
     </div>
     <div class="camhd eufyhd"><b>Live</b><span>Eufy's own viewer</span>
-      <button class="mini" type="button" id="eufyReload" title="Reload the viewers - after signing in once, the other squares pick it up">Refresh</button>
       <div class="eufysw" role="group" aria-label="Layout"><button type="button" data-eufylay="1" aria-pressed="true">Single</button><button type="button" data-eufylay="4" aria-pressed="false">Grid</button></div>
       <button class="mini" type="button" data-camfull="eufyBox">Full screen</button></div>
     <p class="eufyphone" id="eufyPhone" hidden>Eufy only plays video in its web viewer on a computer &mdash; the live view is here on the office PC or the site TV. On a phone, use the <a href="https://apps.apple.com/app/id1424956516" target="_blank" rel="noopener">Eufy app</a>. <button class="mini" type="button" id="eufyTry">Try on this phone</button></p>
     <div class="cambox eufybox" id="eufyBox">
-      <div class="eufytiles" id="eufyTiles"><div class="eslot"><iframe id="eufyFrame" title="Eufy live view" allow="fullscreen; autoplay" allowfullscreen></iframe></div></div>
+      <div class="eufytiles" id="eufyTiles"><div class="eslot"><button type="button" class="eexp" aria-label="Make this square big">&#x2922;</button><iframe id="eufyFrame" title="Eufy live view" allow="fullscreen; autoplay" allowfullscreen></iframe></div></div>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
     </div>
   </div>
@@ -2020,7 +2026,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 20:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 20:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7415,9 +7421,11 @@ function eufyFit(){
   Array.prototype.forEach.call(document.querySelectorAll("#eufyTiles .eslot:not([hidden])"),function(sl){
     var f=sl.querySelector("iframe"); if(!f) return;
     var W=sl.clientWidth, H=sl.clientHeight; if(!W||!H) return;
-    var vw=1280, vh=Math.max(560,Math.round(vw*H/W));
-    var k=W/vw;
-    f.style.width=vw+"px"; f.style.height=vh+"px"; f.style.transform="scale("+k+")";
+    /* the whole Eufy page always fits in the square - login button included */
+    var vw=1280, vh=800, k=Math.min(W/vw,H/vh);
+    f.style.width=vw+"px"; f.style.height=vh+"px";
+    f.style.left=Math.round((W-vw*k)/2)+"px"; f.style.top=Math.round((H-vh*k)/2)+"px";
+    f.style.transform="scale("+k+")";
   });
 }
 window.addEventListener("resize",function(){ clearTimeout(window.__ef); window.__ef=setTimeout(eufyFit,120); });
@@ -7429,6 +7437,7 @@ function eufyLayout(n){
   var want=n==="4"?4:1, have=box.querySelectorAll(".eslot");
   for(var i=have.length;i<want;i++){
     var sl=document.createElement("div"); sl.className="eslot";
+    sl.innerHTML='<button type="button" class="eexp" aria-label="Make this square big">&#x2922;</button>';
     var f=document.createElement("iframe"); f.title="Eufy live view "+(i+1);
     f.setAttribute("allow","fullscreen; autoplay"); f.setAttribute("allowfullscreen","");
     sl.appendChild(f); box.appendChild(sl);
@@ -7445,6 +7454,11 @@ function eufyLayout(n){
     b.setAttribute("aria-pressed",b.getAttribute("data-eufylay")===n?"true":"false");});
 }
 document.addEventListener("click",function(e){
+  var x=e.target.closest&&e.target.closest(".eexp");
+  if(x){ var sl=x.parentNode, box=el("eufyTiles"), on=!sl.classList.contains("big");
+    Array.prototype.forEach.call(box.querySelectorAll(".eslot"),function(o){o.classList.remove("big");});
+    sl.classList.toggle("big",on); box.classList.toggle("focus",on);
+    x.innerHTML=on?"&#x2715;":"&#x2922;"; setTimeout(eufyFit,30); return; }
   var b=e.target.closest&&e.target.closest("[data-eufylay]"); if(b) eufyLayout(b.getAttribute("data-eufylay"));
   if(e.target&&e.target.id==="eufyReload"){
     /* the squares share one Eufy sign-in: sign in in any one, then Refresh
