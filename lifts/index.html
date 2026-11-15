@@ -360,9 +360,9 @@ function group(key,title,rows,note,withBreaks){
        times with the break sitting where the hook stops, which is what the
        printed run sheet does. */
     var brks=breaksFor(rows), events=[];
-    rows.forEach(function(r){
-      expand(r, brks).forEach(function(p){ events.push({t:p.start, r:r, p:p}); });
-    });
+    /* one line per booking, the same as the main board - a two-lift run is
+       one line saying "2 lifts", not a line per lift */
+    rows.forEach(function(r){ events.push({t:+r.start_min, r:r, p:null}); });
     brks.forEach(function(b){ events.push({t:b[0], brk:b}); });
     events.sort(function(a,b){
       if(a.t!==b.t) return a.t-b.t;
