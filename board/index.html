@@ -795,7 +795,22 @@ input,textarea,select,option{text-transform:none}
 #v-prestart .addrow{padding:6px 12px;gap:6px}
 #v-prestart .addrow textarea{min-height:0;padding:5px 8px;line-height:1.35}
 #v-prestart .addrow input{padding:5px 8px}
-#v-prestart .subhead{padding-top:6px;padding-bottom:6px}
+/* Prestart / Safety: every subheading underlined, the same rule all the way down */
+#v-prestart .subhead,#v-safety .subhead{padding:12px 14px 6px;margin:0 14px;padding-left:0;padding-right:0;
+  border-top:0;border-bottom:2px solid var(--clock);font-size:12px;color:var(--ink)}
+#v-prestart .subhead,#v-safety .subhead,#v-prestart .phead h2,#v-safety .phead h2{color:var(--clock)!important}
+#v-prestart .phead,#v-safety .phead{--acc:var(--clock)!important}
+#v-prestart .subhead > span:first-child,#v-safety .subhead > span:first-child{color:var(--clock)!important}
+#v-prestart .phead h2::before,#v-safety .phead h2::before{background:var(--clock)!important}
+#v-prestart .subhead span:last-child:not(:first-child),#v-safety .subhead > span:not(:first-child){color:var(--ink-3);font-size:10.5px}
+#v-prestart .addrow,#v-safety .addrow{background:transparent;border:0;padding:8px 14px}
+#v-prestart .srow,#v-safety .srow{padding:6px 14px}
+#v-prestart #preSafeList .srow{padding:4px 14px 4px 28px;position:relative}
+#v-prestart #preSafeList .srow::before{content:"";position:absolute;left:16px;top:12px;width:5px;height:5px;border-radius:50%;background:var(--ink-3)}
+#v-prestart #preSafeList .srow .tx{font-size:12.5px;line-height:1.35}
+#v-prestart #preSafeList .srow+.srow{border-top:0}
+#v-prestart .prenote{border-bottom:0;padding:2px 14px 4px;font-size:11px;text-transform:none}
+#v-prestart .empty{padding:8px 14px}
 #v-prestart .srow{padding-top:5px;padding-bottom:5px}
 #v-prestart .empty{margin:0;padding:4px 14px 8px;font-size:12px;text-align:left}
 #v-prestart .empty b{display:inline;margin:0 6px 0 0}
@@ -1942,7 +1957,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 13:25</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 13:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
