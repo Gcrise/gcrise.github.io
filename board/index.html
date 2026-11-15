@@ -614,7 +614,9 @@ button,input,select{font:inherit;color:inherit}
 .camhd b{font-family:var(--f-cond);font-size:13px;letter-spacing:.11em;text-transform:uppercase}
 .camhd span{font-size:11.5px;color:var(--ink-3);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .camhd .mini{margin-left:auto}
-.camcol .cambox{margin-top:6px;max-height:none}
+.camcol .cambox{margin-top:6px;max-height:none;min-height:0;background:transparent;border:0;border-radius:3px}
+.camcol .cambox:not(.live){aspect-ratio:900/324}
+#camOpenLink,#camOpenLink:visited{color:var(--ink-2)}
 .cambox.live{aspect-ratio:7360/2650}
 .camlive{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:center}
 .camlive img{display:block;width:100%;height:100%;object-fit:contain;cursor:zoom-in}
@@ -726,7 +728,9 @@ input,textarea,select,option{text-transform:none}
 .sub2{border-top-color:var(--line)}
 .jobcols{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;align-items:start}
 .jobcol{min-width:0}
-.jobcols.paired{align-items:stretch}
+.jobcols.paired{align-items:stretch;position:relative}
+/* a line down the middle between priority and non-priority */
+.jobcols.paired::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--line-hard);transform:translateX(-.5px);pointer-events:none}
 .jobcols.paired > *{min-width:0}
 .jobcols.paired .jgap{border-top:1px solid var(--line)}
 .jobcols.paired .item{align-content:space-between}
@@ -1938,7 +1942,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 13:25</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
