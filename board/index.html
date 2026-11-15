@@ -787,6 +787,10 @@ input,textarea,select,option{text-transform:none}
 .joblist .jgroup .item{padding-left:12px;padding-right:4px}
 .joblist .jgroup .item.pri{box-shadow:none;border-left:0}
 .joblist .jgroup .item:first-child{border-top:0}
+.joblist .jfold{cursor:pointer;user-select:none}
+.joblist .jfold .chev{font-style:normal;margin-left:8px;display:inline-block;transition:transform .15s;color:var(--ink-3)}
+.joblist .jfold.shut .chev{transform:rotate(-90deg)}
+.joblist .jgroup[hidden]{display:none}
 .item.hasph{flex-wrap:wrap}
 .jthumbs{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 2px 52px}
 .jthumbs img.closeph{border-color:#6FBF73;border-width:2px}
@@ -2040,7 +2044,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 08:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 08:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5613,11 +5617,17 @@ function renderJobs(){
   });
   /* Priority and Non-priority side by side, so both lists are in view at once */
   /* one full-width list per group, the same layout as the crew's job sheet */
+  /* each group folds under its heading - tap the heading; remembered */
+  var JF={}; try{ JF=JSON.parse(localStorage.getItem("elise.board.jfold")||"{}")||{}; }catch(e){}
+  function fh(key,label,n,cls){
+    return '<div class="subhead sub2 jfold'+(cls?" "+cls:"")+(JF[key]?" shut":"")+'" data-jfold="'+key+'" role="button" tabindex="0">'+
+      '<span>'+label+'</span><span>'+(n||"")+'<i class="chev">&#9662;</i></span></div>';
+  }
   var html='<div class="joblist">'+
-    '<div class="subhead sub2 jpri"><span>Priority</span><span>'+(pri.length||"")+'</span></div>'+
-    '<div class="jgroup jg-pri">'+(pri.length?pri.join(""):'<div class="nojobs">Nothing marked priority. Hit the star on anything that has to happen today.</div>')+'</div>'+
-    '<div class="subhead sub2"><span>Non-priority</span><span>'+(rest.length||"")+'</span></div>'+
-    '<div class="jgroup jg-rest">'+(rest.length?rest.join(""):'<div class="nojobs">Nothing else listed.</div>')+'</div>'+
+    fh("pri","Priority",pri.length,"jpri")+
+    '<div class="jgroup jg-pri"'+(JF.pri?' hidden':'')+'>'+(pri.length?pri.join(""):'<div class="nojobs">Nothing marked priority. Hit the star on anything that has to happen today.</div>')+'</div>'+
+    fh("rest","Non-priority",rest.length,"")+
+    '<div class="jgroup jg-rest"'+(JF.rest?' hidden':'')+'>'+(rest.length?rest.join(""):'<div class="nojobs">Nothing else listed.</div>')+'</div>'+
     '</div>';
   el("jobs").innerHTML=html;
   var dbox=el("jobsDone");
@@ -7959,6 +7969,14 @@ document.addEventListener("click",function(e){
   document.addEventListener("touchcancel",function(){ if(x0!=null){x0=null;setX(0,true);} },{passive:true});
 })();
 
+document.addEventListener("click",function(e){
+  var h=e.target.closest&&e.target.closest("[data-jfold]"); if(!h) return;
+  var k=h.getAttribute("data-jfold"), JF={};
+  try{ JF=JSON.parse(localStorage.getItem("elise.board.jfold")||"{}")||{}; }catch(_){}
+  JF[k]=!JF[k]; try{ localStorage.setItem("elise.board.jfold",JSON.stringify(JF)); }catch(_){}
+  h.classList.toggle("shut",JF[k]);
+  var b=h.nextElementSibling; if(b) b.hidden=JF[k];
+});
 function renderNowStrip(){
   var el0=el("nowStrip");if(!el0)return;
   var p=stripPick();state.strip=p;

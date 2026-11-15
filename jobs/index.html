@@ -262,6 +262,12 @@ label.btn{display:inline-flex;align-items:center;justify-content:center}
 .jobrow > .job{flex:1 1 0}
 .jphs{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap;padding:0 0 10px 34px}
 .jphs img{width:72px;height:54px;object-fit:cover;border-radius:4px;border:1px solid var(--rule);display:block}
+.sec.fold{cursor:pointer;user-select:none}
+.sec.fold .chev{margin-left:auto;font-size:13px;color:var(--ink3);transition:transform .15s}
+.sec.fold .hint+.chev{margin-left:10px}
+.sec.fold.shut .chev{transform:rotate(-90deg)}
+.sec.fold.shut{opacity:.85}
+.foldbody[hidden]{display:none}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 </style>
@@ -577,6 +583,24 @@ function sec(cls,title,count,hint){
     '<span class="n">'+count+'</span>'+
     (hint?'<span class="hint">'+esc(hint)+'</span>':'')+'</div>';
 }
+/* each list folds up under its heading - tap the heading. Remembered on this
+   phone; Completed starts folded so the open work is what you see first */
+var FOLD={"Completed":true};
+try{ var fz=JSON.parse(localStorage.getItem("elise.jobs.fold")||"null"); if(fz) FOLD=fz; }catch(e){}
+function fsec(cls,title,count,hint,body){
+  var shut=!!FOLD[title];
+  return '<div class="sec fold'+(cls?" "+cls:"")+(shut?" shut":"")+'" data-fold="'+esc(title)+'" role="button" tabindex="0" aria-expanded="'+(!shut)+'">'+
+    '<h2>'+esc(title)+'</h2><span class="n">'+count+'</span>'+
+    (hint?'<span class="hint">'+esc(hint)+'</span>':'')+'<span class="chev">&#9662;</span></div>'+
+    '<div class="foldbody"'+(shut?' hidden':'')+'>'+body+'</div>';
+}
+document.addEventListener("click",function(e){
+  var h=e.target.closest&&e.target.closest("[data-fold]"); if(!h) return;
+  var t=h.getAttribute("data-fold"); FOLD[t]=!FOLD[t];
+  try{ localStorage.setItem("elise.jobs.fold",JSON.stringify(FOLD)); }catch(_){}
+  h.classList.toggle("shut",FOLD[t]); h.setAttribute("aria-expanded",String(!FOLD[t]));
+  var b=h.nextElementSibling; if(b&&b.classList.contains("foldbody")) b.hidden=FOLD[t];
+});
 
 function render(){
   paintMe();
@@ -591,16 +615,16 @@ function render(){
   var html="";
 
   /* every list laid out the same as Daily: full width, one job a line */
-  if(pri.length)  html += sec("pri","Priority",pri.length)+'<div class="dwrap pwrap">'+pri.map(jobRow).join("")+'</div>';
-  if(todo.length) html += sec("","Non-priority",todo.length)+'<div class="dwrap nwrap">'+todo.map(jobRow).join("")+'</div>';
+  if(pri.length)  html += fsec("pri","Priority",pri.length,"",'<div class="dwrap pwrap">'+pri.map(jobRow).join("")+'</div>');
+  if(todo.length) html += fsec("","Non-priority",todo.length,"",'<div class="dwrap nwrap">'+todo.map(jobRow).join("")+'</div>');
 
   /* Then the daily run-through, which is the same every morning. */
   if(dl.length){
-    html += sec("daily","Daily", dDone+" of "+dl.length, (daily&&daily.note)||"") +
-            '<div class="dwrap">'+dl.map(jobRow).join("")+'</div>';
+    html += fsec("daily","Daily", dDone+" of "+dl.length, (daily&&daily.note)||"",
+            '<div class="dwrap">'+dl.map(jobRow).join("")+'</div>');
   }
 
-  if(done.length) html += sec("","Completed",done.length) + done.map(jobRow).join("");
+  if(done.length) html += fsec("","Completed",done.length,"",done.map(jobRow).join(""));
 
   if(!mine.length && !dl.length){
     html = '<div class="empty"><b>Nothing on the list</b>No jobs for this day yet. '+
