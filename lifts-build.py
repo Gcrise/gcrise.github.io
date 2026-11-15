@@ -329,10 +329,11 @@ function chipTxt(r){ return r.co2 ? r.co+"/"+r.co2 : r.co; }
 function rowHtml(r, piece){
   var qty=(+r.qty||0), kg=(+r.kg||0), tr=trade(r.co), bits=[];
   var boom = r.kind==="BOOM";
-  var one  = piece && piece.n > 0;                 // one lift of a run
-  var head = !piece || piece.n <= 1;               // carries the description
+  var whole= piece && piece.whole;                 // the full booking, start to finish
+  var one  = piece && !whole && piece.n > 0;       // one lift of a run
+  var head = !piece || whole || piece.n <= 1;      // carries the description
 
-  if(!one && r.type==="lift" && qty>1) bits.push(qty+" lifts");
+  if(!one && r.type==="lift" && !boom){ var nl=Math.max(1,qty); bits.push(nl+(nl===1?" lift":" lifts")); }
   if(kg) bits.push(kg>=1000?(Math.round(kg/100)/10)+"t":kg+"kg");
   if(r.from_loc||r.to_loc) bits.push((r.from_loc||"?")+" → "+(r.to_loc||"?"));
   bits.push(tr.name);
@@ -351,7 +352,7 @@ function rowHtml(r, piece){
     : '<div class="d"><span class="of">LIFT '+piece.n+' OF '+piece.of+'</span></div>';
 
   return '<div class="row'+(r.type==="del"?" del":"")+(head?"":" cont")+'">'+
-    '<div class="t">'+hhmm(start)+'<small>'+mins+' min</small></div>'+
+    '<div class="t">'+hhmm(start)+'<small>'+(whole?("to "+hhmm(piece.end)):(mins+' min'))+'</small></div>'+
     '<div>'+(head?'<span class="co" style="background:'+esc(chipBg(r))+'">'+esc(chipTxt(r))+'</span>':'')+'</div>'+
     '<div>'+body+'</div></div>';
 }
@@ -367,7 +368,12 @@ function group(key,title,rows,note,withBreaks){
     var brks=breaksFor(rows), events=[];
     /* one line per booking, the same as the main board - a two-lift run is
        one line saying "2 lifts", not a line per lift */
-    rows.forEach(function(r){ events.push({t:+r.start_min, r:r, p:null}); });
+    rows.forEach(function(r){
+      /* finish time: the end of the last lift, stepping over the breaks */
+      var pcs=expand(r, brks), fin=pcs.length?pcs[pcs.length-1].end:(+r.start_min+(+r.dur||0));
+      if(pcs.length===1) fin=+r.start_min+(+r.dur||0);
+      events.push({t:+r.start_min, r:r, p:{whole:true,start:+r.start_min,end:fin}});
+    });
     brks.forEach(function(b){ events.push({t:b[0], brk:b}); });
     events.sort(function(a,b){
       if(a.t!==b.t) return a.t-b.t;
