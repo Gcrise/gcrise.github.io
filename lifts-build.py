@@ -6,7 +6,7 @@ SB_URL = sys.argv[1].rstrip("/"); SB_KEY = sys.argv[2].strip()
 HTML = r"""<!doctype html>
 <html lang="en-AU"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <link rel="apple-touch-icon" href="icon-180.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
