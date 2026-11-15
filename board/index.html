@@ -557,7 +557,7 @@ button,input,select{font:inherit;color:inherit}
 .tab b{font-family:var(--f-num);font-size:10px;font-weight:500;background:#8884;border-radius:8px;padding:1px 5px;letter-spacing:0}
 .tab b.alert{background:var(--crit);color:#fff}
 
-.daystrip{position:sticky;top:calc(env(safe-area-inset-top,0px) + 73px);z-index:40;background:var(--surface);border-bottom:1px solid var(--line)}
+.daystrip{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--mastH,73px));z-index:40;background:var(--surface);border-bottom:1px solid var(--line)}
 .daystrip-in{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:9px}
 .navbtn{background:var(--surface-2);border:1px solid var(--line-hard);border-radius:3px;width:30px;height:30px;cursor:pointer;font-size:15px;line-height:1}
 .navbtn:hover{background:var(--line)}
@@ -1006,7 +1006,7 @@ footer{padding-block:18px;border-top:1px solid var(--line);margin-top:10px;font-
   .tab{font-size:12px;padding:6px 10px 5px;letter-spacing:.07em}
   .tabs{scroll-snap-type:x proximity}
   .tab{scroll-snap-align:start}
-  .daystrip{top:calc(env(safe-area-inset-top,0px) + 62px)}
+  .daystrip{top:calc(env(safe-area-inset-top,0px) + var(--mastH,62px))}
   .daystrip-in{gap:6px;padding-block:6px}
   .daylabel{font-size:14px;letter-spacing:.02em}
   .daystrip input[type=date]{font-size:12px;padding:4px 5px}
@@ -1957,7 +1957,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 13:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 13:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7549,6 +7549,42 @@ function wxSpark(){
 document.addEventListener("click",function(e){
   if(e.target.closest&&e.target.closest("[data-scrolltop]")) window.scrollTo({top:0,behavior:"smooth"});
 });
+/* the date bar sticks directly under the masthead, whatever height that is
+   today - a fixed offset left it hidden behind the taller header */
+(function(){
+  function fit(){
+    var m=document.querySelector(".mast"); if(!m) return;
+    document.documentElement.style.setProperty("--mastH",Math.round(m.getBoundingClientRect().height)+"px");
+  }
+  fit(); window.addEventListener("resize",fit);
+  window.addEventListener("load",fit);
+  if(window.ResizeObserver){ var m=document.querySelector(".mast"); if(m) new ResizeObserver(fit).observe(m); }
+})();
+
+/* swipe left or right anywhere on the page to move between tabs - except
+   where a swipe already does something (the tab bar, day chips, tables,
+   the camera, the crane rows, text boxes) */
+(function(){
+  var x0=null,y0=0,t0=0,skip=false;
+  var NOSWIPE='input,textarea,select,[contenteditable="true"],.tabs,#tabs,.scroll-x,.cambox,.camlive,#cbapp .week,#cbapp .rv,#cbapp .sheet,.sheet,.lb,.mastmenu,.ltable,.wb-chart,svg.wind';
+  document.addEventListener("touchstart",function(e){
+    if(e.touches.length!==1){x0=null;return;}
+    var t=e.target; skip=!!(t.closest&&t.closest(NOSWIPE));
+    if(document.querySelector(".cambox.camfull,.scrim:not([hidden]),.lb:not([hidden])")) skip=true;
+    x0=e.touches[0].clientX; y0=e.touches[0].clientY; t0=Date.now();
+  },{passive:true});
+  document.addEventListener("touchend",function(e){
+    if(x0==null||skip){x0=null;return;}
+    var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0; x0=null;
+    if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*2||dt>700) return;
+    var ids=VIEWS.map(function(v){return v[0];}), i=ids.indexOf(state.view);
+    var n=i+(dx<0?1:-1); if(n<0||n>=ids.length) return;
+    go(ids[n]);
+    var tab=document.querySelector('.tab[data-go="'+ids[n]+'"]');
+    if(tab&&tab.scrollIntoView) tab.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+  },{passive:true});
+})();
+
 function renderNowStrip(){
   var el0=el("nowStrip");if(!el0)return;
   var p=stripPick();state.strip=p;
