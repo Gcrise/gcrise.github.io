@@ -57,7 +57,19 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .tab[data-today="1"] b::after{content:" \2022"}
 
 /* lifts and deliveries, each foldable - a subbie usually only wants one */
-.grp{margin:20px 0 0;border-top:1px solid var(--rule)}
+.grp{margin:20px 0 0;border:1px solid var(--rule);border-radius:8px;background:var(--card);overflow:hidden}
+/* each section its own panel, with a coloured band so lifts and deliveries
+   can't be mistaken for each other at a glance */
+.grp .ghead{padding:13px 14px 11px;border-bottom:3px solid var(--gacc,var(--accent));
+  background:color-mix(in srgb,var(--gacc,var(--accent)) 9%,transparent)}
+.grp .ghead .gt{font-size:13.5px;color:var(--gacc,var(--accent))}
+.grp[data-grp="lift"]{--gacc:var(--accent)}
+.grp[data-grp="del"]{--gacc:#8FB8A8}
+:root[data-theme="light"] .grp[data-grp="del"]{--gacc:#3F6B5C}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]) .grp[data-grp="del"]{--gacc:#3F6B5C}}
+.grp .gbody{padding:0 14px}
+.grp .gbody > .brk{margin:0 -14px;padding-left:14px;padding-right:14px}
+.grp[data-open="0"] .ghead{border-bottom-color:transparent}
 .ghead{width:100%;appearance:none;background:transparent;border:none;color:inherit;
   font:inherit;cursor:pointer;display:flex;align-items:center;gap:10px;
   padding:13px 0 11px;text-align:left}
@@ -392,7 +404,7 @@ function group(key,title,rows,note,withBreaks){
         : rowHtml(e.r, e.p);
     });
   } else {
-    body=rows.map(function(r){ return rowHtml(r, null); }).join("");
+    body=rows.map(function(r){ return rowHtml(r, {whole:true,start:+r.start_min,end:+r.start_min+(+r.dur||0)}); }).join("");
   }
   return '<section class="grp" data-grp="'+key+'" data-open="'+(open_[key]?1:0)+'">'+
     '<button class="ghead" type="button" data-toggle="'+key+'" aria-expanded="'+(open_[key]?"true":"false")+'">'+
