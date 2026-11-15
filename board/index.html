@@ -594,10 +594,16 @@ button,input,select{font:inherit;color:inherit}
    pins itself over the whole window - iPhone Safari will not fullscreen a
    section of a page, only a bare video */
 .cambox:fullscreen{width:100vw;height:100vh;max-height:none;aspect-ratio:auto;border:0;border-radius:0;background:#000}
-.cambox.camfull{position:fixed;inset:0;z-index:10001;width:auto;height:auto;max-height:none;
-  aspect-ratio:auto;margin:0;border:0;border-radius:0;background:#000}
-.camclose{position:absolute;z-index:3;top:max(10px,env(safe-area-inset-top,0px));
-  right:max(10px,env(safe-area-inset-right,0px));width:40px;height:40px;border-radius:50%;
+.cambox.camfull,.camcol .cambox.camfull,.cambox.live.camfull{position:fixed;inset:0;z-index:10001;width:100vw;height:100vh;height:100dvh;max-height:none;
+  aspect-ratio:auto!important;margin:0!important;border:0;border-radius:0;background:#000}
+/* phone held upright: fill the height and swipe sideways along the panorama */
+@media (orientation:portrait){
+  .cambox.camfull .camlive:not(.zoom){display:block;overflow-x:auto;overflow-y:hidden}
+  .cambox.camfull .camlive:not(.zoom) img{height:100%;width:auto;max-width:none;object-fit:initial}
+}
+.cambox.camfull .camlive{inset:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.camclose{position:absolute;z-index:3;top:calc(10px + env(safe-area-inset-top,0px));
+  right:calc(12px + env(safe-area-inset-right,0px));width:40px;height:40px;border-radius:50%;
   border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.55);color:#fff;font-size:24px;
   line-height:1;cursor:pointer;display:none}
 .cambox.camfull .camclose,.cambox:fullscreen .camclose{display:block}
@@ -1818,29 +1824,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 </div>
 </section>
 
-<section id="v-safety" class="view" hidden>
-  <div class="panel">
-    <div class="phead" data-acc="safety"><h2>Safety</h2><span class="meta" id="safeMeta"></span>
-      <span class="right"><button class="mini" data-copy="safety">Copy</button><button class="mini" data-pdf="safety">PDF</button></span>
-    </div>
-    <div id="safeList"></div>
-    <div class="subhead" data-acc="photos"><span>Photos</span><span id="safePhotoMeta"></span>
-      <span class="right"><button class="mini" id="addSafePhoto" hidden>Camera</button>
-      <button class="mini" id="addSafePhotoLib" hidden>Upload</button>
-      <button class="mini" id="matchSafePhotos" title="Work out which safety item each photo belongs to">Match</button>
-      <button class="mini" data-copy="safetyphotos">Copy</button>
-      <button class="mini" data-pdf="safety">PDF</button></span></div>
-    <div id="safePhotos"></div>
-    <form class="addrow" id="safeForm">
-      <select id="sfKind"></select>
-      <input id="sfText" placeholder="What it is and where" autocomplete="off">
-      <button class="addbtn" type="submit">Add</button>
-    </form>
-    <div class="subhead" data-acc="safety"><span>Completed today</span><span id="safeDoneMeta"></span></div>
-    <div id="safeDone"></div>
-    <p class="note">Critical items and NCRs only. Both stay open until you close them, and carry to the next day so nothing drops off. Shoot from the camera on a row and the photo lands below, captioned with the item and cleared when you close it.</p>
-  </div>
-</section>
+
 
 </section>
 
@@ -1881,7 +1865,29 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <button class="addbtn" id="preDone" type="button">Complete prestart</button>
       <button class="mini" id="preReopen" type="button" hidden>Reopen</button>
     </div>
-    <p class="note">Deliveries and lifts come straight off the board. The safety register stays on the Safety tab.</p>
+  </div>
+</section>
+
+<section id="v-safety" class="view" hidden>
+  <div class="panel">
+    <div class="phead" data-acc="safety"><h2>Safety</h2><span class="meta" id="safeMeta"></span>
+      <span class="right"><button class="mini" data-copy="safety">Copy</button><button class="mini" data-pdf="safety">PDF</button></span>
+    </div>
+    <div id="safeList"></div>
+    <div class="subhead" data-acc="photos"><span>Photos</span><span id="safePhotoMeta"></span>
+      <span class="right"><button class="mini" id="addSafePhoto" hidden>Camera</button>
+      <button class="mini" id="addSafePhotoLib" hidden>Upload</button>
+      <button class="mini" id="matchSafePhotos" title="Work out which safety item each photo belongs to">Match</button>
+      <button class="mini" data-copy="safetyphotos">Copy</button>
+      <button class="mini" data-pdf="safety">PDF</button></span></div>
+    <div id="safePhotos"></div>
+    <form class="addrow" id="safeForm">
+      <select id="sfKind"></select>
+      <input id="sfText" placeholder="What it is and where" autocomplete="off">
+      <button class="addbtn" type="submit">Add</button>
+    </form>
+    <div class="subhead" data-acc="safety"><span>Completed today</span><span id="safeDoneMeta"></span></div>
+    <div id="safeDone"></div>
   </div>
 </section>
 
@@ -1920,7 +1926,6 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
         </div>
       </div>
     </div>
-    <p class="note">The latest photo refreshes every five minutes while this tab is open. In full screen, tap the photo to zoom in and drag to look around; tap again to fit.</p>
   </div>
 </section>
 
@@ -1933,7 +1938,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4203,7 +4208,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["prestart","Prestart"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["safety","Safety"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
+var VIEWS=[["today","Today"],["prestart","Prestart / Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
 var CUT=1260;      /* one cut a day, 9pm */
 var ROLLOVER=990;  /* 4:30pm - after knock-off you are planning tomorrow */
 /* the day the board opens on: today until 4:30pm, tomorrow after it */
@@ -4262,10 +4267,13 @@ function thumbs(list,owner,i){
 
 /* ---------- navigation ---------- */
 function go(v){
+  /* safety now sits on the prestart page */
+  if(v==="safety")v="prestart";
   if(!VIEWS.some(function(x){return x[0]===v;}))v="today";
   state.view=v;
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
+  if(el("v-safety")) el("v-safety").hidden = v!=="prestart";
   el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera");
   if(v==="camera")camOpen();
   if(v==="crane"&&window.__cbRail)setTimeout(window.__cbRail,30);
@@ -4283,6 +4291,8 @@ function tabCount(v){
   if(v==="crane"){var n=dayRows().length;return n?{n:n}:null;}
   if(v==="safety"){var s=openSafety();return s.length?{n:s.length,alert:s.some(function(i){return i.kind==="INC";})}:null;}
   if(v==="prestart"){
+    var so=openSafety();
+    if(so.length) return {n:so.length,alert:so.some(function(i){return i.kind==="INC";})};
     var pd=preDoc();
     /* signed off is the only "done" there is now, so an unsigned prestart
        shows a single flag rather than a count of boxes */
@@ -7161,6 +7171,8 @@ function camFull(on,id){
     }else{
       b.classList.add("camfull");
       document.documentElement.style.overflow="hidden";
+      /* start in the middle of the panorama */
+      setTimeout(function(){var lv=el("camLive");if(lv&&b.id==="camBox")lv.scrollLeft=(lv.scrollWidth-lv.clientWidth)/2;},60);
     }
   }else{
     if(document.fullscreenElement)document.exitFullscreen().catch(function(){});
