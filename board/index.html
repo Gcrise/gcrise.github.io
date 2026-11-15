@@ -566,6 +566,11 @@ button,input,select{font:inherit;color:inherit}
 .stripdiv{width:1px;height:17px;background:var(--line-hard);opacity:.55;flex:none}
 
 .front{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;padding-block:16px;align-items:start}
+/* crane and deliveries side by side up top; labour & jobs, then safety, full width under */
+@media (min-width:700px){
+  .front{grid-template-columns:1fr 1fr}
+  .front .k-labour,.front .k-safety{grid-column:1/-1}
+}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:4px;min-width:0;overflow:hidden}
 .cardhead{width:100%;display:flex;align-items:baseline;gap:9px;padding:11px 14px;background:none;border:none;
   border-bottom:2px solid var(--cacc,var(--line));cursor:pointer;text-align:left}
@@ -1507,11 +1512,6 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 
 <section id="v-today" class="view">
   <div class="front">
-    <div class="card k-labour">
-      <button class="cardhead" data-go="labour"><span class="t">Labour &amp; jobs</span><span class="c" id="cLabour"></span><span class="go">&rsaquo;</span></button>
-      <div class="cardbody" id="fLabour"></div>
-      <div class="cardtools"><button class="mini" data-copy="labour">Copy</button><button class="mini" data-pdf="labour">PDF</button></div>
-    </div>
     <div class="card k-crane">
       <button class="cardhead" data-go="crane"><span class="t">Crane lifts</span><span class="c" id="cCrane"></span><span class="go">&rsaquo;</span></button>
       <div class="cardbody" id="fCrane"></div>
@@ -1521,6 +1521,11 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <button class="cardhead" data-go="crane"><span class="t">Deliveries</span><span class="c" id="cDel"></span><span class="go">&rsaquo;</span></button>
       <div class="cardbody" id="fDel"></div>
       <div class="cardtools"><button class="mini" data-copy="crane">Copy</button><button class="mini" data-pdf="crane">PDF</button></div>
+    </div>
+    <div class="card k-labour">
+      <button class="cardhead" data-go="labour"><span class="t">Labour &amp; jobs</span><span class="c" id="cLabour"></span><span class="go">&rsaquo;</span></button>
+      <div class="cardbody" id="fLabour"></div>
+      <div class="cardtools"><button class="mini" data-copy="labour">Copy</button><button class="mini" data-pdf="labour">PDF</button></div>
     </div>
     <div class="card k-safety">
       <button class="cardhead" data-go="safety"><span class="t">Safety</span><span class="c" id="cSafe"></span><span class="go">&rsaquo;</span></button>
@@ -1922,7 +1927,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:25</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
