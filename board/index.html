@@ -616,6 +616,7 @@ button,input,select{font:inherit;color:inherit}
    the camera in Eufy's own web viewer or app, where you are signed in */
 a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .eufyhd{padding:0 14px}
+.eufyphone .mini{margin-top:8px;display:inline-block}
 .eufyphone{margin:8px 14px 0;padding:10px 12px;border:1px dashed var(--line-hard);border-radius:4px;font-size:12.5px;color:var(--ink-2)}
 .cambox.eufybox{margin:6px 14px 0;width:auto;aspect-ratio:auto;height:min(72vh,720px);min-height:420px;max-height:none;background:#fff;border:1px solid var(--line-hard);border-radius:4px}
 .cambox.eufybox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;transform:none}
@@ -1964,7 +1965,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <span class="right"><a class="mini" href="https://mysecurity.eufylife.com/" target="_blank" rel="noopener">Eufy web</a></span>
     </div>
     <div class="camhd eufyhd"><b>Live</b><span>Eufy's own viewer &middot; sign in once</span><button class="mini" type="button" data-camfull="eufyBox">Full screen</button></div>
-    <p class="eufyphone" id="eufyPhone" hidden>Eufy only plays video in its web viewer on a computer. On a phone, use the Eufy app &mdash; the live view is here on the office PC or the site TV.</p>
+    <p class="eufyphone" id="eufyPhone" hidden>Eufy only plays video in its web viewer on a computer. On a phone, use the Eufy app &mdash; the live view is here on the office PC or the site TV. <button class="mini" type="button" id="eufyTry">Try on this phone</button></p>
     <div class="cambox eufybox" id="eufyBox">
       <iframe id="eufyFrame" title="Eufy live view" allow="fullscreen; autoplay; camera; microphone" allowfullscreen></iframe>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
@@ -2006,7 +2007,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 18:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 19:00</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7299,8 +7300,12 @@ function eufyIsPhone(){
   return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent) ||
          (navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 }
+var eufyForce=false;
+document.addEventListener("click",function(e){
+  if(e.target&&e.target.id==="eufyTry"){ eufyForce=true; renderEufy(); }
+});
 function renderEufy(){
-  var phone=eufyIsPhone();
+  var phone=eufyIsPhone()&&!eufyForce;
   if(el("eufyPhone")) el("eufyPhone").hidden=!phone;
   if(el("eufyBox")) el("eufyBox").hidden=phone;
   var fb=document.querySelector('[data-camfull="eufyBox"]'); if(fb) fb.hidden=phone;
