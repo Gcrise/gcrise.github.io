@@ -642,7 +642,8 @@ function load(){
 }
 
 load();
-setInterval(load, 60000);
+setInterval(load, 20000);
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") load(); });
 window.addEventListener("hashchange",function(){
   var d=dayFromHash();
   if(d!==day){ day=d; load(); }

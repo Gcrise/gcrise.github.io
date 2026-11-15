@@ -816,7 +816,7 @@ el("addSave").addEventListener("click", async function(){
 me=loadMe();
 load();
 if(!me) setTimeout(askWho, 600);
-setInterval(load, 60000);
+setInterval(load, 20000);
 window.addEventListener("hashchange",function(){
   var d=dayFromHash();
   if(d!==day){ day=d; load(); }

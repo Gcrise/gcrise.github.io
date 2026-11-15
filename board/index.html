@@ -2007,7 +2007,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 19:00</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 20:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4617,13 +4617,103 @@ function renderLabour(){
   });
 }
 
-/* ---------- jobs ---------- */
-function dayJobs(){var d=state.jobDocs[state.date];return (d&&d.items)?d.items:[];}
+/* ---------- jobs ----------
+   The board and the crew's job sheet share one record of what happened to
+   each job: the job log. A tick, a reopen or a star on either side lands
+   in the log, and both sides read the newest entry for each job - so
+   closing a job here closes it on the job sheet, and a job the crew ticks
+   off there shows ticked here. Jobs the crew add on the sheet show here too. */
+state.jobLog={}; state.jobAdds=[];
+function jobLogApply(rows){
+  var L={},adds={},gone={};
+  rows.forEach(function(r){
+    var o=L[r.item_id]||(L[r.item_id]={});
+    if(r.action==="done"||r.action==="reopen") o.done={a:r.action,who:r.who||"",at:r.at};
+    else if(r.action==="pri"||r.action==="unpri") o.pri={a:r.action};
+    else if(r.action==="add"&&!adds[r.item_id]) adds[r.item_id]={id:r.item_id,text:r.item_text||"",from:r.job_date,who:r.who||"",crew:true};
+    else if(r.action==="delete") gone[r.item_id]=1;
+  });
+  state.jobLog=L; state.jobGone=gone;
+  state.jobAdds=Object.keys(adds).filter(function(k){return !gone[k];}).map(function(k){return adds[k];});
+}
+var JL_REST=((window.ELISE_CONFIG||{}).url||"").replace(/\/+$/,"")+"/rest/v1/";
+function JLH(extra){
+  var k=(window.ELISE_CONFIG||{}).key||"", tok="";
+  try{ var se=JSON.parse(localStorage.getItem("elise_sb_session")||"null"); tok=se&&se.access_token||""; }catch(e){}
+  var h={"apikey":k,"Content-Type":"application/json","Authorization":"Bearer "+(tok||k)};
+  if(extra) for(var x in extra) h[x]=extra[x];
+  return h;
+}
+var jobLogBusy=false;
+function pullJobLog(){
+  if(jobLogBusy||JL_REST.indexOf("http")!==0) return;
+  jobLogBusy=true;
+  var since=iso(new Date(Date.now()-60*86400000));
+  fetch(JL_REST+"job_log?select=item_id,job_date,action,item_text,who,at,seq&job_date=gte."+since+"&order=at.asc,seq.asc",{headers:JLH()})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(rows){ jobLogBusy=false; if(!rows) return;
+      var before=JSON.stringify([state.jobLog,state.jobAdds]);
+      jobLogApply(rows);
+      if(JSON.stringify([state.jobLog,state.jobAdds])!==before){ if(el("jobs"))renderJobs(); renderFront(); renderTabs(); }
+    })
+    .catch(function(){ jobLogBusy=false; });
+}
+setTimeout(pullJobLog,1500); setInterval(pullJobLog,20000);
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") pullJobLog(); });
+
+function jobOverlay(items,date){
+  var L=state.jobLog||{}, gone=state.jobGone||{}, ids={};
+  var out=items.filter(function(j){return !(j.id&&gone[j.id]);}).map(function(j){
+    if(j.id) ids[j.id]=1;
+    var l=j.id&&L[j.id]; if(!l) return j;
+    var o={};for(var k in j)o[k]=j[k];
+    if(l.done){ o.done=l.done.a==="done"; if(o.done&&l.done.who&&!o.doneBy)o.doneBy=l.done.who; }
+    if(l.pri) o.pri=l.pri.a==="pri";
+    return o;
+  });
+  /* jobs the crew added on the sheet: open ones carry forward to today,
+     finished ones show on the day they were finished */
+  var today=iso(new Date());
+  (state.jobAdds||[]).forEach(function(a){
+    if(ids[a.id]||!a.from||a.from>date) return;
+    var l=L[a.id]||{}, done=!!(l.done&&l.done.a==="done");
+    var doneDay=done&&l.done.at?iso(new Date(l.done.at)):null;
+    if(done?doneDay!==date:date<today&&date!==a.from) return;
+    out.push({id:a.id,text:a.text,who:a.who,from:a.from,done:done,doneBy:done?l.done.who:"",pri:!!(l.pri&&l.pri.a==="pri"),crew:true});
+  });
+  return out;
+}
+function dayJobs(){var d=state.jobDocs[state.date];return jobOverlay((d&&d.items)?d.items:[],state.date);}
 function saveJobs(items){
   var was=dayJobs();
-  var body={date:state.date,items:items,ts:Date.now()};
+  var body={date:state.date,items:items.map(function(j){var o={};for(var k in j)if(k!=="crew")o[k]=j[k];return o;}),ts:Date.now()};
   state.jobDocs[state.date]=body;write("jobs",state.date,body);
   logDone(was,items);
+  /* tell the job log what changed, so the crew's sheet follows */
+  var rows=[], byId={}, me=whoAmI()||"Board";
+  was.forEach(function(j){ if(j.id) byId[j.id]=j; });
+  var keep={};
+  items.forEach(function(j){
+    if(!j.id) return; keep[j.id]=1;
+    var o=byId[j.id];
+    if(!o) return;
+    var base={item_id:j.id,job_date:state.date,item_text:j.text||"",who:me,note:"",photo_id:""};
+    if(!!o.done!==!!j.done){ var r1={};for(var k in base)r1[k]=base[k]; r1.action=j.done?"done":"reopen"; rows.push(r1); }
+    if(!!o.pri!==!!j.pri){ var r2={};for(var k2 in base)r2[k2]=base[k2]; r2.action=j.pri?"pri":"unpri"; rows.push(r2); }
+  });
+  was.forEach(function(j){
+    if(j.id&&!keep[j.id]) rows.push({item_id:j.id,job_date:state.date,item_text:j.text||"",who:me,note:"",photo_id:"",action:"delete"});
+  });
+  if(rows.length){
+    var now=new Date().toISOString();
+    rows.forEach(function(r){
+      var o=state.jobLog[r.item_id]||(state.jobLog[r.item_id]={});
+      if(r.action==="done"||r.action==="reopen") o.done={a:r.action,who:r.who,at:now};
+      else if(r.action==="pri"||r.action==="unpri") o.pri={a:r.action};
+      else if(r.action==="delete"){ state.jobGone=state.jobGone||{}; state.jobGone[r.item_id]=1; }
+    });
+    fetch(JL_REST+"job_log",{method:"POST",headers:JLH({"Prefer":"return=minimal"}),body:JSON.stringify(rows)}).catch(function(){});
+  }
   renderJobs();renderFront();renderTabs();
 }
 /* ---------- completed works ----------
