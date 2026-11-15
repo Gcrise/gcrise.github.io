@@ -31,7 +31,8 @@ button,select{text-transform:inherit;letter-spacing:inherit}
   padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px)}
-header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--rule);
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--rule);
   padding:12px 0 10px}
 .brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .brand b{font-size:18px;letter-spacing:.16em}
@@ -137,6 +138,11 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px so
    priority work above it. */
 .dwrap{border-left:2px solid color-mix(in srgb,var(--accent) 40%,transparent);
   padding-left:13px;margin-top:4px}
+.dwrap.pwrap{border-left-color:var(--pri)}
+.dwrap.nwrap{border-left-color:var(--rule)}
+.dwrap .job.pri{padding-left:0}
+.dwrap .job.pri::before{display:none}
+.dwrap .job{grid-template-columns:22px 1fr auto}
 
 /* Priority is a state you set, not a form field, so it reads as a switch. */
 .prib{display:flex;align-items:center;gap:10px;width:100%;margin-top:16px;
@@ -540,16 +546,9 @@ function render(){
 
   var html="";
 
-  /* Priority and non-priority side by side, the same as the board. */
-  if(pri.length || todo.length){
-    /* row by row, so the two columns line up across */
-    var L=pri.length?pri.map(jobRow):['<p class="cnone">Nothing starred</p>'];
-    var R=todo.length?todo.map(jobRow):['<p class="cnone">Nothing else open</p>'];
-    html += '<div class="jcols">'+sec("pri","Priority",pri.length)+sec("","Non-priority",todo.length);
-    for(var r=0;r<Math.max(L.length,R.length);r++)
-      html += (L[r]||'<div class="jgap"></div>')+(R[r]||'<div class="jgap"></div>');
-    html += '</div>';
-  }
+  /* every list laid out the same as Daily: full width, one job a line */
+  if(pri.length)  html += sec("pri","Priority",pri.length)+'<div class="dwrap pwrap">'+pri.map(jobRow).join("")+'</div>';
+  if(todo.length) html += sec("","Non-priority",todo.length)+'<div class="dwrap nwrap">'+todo.map(jobRow).join("")+'</div>';
 
   /* Then the daily run-through, which is the same every morning. */
   if(dl.length){
