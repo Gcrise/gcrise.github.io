@@ -291,6 +291,12 @@ function breaksFor(rows){
 /* Minutes a single lift takes for this trade. Advanced Precast run 15, the
    rest run 10, and both come off the board's config rather than being
    hard-coded here. */
+/* a crane booking with no lift count is still lifts - one per slot of hook time */
+function liftsIn(r){
+  var q=+r.qty||0; if(q>0) return q;
+  if(r.type!=="lift"||r.kind==="BOOM") return 0;
+  return Math.max(1,Math.round((+r.dur||0)/perLift(r.co)));
+}
 function perLift(co){
   var p15=(cfg&&cfg.per15)||[];
   return (p15.indexOf(co)>=0) ? 15 : ((cfg&&+cfg.per) || 10);
@@ -333,7 +339,7 @@ function rowHtml(r, piece){
   var one  = piece && !whole && piece.n > 0;       // one lift of a run
   var head = !piece || whole || piece.n <= 1;      // carries the description
 
-  if(!one && r.type==="lift" && !boom){ var nl=Math.max(1,qty); bits.push(nl+(nl===1?" lift":" lifts")); }
+  if(!one && r.type==="lift" && !boom){ var nl=liftsIn(r); bits.push(nl+(nl===1?" lift":" lifts")); }
   if(kg) bits.push(kg>=1000?(Math.round(kg/100)/10)+"t":kg+"kg");
   if(r.from_loc||r.to_loc) bits.push((r.from_loc||"?")+" → "+(r.to_loc||"?"));
   bits.push(tr.name);
@@ -509,7 +515,7 @@ function render(){
                  .reduce(function(a,r){return a+(+r.dur||0)},0);
   /* a run of 12 is 12 lifts, not one booking */
   var nLift=lifts.filter(function(r){return r.kind!=="BOOM"})
-                 .reduce(function(a,r){return a+Math.max(1,+r.qty||1)},0);
+                 .reduce(function(a,r){return a+liftsIn(r)},0);
   var nDel =dels.filter(function(r){return r.kind!=="BOOM"}).length;
   var tbc  =rows.filter(function(r){return r.status==="req"}).length;
 

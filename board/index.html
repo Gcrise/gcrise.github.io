@@ -2035,7 +2035,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 07:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 07:15</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -2066,6 +2066,13 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 </footer>
 
 <script>
+function autoQty(v){
+  var q=+v.qty||0; if(q>0) return q;
+  var t=v.type==="hand"?"del":(v.type||"lift");
+  if(t!=="lift"||v.kind==="BOOM"||v.crane==="none") return 0;
+  var per=(String(v.co||"").toUpperCase()==="AP")?15:10;
+  return Math.max(1,Math.round((+v.dur||0)/per));
+}
 
 (function(){
   "use strict";
@@ -4040,7 +4047,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     unsubI=db.collection("lifts").where("date",">=",win[0]).where("date","<=",win[1]).onSnapshot(function(snap){
       items=snap.docs.map(function(d){var v=d.data()||{};return{
         id:d.id,date:v.date,type:v.type==="hand"?"del":(v.type||"lift"),kind:v.type==="hand"?"HAND":(v.kind||""),crane:v.crane||"tower",start:+v.start||0,dur:+v.dur||60,
-        qty:+v.qty||0,kg:+v.kg||0,co:v.co==="LST"?"RZE":(v.co||"OTH"),co2:v.co2||"",from:v.from||"",to:v.to||"",pair:v.pair||"",desc:v.desc||"",status:v.status||"con",notes:v.notes||"",by:v.by||""
+        qty:autoQty(v),kg:+v.kg||0,co:v.co==="LST"?"RZE":(v.co||"OTH"),co2:v.co2||"",from:v.from||"",to:v.to||"",pair:v.pair||"",desc:v.desc||"",status:v.status||"con",notes:v.notes||"",by:v.by||""
       }});
       render();
     },function(e){if(e&&e.code==="revoked")db=null;toast("Live updates stopped — reload the board")});
@@ -4416,12 +4423,22 @@ function liftWin(){
   var d=parseISO(state.date);
   return [iso(new Date(d.getTime()-28*86400000)),iso(new Date(d.getTime()+120*86400000))];
 }
+/* A crane booking with no lift count - "crane on and off for the morning" -
+   is still lifts: one per slot of hook time (10 min, 15 for precast). Shown
+   as that many lifts rather than one. A pour stand-down stays at none. */
+function autoQty(v){
+  var q=+v.qty||0; if(q>0) return q;
+  var t=v.type==="hand"?"del":(v.type||"lift");
+  if(t!=="lift"||v.kind==="BOOM"||v.crane==="none") return 0;
+  var per=(String(v.co||"").toUpperCase()==="AP")?15:10;
+  return Math.max(1,Math.round((+v.dur||0)/per));
+}
 function normLift(id,v){
   return {id:id,date:v.date,
     type:v.type==="hand"?"del":(v.type||"lift"),
     kind:v.type==="hand"?"HAND":(v.kind||""),
     crane:v.crane||"tower",start:+v.start||0,dur:+v.dur||60,
-    qty:+v.qty||0,kg:+v.kg||0,co:v.co==="LST"?"RZE":(v.co||"OTH"),
+    qty:autoQty(v),kg:+v.kg||0,co:v.co==="LST"?"RZE":(v.co||"OTH"),
     /* the second trade of a one-up-one-down swap - dropping it here is what
        made the split colour vanish the moment the board reloaded */
     co2:v.co2||"",
