@@ -523,6 +523,12 @@ window.eliseAuth = {
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:14px;line-height:1.45;margin:0}
+
+/* the ELISE logo, tinted to the theme's ink so it reads on light and dark */
+.elogo{display:inline-block;width:86px;height:23px;background:var(--ink);
+  -webkit-mask:url(elise-logo.png) no-repeat left center/contain;mask:url(elise-logo.png) no-repeat left center/contain;
+  color:transparent;overflow:hidden;white-space:nowrap;vertical-align:middle;flex:none}
+.mast .elogo{width:92px;height:24px}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 
@@ -1124,7 +1130,7 @@ footer{padding-block:18px;border-top:1px solid var(--line);margin-top:10px;font-
 #cbapp .wd .dow{font-size:10.5px}
 #cbapp .wd .num{font-size:17px;margin-top:2px}
 #cbapp .wd .ct{position:absolute;top:2px;right:3px;min-height:0;font-size:9px;line-height:1;color:var(--gold-ink)}
-#cbapp .wd .ct:empty{display:none}
+#cbapp .wd .ct{display:none}
 #cbapp .wd.wk::before{top:2px;bottom:2px}
 #cbapp .dayrow .gear{margin-left:0;align-self:stretch}
 #cbapp .dayrow .btn{padding:5px 9px;font-size:12px}
@@ -1471,7 +1477,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 
 <header class="mast">
   <div class="mast-in gut">
-    <span class="wordmark">Elise</span>
+    <span class="wordmark elogo" role="img" aria-label="ELISE">ELISE</span>
     <span class="mast-sub">Day Board &middot; 3 Twenty Fifth Ave</span>
     <button class="themebtn" id="themeBtn" type="button" title="Switch the board between light and dark"></button>
 <button class="lockbtn fsbtn" id="fsBtn" type="button" title="Full screen (F)" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -1927,7 +1933,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 12:50</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>

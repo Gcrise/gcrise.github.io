@@ -30,7 +30,8 @@ body{padding:env(safe-area-inset-top,0px) 0 calc(48px + env(safe-area-inset-bott
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px))}
 
-header{position:sticky;top:0;z-index:5;background:var(--bg);
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);
   border-bottom:1px solid var(--rule);padding:12px 0 0}
 .brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .brand b{font-size:19px;letter-spacing:.16em;font-weight:700}
@@ -166,13 +167,13 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
 .rvw{display:grid;grid-template-columns:40px 1fr 1fr;gap:0 6px;margin-top:4px}
 .rvh{position:sticky;top:var(--hdr,96px);z-index:3;background:var(--bg);font-size:11px;font-weight:800;
   letter-spacing:.13em;padding:8px 0 6px;border-bottom:2px solid var(--rule)}
-.rvh.c{color:var(--accent)} .rvh.d{color:var(--warn)}
+.rvh.c,.rvh.d{color:var(--accent)}
 .rvax,.rvln{position:relative;margin-top:9px}
 .rvax .hr{position:absolute;left:0;right:0;font-size:10.5px;font-weight:700;color:var(--ink3);
   font-variant-numeric:tabular-nums;transform:translateY(-6px)}
 .rvln{border-left:1px solid var(--rule);
   background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% var(--hr)}
-.rvln .rb{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,var(--stopbg) 0 6px,transparent 6px 11px);
+.rvln .rb{position:absolute;left:0;right:0;z-index:2;opacity:.92;background:repeating-linear-gradient(135deg,var(--stopbg) 0 6px,transparent 6px 11px);
   border-top:1px solid var(--stopline);border-bottom:1px solid var(--stopline);
   font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--stop);padding:2px 5px;overflow:hidden}
 .rvln .bk{position:absolute;border-radius:4px;background:var(--card);border:1px solid var(--rule);
@@ -183,13 +184,18 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
   background:var(--tc);color:#17150F;margin-right:4px}
 .rvln .bk .q{color:var(--ink3);font-size:10px}
 .rvnow{position:absolute;left:0;right:0;height:0;border-top:2px solid var(--accent);z-index:2}
+
+/* the ELISE logo, tinted to the theme's ink so it reads on light and dark */
+.elogo{display:inline-block;width:86px;height:23px;background:var(--ink);
+  -webkit-mask:url(../board/elise-logo.png) no-repeat left center/contain;mask:url(../board/elise-logo.png) no-repeat left center/contain;
+  color:transparent;overflow:hidden;white-space:nowrap;vertical-align:middle;flex:none}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 </style></head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><b>ELISE</b><span>Lifts &amp; deliveries</span><div class="vsw" id="vsw" role="group" aria-label="Layout"><button type="button" data-lay="list">List</button><button type="button" data-lay="rows">Rows</button></div></div>
+    <div class="brand"><b class="elogo" role="img" aria-label="ELISE">ELISE</b><span>Lifts &amp; deliveries</span><div class="vsw" id="vsw" role="group" aria-label="Layout"><button type="button" data-lay="list">List</button><button type="button" data-lay="rows">Rows</button></div></div>
     <div class="tabs" id="tabs" role="tablist"></div>
   </header>
   <div id="now"></div>
@@ -547,7 +553,7 @@ function rowsHtml(lifts, dels){
     '<span class="rvh"></span><span class="rvh c">Crane</span><span class="rvh d">Deliveries</span>'+
     '<div class="rvax" style="height:'+H.toFixed(0)+'px">'+ax+'</div>'+
     '<div class="rvln" '+st+'>'+br+lane(lifts)+nowL+'</div>'+
-    '<div class="rvln" '+st+'>'+lane(dels)+nowL+'</div></div>';
+    '<div class="rvln" '+st+'>'+br+lane(dels)+nowL+'</div></div>';
 }
 function paintSwitch(){
   Array.prototype.forEach.call(document.querySelectorAll("#vsw [data-lay]"),function(b){

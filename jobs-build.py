@@ -19,7 +19,7 @@ HTML = r"""<!doctype html>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23141312'/><rect x='17' y='15' width='30' height='9' rx='2.5' fill='%23F2EDE4'/><rect x='17' y='27.5' width='23' height='9' rx='2.5' fill='%232FD44A'/><rect x='17' y='40' width='30' height='9' rx='2.5' fill='%23F2EDE4'/></svg>">
 <style>
 :root{--bg:#23271A;--card:#2D3221;--rule:#3E4431;--ink:#E8E2D8;--ink2:#C6C7B9;
-  --ink3:#9EA090;--accent:#DCCAA2;--go:#2FD44A;--pri:#E0A33C;--stop:#FF6B6B}
+  --ink3:#9EA090;--accent:#DCCAA2;--go:#2FD44A;--pri:#DCCAA2;--stop:#FF6B6B}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
@@ -163,7 +163,8 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px so
 .dwrap .jt{font-size:14.5px}
 
 /* ---- compact: priority | non-priority side by side ---- */
-.jcols{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-items:stretch}
+.jcols{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-items:stretch;position:relative}
+.jcols::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--rule);transform:translateX(-.5px)}
 .jcols > *{min-width:0}
 .jcols .jobrow{border-bottom:1px solid var(--rule)}
 .jcols .jobrow:last-child{border-bottom:1px solid var(--rule)}
@@ -238,16 +239,21 @@ label.btn{display:inline-flex;align-items:center;justify-content:center}
   overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .offscreen:focus-visible + label.btn{outline:2px solid var(--accent);outline-offset:2px}
 .msg{font-size:12.5px;color:var(--stop);margin-top:8px;min-height:16px}
-@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#E8E2D8;--card:#F5F1EA;
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--pri:#6F6A4C;--bg:#E8E2D8;--card:#F5F1EA;
   --rule:#D2CBBC;--ink:#2D3221;--ink2:#4E5340;--ink3:#717462;--stop:#B3261E;--accent:#2D3221}}
 
+
+/* the ELISE logo, tinted to the theme's ink so it reads on light and dark */
+.elogo{display:inline-block;width:86px;height:23px;background:var(--ink);
+  -webkit-mask:url(../board/elise-logo.png) no-repeat left center/contain;mask:url(../board/elise-logo.png) no-repeat left center/contain;
+  color:transparent;overflow:hidden;white-space:nowrap;vertical-align:middle;flex:none}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 </style></head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><b>ELISE</b>
+    <div class="brand"><b class="elogo" role="img" aria-label="ELISE">ELISE</b>
       <button class="me" id="meBtn">Who am I?</button></div>
     <div class="tabs" role="tablist">
       <button class="tab" id="t0" aria-selected="true">Today<b id="d0">&nbsp;</b></button>
