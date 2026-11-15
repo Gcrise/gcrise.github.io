@@ -603,8 +603,7 @@ button,input,select{font:inherit;color:inherit}
   aspect-ratio:auto!important;margin:0!important;border:0;border-radius:0;background:#000}
 /* phone held upright: fill the height and swipe sideways along the panorama */
 @media (orientation:portrait){
-  .cambox.camfull .camlive:not(.zoom){display:block;overflow-x:auto;overflow-y:hidden}
-  .cambox.camfull .camlive:not(.zoom) img{height:100%;width:auto;max-width:none;object-fit:initial}
+
 }
 .cambox.camfull .camlive{inset:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
 .camclose{position:absolute;z-index:3;top:calc(10px + env(safe-area-inset-top,0px));
@@ -665,10 +664,19 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .camcol .cambox:not(.live){aspect-ratio:900/324}
 #camOpenLink,#camOpenLink:visited{color:var(--ink-2)}
 .cambox.live{aspect-ratio:7360/2650}
-.camlive{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:center}
-.camlive img{display:block;width:100%;height:100%;object-fit:contain;cursor:zoom-in}
-.camlive.zoom{display:block}
-.camlive.zoom img{width:auto;height:auto;max-width:none;max-height:none;object-fit:none;cursor:zoom-out}
+/* the latest photo: scroll or pinch to zoom, drag to look around,
+   double-click / double-tap to jump in or back out */
+.camlive{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab;background:var(--surface-2)}
+.camlive.drag{cursor:grabbing}
+.camlive img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;transform-origin:0 0;
+  user-select:none;-webkit-user-drag:none;pointer-events:none;will-change:transform}
+.camlive img:not([src]){visibility:hidden}
+.camwait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-3);
+  letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+.camzb{position:absolute;right:8px;bottom:8px;z-index:3;display:flex;gap:4px}
+.camzb button{appearance:none;width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;
+  font-size:17px;line-height:1;cursor:pointer;padding:0}
+.camzb button[data-z="0"]{width:auto;border-radius:16px;padding:0 10px;font-size:11px;letter-spacing:.08em}
 .cambox:not(.live) .camlive{display:none}
 .cambox iframe{position:absolute;left:0;top:0;width:900px;height:324px;border:0;
   transform-origin:0 0;background:#0b0b0b}
@@ -2002,7 +2010,8 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <div class="camcol">
         <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
-          <div class="camlive" id="camLive"><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"></div>
+          <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"></div>
+          <div class="camzb"><button type="button" data-z="1" aria-label="Zoom in">+</button><button type="button" data-z="-1" aria-label="Zoom out">&minus;</button><button type="button" data-z="0" aria-label="Fit">Fit</button></div>
           <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
         </div>
       </div>
@@ -2026,7 +2035,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 20:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 07:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7348,18 +7357,17 @@ function camFull(on,id){
     }else{
       b.classList.add("camfull");
       document.documentElement.style.overflow="hidden";
-      /* start in the middle of the panorama */
-      setTimeout(function(){var lv=el("camLive");if(lv&&b.id==="camBox")lv.scrollLeft=(lv.scrollWidth-lv.clientWidth)/2;},60);
+      if(window.camZoomReset) setTimeout(camZoomReset,60);
     }
   }else{
     if(document.fullscreenElement)document.exitFullscreen().catch(function(){});
     b.classList.remove("camfull");
-    if(el("camLive")) el("camLive").classList.remove("zoom");
+    if(window.camZoomReset) camZoomReset();
     document.documentElement.style.overflow="";
   }
   requestAnimationFrame(camFit);
 }
-document.addEventListener("fullscreenchange",function(){if(!document.fullscreenElement&&el("camLive"))el("camLive").classList.remove("zoom");requestAnimationFrame(camFit);});
+document.addEventListener("fullscreenchange",function(){if(!document.fullscreenElement&&window.camZoomReset)camZoomReset();requestAnimationFrame(camFit);});
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape"&&document.querySelector(".cambox.camfull"))camFull(false);
 });
@@ -7370,9 +7378,11 @@ function camLiveLoad(){
   var im=el("camImg"); if(!im) return;
   var src=im.getAttribute("data-src")+"?t="+Date.now();
   var pre=new Image();
-  pre.onload=function(){ im.src=pre.src; var n=new Date();
+  pre.onload=function(){ im.src=pre.src; if(el("camWait")) el("camWait").hidden=true; var n=new Date();
     if(el("camMeta")) el("camMeta").textContent="Checked "+fmtClock(n.getHours()*60+n.getMinutes()); };
-  pre.onerror=function(){ if(el("camMeta")) el("camMeta").textContent="Couldn\u2019t reach the camera \u2014 trying again shortly"; };
+  pre.onerror=function(){ if(el("camMeta")) el("camMeta").textContent="Couldn\u2019t reach the camera \u2014 trying again shortly";
+    if(el("camWait")&&!im.getAttribute("src")) el("camWait").textContent="Couldn\u2019t reach the camera \u2014 trying again";
+    setTimeout(camLiveLoad,30000); };
   pre.src=src;
 }
 document.addEventListener("click",function(e){
@@ -7380,18 +7390,59 @@ document.addEventListener("click",function(e){
   if(f){ var id=f.getAttribute("data-camfull"); if(id!=="eufyBox") camOpen(); camFull(true,id); return; }
   if(e.target.closest&&e.target.closest("[data-camclose]")) camFull(false);
 });
-if(el("camImg")) el("camImg").addEventListener("click",function(e){
-  var box=el("camBox"), lv=el("camLive");
-  var full=box.classList.contains("camfull")||document.fullscreenElement===box;
-  if(!full){ camFull(true,"camBox"); return; }
-  var r=lv.getBoundingClientRect(), fx=(e.clientX-r.left)/r.width, fy=(e.clientY-r.top)/r.height;
-  var on=!lv.classList.contains("zoom");
-  lv.classList.toggle("zoom",on);
-  if(on){ var im=el("camImg");
-    /* zoom on where you tapped */
-    lv.scrollLeft=Math.max(0,im.naturalWidth*fx-lv.clientWidth/2);
-    lv.scrollTop=Math.max(0,im.naturalHeight*fy-lv.clientHeight/2); }
-});
+(function(){
+  var lv=el("camLive"), im=el("camImg"); if(!lv||!im) return;
+  var z=1, tx=0, ty=0, pts={}, start=null, lastTap=0;
+  function clamp(){
+    var W=lv.clientWidth, H=lv.clientHeight;
+    var minX=W-W*z, minY=H-H*z;
+    tx=Math.min(0,Math.max(minX,tx)); ty=Math.min(0,Math.max(minY,ty));
+    if(z<=1){z=1;tx=0;ty=0;}
+  }
+  function paint(){ clamp(); im.style.transform="translate("+tx+"px,"+ty+"px) scale("+z+")"; }
+  function zoomAt(nz,cx,cy){
+    nz=Math.max(1,Math.min(10,nz));
+    tx=cx-(cx-tx)*nz/z; ty=cy-(cy-ty)*nz/z; z=nz; paint();
+  }
+  window.camZoomReset=function(){ z=1;tx=0;ty=0; paint(); };
+  function rel(e){ var r=lv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; }
+  lv.addEventListener("wheel",function(e){
+    e.preventDefault(); var p=rel(e);
+    zoomAt(z*Math.exp(-e.deltaY*0.0015),p[0],p[1]);
+  },{passive:false});
+  lv.addEventListener("pointerdown",function(e){
+    lv.setPointerCapture(e.pointerId); pts[e.pointerId]=rel(e);
+    var ids=Object.keys(pts);
+    if(ids.length===1){
+      var now=Date.now(), p=pts[ids[0]];
+      if(now-lastTap<300){ if(z>1.5) camZoomReset(); else zoomAt(3,p[0],p[1]); lastTap=0; return; }
+      lastTap=now; start={x:p[0],y:p[1],tx:tx,ty:ty}; lv.classList.add("drag");
+    } else if(ids.length===2){
+      var a=pts[ids[0]], b=pts[ids[1]];
+      start={pinch:Math.hypot(a[0]-b[0],a[1]-b[1]),z:z,cx:(a[0]+b[0])/2,cy:(a[1]+b[1])/2,tx:tx,ty:ty};
+    }
+  });
+  lv.addEventListener("pointermove",function(e){
+    if(!pts[e.pointerId]||!start) return;
+    pts[e.pointerId]=rel(e); var ids=Object.keys(pts);
+    if(ids.length===1&&start.x!=null){
+      var p=pts[ids[0]]; tx=start.tx+p[0]-start.x; ty=start.ty+p[1]-start.y; paint();
+    } else if(ids.length===2&&start.pinch){
+      var a=pts[ids[0]], b=pts[ids[1]], d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+      var nz=Math.max(1,Math.min(10,start.z*d/start.pinch));
+      tx=start.cx-(start.cx-start.tx)*nz/start.z; ty=start.cy-(start.cy-start.ty)*nz/start.z; z=nz; paint();
+    }
+  });
+  function up(e){ delete pts[e.pointerId]; if(!Object.keys(pts).length){ start=null; lv.classList.remove("drag"); }
+    else { var ids=Object.keys(pts),p=pts[ids[0]]; start={x:p[0],y:p[1],tx:tx,ty:ty}; } }
+  lv.addEventListener("pointerup",up); lv.addEventListener("pointercancel",up);
+  document.addEventListener("click",function(e){
+    var b=e.target.closest&&e.target.closest(".camzb [data-z]"); if(!b) return;
+    var k=+b.getAttribute("data-z");
+    if(!k) camZoomReset(); else zoomAt(z*(k>0?1.6:1/1.6),lv.clientWidth/2,lv.clientHeight/2);
+  });
+  window.addEventListener("resize",function(){ paint(); });
+})();
 document.addEventListener("visibilitychange",function(){
   if(document.visibilityState==="visible"&&el("v-camera")&&!el("v-camera").hidden) camLiveLoad();
 });
