@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon-180.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#23271A">
 <title>ELISE Day Board</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="fonts.css">
 <script src="config.js"></script>
 <script src="vendor/supabase.js"></script>
@@ -522,7 +522,7 @@ window.eliseAuth = {
 .themebtn svg{display:block;width:15px;height:15px}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:14px;line-height:1.45;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:14px;line-height:1.45;margin:0;padding-top:env(safe-area-inset-top,0px)}
 
 /* the ELISE logo, tinted to the theme's ink so it reads on light and dark */
 .elogo{display:inline-block;width:86px;height:23px;background:var(--ink);
@@ -1082,7 +1082,7 @@ footer{padding-block:18px;border-top:1px solid var(--line);margin-top:10px;font-
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* the crane board rides inside its own scope; its header stacks under the tab bar */
-#cbapp .top{top:calc(env(safe-area-inset-top,0px) + 73px)}
+#cbapp .top{top:calc(env(safe-area-inset-top,0px) + var(--mastH,73px))}
 #cbapp{display:block;margin:0 calc(-1 * var(--gut-r)) 0 calc(-1 * var(--gut-l))}
 #cbapp{
   --bg:#E8E2D8; --panel:#F5F1EA; --panel-2:#FFFFFF;
@@ -1963,7 +1963,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 14:22</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 14:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
