@@ -74,7 +74,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
    the words at a readable size, and the age of the thing where you can see
    it - a job sitting since the 3rd is a different problem from one raised
    this morning. */
-.jobrow{display:flex;align-items:stretch;gap:8px;border-bottom:1px solid var(--rule);
+.jobrow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;border-bottom:1px solid var(--rule);
   break-inside:avoid;page-break-inside:avoid}
 .jobrow:last-child{border-bottom:none}
 .job{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start;
@@ -259,6 +259,9 @@ label.btn{display:inline-flex;align-items:center;justify-content:center}
 /* iPhone zooms the page into any text box set smaller than 16px - keep every
    box at 16px on touch screens so typing never zooms */
 @media (pointer:coarse){input,textarea,select,[contenteditable="true"]{font-size:16px!important}}
+.jobrow > .job{flex:1 1 0}
+.jphs{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap;padding:0 0 10px 34px}
+.jphs img{width:72px;height:54px;object-fit:cover;border-radius:4px;border:1px solid var(--rule);display:block}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 </style>
@@ -377,6 +380,8 @@ var DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
 function nice(d){return DAYS[d.getDay()]+" "+d.getDate()+" "+MONS[d.getMonth()]}
 function el(id){return document.getElementById(id)}
 function photoURL(id){return URL_+"/storage/v1/object/public/"+BUCKET+"/"+id+".jpg"}
+var jobPh={};
+function boardPhotoURL(ph){return URL_+"/storage/v1/object/public/"+(ph.bkt||"photos")+"/"+ph.id+".jpg"}
 function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
 
 /* ---------- who am I ---------- */
@@ -432,6 +437,10 @@ function load(){
     fetch(URL_+"/rest/v1/job_log?job_date=gte."+from+"&job_date=lte."+to+
           "&item_id=like.daily-*&select=item_id,action,who,note,photo_id,at,job_date"+
           "&order=at.desc",{headers:H}).then(function(r){ return r.ok?r.json():[]; }),
+    /* photos taken on the board against each job - the last month, since a
+       carried job keeps its photos from the day they were taken */
+    fetch(URL_+"/rest/v1/photos?id=gte."+iso(new Date(Date.now()-35*86400000))+"&select=id,data",{headers:H})
+      .then(function(r){ return r.ok?r.json():[]; }),
     /* who is on site these two days */
     fetch(URL_+"/rest/v1/v_labour_day?job_date=gte."+from+"&job_date=lte."+to+
           "&select=*",{headers:H}).then(function(r){ return r.ok?r.json():[]; })
@@ -440,12 +449,18 @@ function load(){
   if(needCfg) jobs.push(
     fetch(URL_+"/rest/v1/config?id=in.(daily,board)&select=id,data",{headers:H})
       .then(function(r){ return r.ok?r.json():[]; }));
-  var cfgAt = needCfg ? 3 : -1;
+  var cfgAt = needCfg ? 4 : -1;
   Promise.all(jobs).then(function(res){
     rows=res[0]||[];
     dlog={};
     (res[1]||[]).forEach(function(l){ if(!dlog[l.item_id]) dlog[l.item_id]=l; });
-    crew=res[2]||[];
+    jobPh={};
+    (res[2]||[]).forEach(function(d){
+      ((d.data&&d.data.items)||[]).forEach(function(ph){
+        if(ph&&ph.job&&ph.id) (jobPh[ph.job]=jobPh[ph.job]||[]).push(ph);
+      });
+    });
+    crew=res[3]||[];
     if(cfgAt>0 && res[cfgAt]) res[cfgAt].forEach(function(c){
       if(c.id==="daily") daily=c.data;
       if(c.id==="board" && c.data && c.data.trades) trades=c.data.trades;
@@ -509,6 +524,11 @@ function jobRow(j){
     ev='<span class="ev">'+line+'</span>';
     if(j.done_photo) ev+='<span class="evimg"><img src="'+photoURL(esc(j.done_photo))+'" alt="" loading="lazy"></span>';
   }
+  /* photos taken on the board for this job */
+  var bp=jobPh[j.item_id]||[], phs="";
+  if(bp.length) phs='<div class="jphs">'+bp.map(function(ph){
+    return '<a href="'+esc(boardPhotoURL(ph))+'" target="_blank" rel="noopener"><img src="'+esc(boardPhotoURL(ph))+'" alt="'+esc(ph.cap||"Job photo")+'" loading="lazy"></a>';
+  }).join("")+'</div>';
 
   /* The star has to live outside the row button - a button inside a button
      is not a thing, and on a phone the two would fight over the same tap. */
@@ -521,7 +541,7 @@ function jobRow(j){
     (j.done?'':'<button class="star" type="button" data-star="'+esc(j.item_id)+'" '+
       'aria-pressed="'+(!!j.priority)+'" title="'+(j.priority?'Drop off priority':'Make priority')+'">'+
       (j.priority?'\u2605':'\u2606')+'</button>')+
-    '</div>';
+    phs+'</div>';
 }
 
 /* A priority change is its own line in the record, same as the sheet writes,

@@ -789,6 +789,7 @@ input,textarea,select,option{text-transform:none}
 .joblist .jgroup .item:first-child{border-top:0}
 .item.hasph{flex-wrap:wrap}
 .jthumbs{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 2px 52px}
+.jthumbs img.closeph{border-color:#6FBF73;border-width:2px}
 .jthumbs img{width:76px;height:57px;object-fit:cover;border-radius:4px;border:1px solid var(--line-hard);cursor:zoom-in;background:var(--surface-2)}
 @media (max-width:620px){.jthumbs{padding-left:0}.jthumbs img{width:64px;height:48px}}
 .jobcol{min-width:0}
@@ -2039,7 +2040,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 08:15</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 08:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4677,7 +4678,7 @@ function jobLogApply(rows){
   var L={},adds={},gone={};
   rows.forEach(function(r){
     var o=L[r.item_id]||(L[r.item_id]={});
-    if(r.action==="done"||r.action==="reopen") o.done={a:r.action,who:r.who||"",at:r.at};
+    if(r.action==="done"||r.action==="reopen") o.done={a:r.action,who:r.who||"",at:r.at,photo:r.photo_id||"",note:r.note||""};
     else if(r.action==="pri"||r.action==="unpri") o.pri={a:r.action};
     else if(r.action==="add"&&!adds[r.item_id]) adds[r.item_id]={id:r.item_id,text:r.item_text||"",from:r.job_date,who:r.who||"",crew:true};
     else if(r.action==="delete") gone[r.item_id]=1;
@@ -4698,7 +4699,7 @@ function pullJobLog(){
   if(jobLogBusy||JL_REST.indexOf("http")!==0) return;
   jobLogBusy=true;
   var since=iso(new Date(Date.now()-60*86400000));
-  fetch(JL_REST+"job_log?select=item_id,job_date,action,item_text,who,at,seq&job_date=gte."+since+"&order=at.asc,seq.asc",{headers:JLH()})
+  fetch(JL_REST+"job_log?select=item_id,job_date,action,item_text,who,at,seq,photo_id,note&job_date=gte."+since+"&order=at.asc,seq.asc",{headers:JLH()})
     .then(function(r){return r.ok?r.json():null;})
     .then(function(rows){ jobLogBusy=false; if(!rows) return;
       var before=JSON.stringify([state.jobLog,state.jobAdds]);
@@ -5455,20 +5456,25 @@ function jobPhotos(j,sc){
   return SCOPE[sc].list().filter(function(p){return p[key]===j.id;});
 }
 var CAMICON='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3.8 8.6h2.9l1.3-2h8l1.3 2h2.9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H3.8a1 1 0 0 1-1-1V9.6a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.2" r="3.1"/></svg>';
+var SB_PUB=((window.ELISE_CONFIG||{}).url||"").replace(/\/+$/,"")+"/storage/v1/object/public/";
 function jobThumbs(j){
   /* the job's photos, right under it - tap one for full screen */
   if(!j||!j.id) return "";
   var all=SCOPE.day.list(), out=[];
   all.forEach(function(p,n){ if(p.job===j.id) out.push([p,n]); });
-  if(!out.length) return "";
-  return '<div class="jthumbs">'+out.map(function(x){
+  /* the close-out photo the crew took on the job sheet */
+  var L=(state.jobLog||{})[j.id], cp=(L&&L.done&&L.done.a==="done"&&L.done.photo)||"";
+  var close=cp?'<a href="'+SB_PUB+'job-photos/'+esc(cp)+'.jpg" target="_blank" rel="noopener" title="Closed out'+
+    (L.done.who?" by "+esc(L.done.who):"")+(L.done.note?" \u2014 "+esc(L.done.note):"")+'"><img class="closeph" src="'+SB_PUB+'job-photos/'+esc(cp)+'.jpg" alt="Close-out photo" loading="lazy"></a>':"";
+  if(!out.length&&!close) return "";
+  return '<div class="jthumbs">'+close+out.map(function(x){
     return '<img src="'+PHOTO(esc(x[0].id), x[0].bkt)+'" alt="'+esc(x[0].cap||"Job photo")+'" loading="lazy" data-zoom="day||'+x[1]+'"'+
       (x[0].cap?' title="'+esc(x[0].cap)+'"':'')+'>';
   }).join("")+'</div>';
 }
 function jobRow(j,i){
-  var np=jobPhotos(j).length;
-  return '<div class="item'+(j.done?' done':'')+(j.pri?' pri':'')+(np?' hasph':'')+'">'+
+  var np=jobPhotos(j).length, th=jobThumbs(j);
+  return '<div class="item'+(j.done?' done':'')+(j.pri?' pri':'')+(th?' hasph':'')+'">'+
     '<input type="checkbox" data-job="'+i+'"'+(j.done?' checked':'')+' aria-label="Done">'+
     '<button class="flag" data-pri="'+i+'" title="'+(j.pri?"Drop off priority":"Make priority")+'" aria-pressed="'+(!!j.pri)+'">'+(j.pri?"★":"☆")+'</button>'+
     '<span class="txt" contenteditable="true" data-jobtxt="'+i+'">'+esc(j.text)+'</span>'+
@@ -5479,7 +5485,7 @@ function jobRow(j,i){
         ? '<button class="cam'+(np?' has':'')+'" data-jobcam="'+i+'" title="'+(np?np+" photo"+(np>1?"s":"")+" on this job":"Add a photo for this job")+'">'+CAMICON+(np?'<b>'+np+'</b>':'')+'</button>'
         : '')+
       '<button class="del" data-del-job="'+i+'" title="Remove">&times;</button>'+
-    '</span>'+jobThumbs(j)+'</div>';
+    '</span>'+th+'</div>';
 }
 /* a job photo is that job's evidence: it goes when the job is ticked off */
 function clearJobPhotos(j,sc){
