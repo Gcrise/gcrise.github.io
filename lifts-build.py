@@ -40,7 +40,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
   border-bottom:1px solid var(--rule);padding:12px 0 0}
 .brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .brand b{font-size:19px;letter-spacing:.16em;font-weight:700}
-.brand span{font-size:11.5px;letter-spacing:.09em;color:var(--ink3);text-transform:uppercase}
+.brand span{white-space:nowrap;font-size:11.5px;letter-spacing:.09em;color:var(--ink3);text-transform:uppercase}
 .tabs{display:flex;gap:6px;margin:12px -16px 0;padding:0 16px 10px;
   overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -157,6 +157,10 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
   font-size:11.5px;color:var(--ink3);letter-spacing:.04em;display:flex;
   justify-content:space-between;gap:12px;flex-wrap:wrap}
 .live{color:var(--accent)}
+:root[data-theme="light"]{--bg:#E8E2D8;--card:#F5F1EA;--rule:#D2CBBC;--ink:#2D3221;
+  --ink2:#4E5340;--ink3:#717462;--brk:#EDE7DA;--stop:#B3261E;--stopbg:#F7E2DF;--stopline:#E0B4AF;--accent:#2D3221;color-scheme:light}
+:root[data-theme="light"] .co{color:#fff;text-shadow:0 0 1px rgba(0,0,0,.35)}
+:root[data-theme="dark"]{color-scheme:dark}
 @media(prefers-color-scheme:light){
   :root:not([data-theme="dark"]){--bg:#E8E2D8;--card:#F5F1EA;--rule:#D2CBBC;--ink:#2D3221;
     --ink2:#4E5340;--ink3:#717462;--brk:#EDE7DA;--stop:#B3261E;--stopbg:#F7E2DF;--stopline:#E0B4AF;--accent:#2D3221}
@@ -165,6 +169,8 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
 
 
 /* ---- layout switch: the usual list, or rows on a time ruler ---- */
+@media (max-width:480px){.brand > span{display:none}}
+.brand{flex-wrap:nowrap}
 .vsw{margin-left:auto;display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden}
 .vsw button{appearance:none;border:0;background:transparent;color:var(--ink3);font:inherit;
   font-size:11px;font-weight:700;letter-spacing:.1em;padding:6px 11px;cursor:pointer}
@@ -194,13 +200,36 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
 .elogo{display:inline-block;width:86px;height:23px;background:var(--ink);
   -webkit-mask:url(../board/elise-logo.png) no-repeat left center/contain;mask:url(../board/elise-logo.png) no-repeat left center/contain;
   color:transparent;overflow:hidden;white-space:nowrap;vertical-align:middle;flex:none}
+
+/* light / dark switch - shares the board's choice (same phone, same setting) */
+.thbtn{appearance:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--rule);background:transparent;
+  color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
+.thbtn svg{width:17px;height:17px}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
-</style></head>
+</style>
+<script>
+(function(){
+  var r=document.documentElement;
+  try{var t=localStorage.getItem("elise-theme");if(t==="light"||t==="dark")r.setAttribute("data-theme",t);}catch(e){}
+  var SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  function cur(){var a=r.getAttribute("data-theme");if(a)return a;return matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}
+  function paint(){var b=document.getElementById("thBtn");if(b)b.innerHTML=cur()==="dark"?SUN:MOON;
+    var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",cur()==="dark"?"#23271A":"#E8E2D8");}
+  document.addEventListener("DOMContentLoaded",function(){
+    paint();
+    var b=document.getElementById("thBtn"); if(!b) return;
+    b.addEventListener("click",function(){var t=cur()==="dark"?"light":"dark";r.setAttribute("data-theme",t);
+      try{localStorage.setItem("elise-theme",t);}catch(e){} paint();});
+  });
+})();
+</script>
+</head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><b class="elogo" role="img" aria-label="ELISE">ELISE</b><span>Lifts &amp; deliveries</span><div class="vsw" id="vsw" role="group" aria-label="Layout"><button type="button" data-lay="list">List</button><button type="button" data-lay="rows">Rows</button></div></div>
+    <div class="brand"><b class="elogo" role="img" aria-label="ELISE">ELISE</b><span>Lifts &amp; deliveries</span><div class="vsw" id="vsw" role="group" aria-label="Layout"><button type="button" data-lay="list">List</button><button type="button" data-lay="rows">Rows</button></div><button class="thbtn" id="thBtn" type="button" aria-label="Switch light or dark" title="Light / dark"></button></div>
     <div class="tabs" id="tabs" role="tablist"></div>
   </header>
   <div id="now"></div>
