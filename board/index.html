@@ -1979,12 +1979,11 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <button class="mini" type="button" id="eufyReload" title="Reload the viewers - after signing in once, the other squares pick it up">Refresh</button>
       <div class="eufysw" role="group" aria-label="Layout"><button type="button" data-eufylay="1" aria-pressed="true">Single</button><button type="button" data-eufylay="4" aria-pressed="false">Grid</button></div>
       <button class="mini" type="button" data-camfull="eufyBox">Full screen</button></div>
-    <p class="eufyphone" id="eufyPhone" hidden>Eufy only plays video in its web viewer on a computer. On a phone, use the Eufy app &mdash; the live view is here on the office PC or the site TV. <button class="mini" type="button" id="eufyTry">Try on this phone</button></p>
+    <p class="eufyphone" id="eufyPhone" hidden>Eufy only plays video in its web viewer on a computer &mdash; the live view is here on the office PC or the site TV. On a phone, use the <a href="https://apps.apple.com/app/id1424956516" target="_blank" rel="noopener">Eufy app</a>. <button class="mini" type="button" id="eufyTry">Try on this phone</button></p>
     <div class="cambox eufybox" id="eufyBox">
       <div class="eufytiles" id="eufyTiles"><div class="eslot"><iframe id="eufyFrame" title="Eufy live view" allow="fullscreen; autoplay" allowfullscreen></iframe></div></div>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
     </div>
-    <div class="eufygrid" id="eufyGrid"></div>
   </div>
 </section>
 
@@ -7465,6 +7464,7 @@ function renderEufy(){
   if(el("eufyBox")) el("eufyBox").hidden=phone;
   var fb=document.querySelector('[data-camfull="eufyBox"]'); if(fb) fb.hidden=phone;
   if(!phone) eufyLayout(eufyLay);
+  if(el("eufyMeta")) el("eufyMeta").textContent=EUFY_CAMS.length+" cameras";
   var g=el("eufyGrid"); if(!g) return;
   var CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h11a2 2 0 0 1 2 2v1l3-2v6l-3-2v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"/><circle cx="9" cy="12" r="2"/></svg>';
   g.innerHTML=EUFY_CAMS.map(function(c){
