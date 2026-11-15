@@ -621,8 +621,9 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .cambox.eufybox{margin:6px 14px 0;width:auto;aspect-ratio:auto;height:min(72vh,720px);min-height:420px;max-height:none;background:#fff;border:1px solid var(--line-hard);border-radius:4px}
 .eufytiles{position:absolute;inset:0;display:grid;grid-template-columns:1fr;gap:4px;background:var(--line-hard)}
 .eufytiles.g4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
-.cambox.eufybox .eufytiles iframe{position:static;width:100%;height:100%;min-height:0;border:0;background:#fff;display:block;transform:none}
-.cambox.eufybox .eufytiles iframe[hidden]{display:none}
+.eufytiles .eslot{position:relative;overflow:hidden;background:#fff;min-width:0;min-height:0}
+.cambox.eufybox .eufytiles iframe{position:absolute;left:0;top:0;width:1280px;height:800px;min-height:0;border:0;background:#fff;display:block;transform-origin:0 0}
+.eufytiles .eslot[hidden]{display:none}
 .eufysw{display:inline-flex;flex:none;margin-left:auto;border:1px solid var(--line-hard);border-radius:4px;overflow:hidden}
 .eufysw button{appearance:none;border:0;background:transparent;color:var(--ink-2);font-family:var(--f-cond);font-size:11px;font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;cursor:pointer}
@@ -1980,7 +1981,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <button class="mini" type="button" data-camfull="eufyBox">Full screen</button></div>
     <p class="eufyphone" id="eufyPhone" hidden>Eufy only plays video in its web viewer on a computer. On a phone, use the Eufy app &mdash; the live view is here on the office PC or the site TV. <button class="mini" type="button" id="eufyTry">Try on this phone</button></p>
     <div class="cambox eufybox" id="eufyBox">
-      <div class="eufytiles" id="eufyTiles"><iframe id="eufyFrame" title="Eufy live view" allow="fullscreen; autoplay; camera; microphone" allowfullscreen></iframe></div>
+      <div class="eufytiles" id="eufyTiles"><div class="eslot"><iframe id="eufyFrame" title="Eufy live view" allow="fullscreen; autoplay" allowfullscreen></iframe></div></div>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
     </div>
     <div class="eufygrid" id="eufyGrid"></div>
@@ -2020,7 +2021,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 20:32</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 15 Nov 20:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7408,21 +7409,39 @@ try{ if(localStorage.getItem("elise.eufy.lay")==="4") eufyLay="4"; }catch(e){}
 /* Single: one Eufy viewer. Grid: four viewers side by side - Eufy has no
    link to a particular camera, so pick a different camera in each square
    once; each square keeps its choice until the page is reloaded */
+/* Eufy's viewer is laid out for a computer screen. Each square shows it at
+   a full desktop size (1280 x 800) scaled down to fit, so it keeps its
+   computer layout instead of squashing into a phone layout */
+function eufyFit(){
+  Array.prototype.forEach.call(document.querySelectorAll("#eufyTiles .eslot:not([hidden])"),function(sl){
+    var f=sl.querySelector("iframe"); if(!f) return;
+    var W=sl.clientWidth, H=sl.clientHeight; if(!W||!H) return;
+    var vw=1280, vh=Math.max(560,Math.round(vw*H/W));
+    var k=W/vw;
+    f.style.width=vw+"px"; f.style.height=vh+"px"; f.style.transform="scale("+k+")";
+  });
+}
+window.addEventListener("resize",function(){ clearTimeout(window.__ef); window.__ef=setTimeout(eufyFit,120); });
+document.addEventListener("fullscreenchange",function(){ setTimeout(eufyFit,80); });
+if(window.ResizeObserver){ document.addEventListener("DOMContentLoaded",function(){ var t=document.getElementById("eufyTiles"); if(t) new ResizeObserver(eufyFit).observe(t); }); }
 function eufyLayout(n){
   eufyLay=n; try{ localStorage.setItem("elise.eufy.lay",n); }catch(e){}
   var box=el("eufyTiles"); if(!box) return;
-  var want=n==="4"?4:1, have=box.querySelectorAll("iframe");
+  var want=n==="4"?4:1, have=box.querySelectorAll(".eslot");
   for(var i=have.length;i<want;i++){
+    var sl=document.createElement("div"); sl.className="eslot";
     var f=document.createElement("iframe"); f.title="Eufy live view "+(i+1);
     f.setAttribute("allow","fullscreen; autoplay"); f.setAttribute("allowfullscreen","");
-    box.appendChild(f);
+    sl.appendChild(f); box.appendChild(sl);
   }
-  have=box.querySelectorAll("iframe");
+  have=box.querySelectorAll(".eslot");
   for(var j=0;j<have.length;j++){
     have[j].hidden = j>=want;
-    if(j<want&&!have[j].getAttribute("src")) have[j].setAttribute("src","https://mysecurity.eufylife.com/#/camera");
+    var fr=have[j].querySelector("iframe");
+    if(j<want&&!fr.getAttribute("src")) fr.setAttribute("src","https://mysecurity.eufylife.com/#/camera");
   }
   box.classList.toggle("g4",want===4);
+  eufyFit();
   Array.prototype.forEach.call(document.querySelectorAll("[data-eufylay]"),function(b){
     b.setAttribute("aria-pressed",b.getAttribute("data-eufylay")===n?"true":"false");});
 }
@@ -7431,7 +7450,7 @@ document.addEventListener("click",function(e){
   if(e.target&&e.target.id==="eufyReload"){
     /* the squares share one Eufy sign-in: sign in in any one, then Refresh
        and the rest open signed in */
-    Array.prototype.forEach.call(document.querySelectorAll("#eufyTiles iframe:not([hidden])"),function(f){
+    Array.prototype.forEach.call(document.querySelectorAll("#eufyTiles .eslot:not([hidden]) iframe"),function(f){
       f.setAttribute("src","about:blank");
       setTimeout(function(){ f.setAttribute("src","https://mysecurity.eufylife.com/#/camera"); },60);
     });
