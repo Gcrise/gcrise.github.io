@@ -7524,7 +7524,7 @@ document.addEventListener("click",function(e){
   window.addEventListener("resize",function(){ paint(); });
 })();
 document.addEventListener("visibilitychange",function(){
-  if(document.visibilityState==="visible"&&el("v-camera")&&!el("v-camera").hidden) camLiveLoad();
+  if(document.visibilityState==="visible"&&el("v-camera")&&!el("v-camera").hidden){ camLiveLoad(); deckCount(); }
 });
 /* the site's Eufy cameras - add a line here for each new camera */
 var EUFY_CAMS=[
@@ -7648,6 +7648,10 @@ function camOpen(){
   if(!camTimer) camTimer=setInterval(function(){
     if(el("v-camera")&&!el("v-camera").hidden&&document.visibilityState==="visible") camLiveLoad();
   },300000);
+  /* the count keeps up as new checks land or a note is corrected */
+  if(!window.deckTimer) window.deckTimer=setInterval(function(){
+    if(el("v-camera")&&!el("v-camera").hidden&&document.visibilityState==="visible") deckCount();
+  },60000);
   var f=el("camFrame");
   if(!f)return;
   /* read from the link rather than a variable, so opening the board
