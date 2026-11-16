@@ -807,6 +807,7 @@ input,textarea,select,option{text-transform:none}
 .logrow .tick{color:#3F6B46;font-weight:700;flex:none;line-height:1}
 .logrow .ltext{flex:1;min-width:0;color:var(--ink-2)}
 .logrow .lwho{flex:none;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--gold,#8C764E)}
+.prelab{display:block;padding:8px 14px 0;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;color:var(--ink-2)}
 .subhead{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap;padding:12px 14px 6px;border-top:1px solid var(--line);font-family:var(--f-cond);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
 .subhead span:first-child{color:var(--acc-ink);font-weight:700}
 .sub2{border-top-color:var(--line)}
@@ -1962,7 +1963,10 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <div id="preWx"></div>
 
     <div class="subhead" data-acc="prestart"><span>Site works</span></div>
-    <div class="addrow top"><textarea id="preWorks" rows="2" placeholder="What is happening today, by level and area"></textarea></div>
+    <label class="prelab" for="preWorks">Structures</label>
+    <div class="addrow top"><textarea id="preWorks" rows="2" placeholder="Formwork, reo, pours, posts &mdash; by level"></textarea></div>
+    <label class="prelab" for="preFinishes">Finishes</label>
+    <div class="addrow top"><textarea id="preFinishes" rows="2" placeholder="Framing, sheeting, tiling, painting &mdash; by level"></textarea></div>
 
     <div class="subhead" data-acc="prestart"><span>Deliveries for the day</span><span id="preDelMeta"></span></div>
     <div id="preDels"></div>
@@ -2074,7 +2078,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 07:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 08:20</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5108,7 +5112,7 @@ function preSafetyAll(){
 function savePre(patch){
   var d=preDoc(), body={
     date:state.date,
-    weather:d.weather||"", works:d.works||"", safety:d.safety||"",
+    weather:d.weather||"", works:d.works||"", finishes:d.finishes||"", safety:d.safety||"",
     risk:d.risk||"",
     ticks:d.ticks||{}, note:d.note||"", by:d.by||"", at:d.at||0, ts:Date.now()
   };
@@ -5119,12 +5123,12 @@ function savePre(patch){
 /* The fields the person actually writes. Site works and high risk works are
    the record, so neither goes unanswered - "none" is a fine answer to the
    second, a blank is not. */
-var PREFIELDS=[["preWeather","weather"],["preWorks","works"],["preSafety","safety"],
+var PREFIELDS=[["preWeather","weather"],["preWorks","works"],["preFinishes","finishes"],["preSafety","safety"],
                ["preRisk","risk"]];
 function completePre(){
   var d=preDoc();
-  var works=(el("preWorks").value||"").trim(), risk=(el("preRisk").value||"").trim();
-  if(!works){ toast("Say what the site works are first"); el("preWorks").focus(); return; }
+  var works=(el("preWorks").value||"").trim()+(el("preFinishes").value||"").trim(), risk=(el("preRisk").value||"").trim();
+  if(!works){ toast("Put in the structures or finishes works first"); el("preWorks").focus(); return; }
   if(!risk){ toast("High risk works - put 'none' if there are none"); el("preRisk").focus(); return; }
   var who=(el("preBy").value||whoAmI()||"").trim().toUpperCase();
   if(!who){ toast("Put your name on it first"); el("preBy").focus(); return; }
@@ -6473,8 +6477,11 @@ function prestartText(){
   var pd=preDoc();
   var out=["ELISE PRESTART — "+dayName(d)+" "+d.getDate()+" "+monName(d),"On site: "+heads];
   if(pd.weather||wxLine(state.date))out.push("Weather: "+(pd.weather||wxLine(state.date)));
-  out.push("","WORKS TODAY");
-  if(pd.works)pd.works.split(/\n+/).forEach(function(l){out.push("- "+l);});
+  out.push("","STRUCTURES");
+  if(pd.works)pd.works.split(/\n+/).forEach(function(l){out.push("- "+l);});else out.push("-");
+  out.push("","FINISHES");
+  if(pd.finishes)pd.finishes.split(/\n+/).forEach(function(l){out.push("- "+l);});else out.push("-");
+  if(lab.length)out.push("","LABOUR ON SITE");
   lab.forEach(function(r){out.push("- "+r.name+(r.supplier?" ("+r.supplier+")":"")+": "+[r.area,r.task||r.notes].filter(Boolean).join(" · "));});
   var safe=openSafety();
   if(safe.length||pd.safety){
@@ -6482,11 +6489,6 @@ function prestartText(){
     safe.forEach(function(i){out.push("- ["+((SKIND[i.kind]||SKIND.HAZ)[0]).toUpperCase()+"] "+i.text);});
     if(pd.safety)pd.safety.split(/\n+/).forEach(function(l){out.push("- "+l);});
   }
-  var jobs=dayJobs().filter(function(j){return !j.done;});
-  var jp=jobs.filter(function(j){return j.pri;}),jn=jobs.filter(function(j){return !j.pri;});
-  function jline(j){return "- "+j.text+(j.who?"  ["+j.who+"]":"");}
-  if(jp.length){out.push("","JOBS - PRIORITY");jp.forEach(function(j){out.push(jline(j));});}
-  if(jn.length){out.push("",jp.length?"JOBS - OTHER":"JOBS");jn.forEach(function(j){out.push(jline(j));});}
   out.push("","LIFTS");
   expand(rows).filter(function(i){return i.row.type==="lift";}).forEach(function(it){
     out.push("- "+fmtClock(it.t)+" "+(it.row.co2?(it.row.co+"/"+it.row.co2):it.row.co)+" "+(it.row.desc||"")+(it.of>1?" ("+it.n+"/"+it.of+")":"")+(it.row.status==="req"?" [TBC]":""));
@@ -6515,7 +6517,8 @@ function sectionText(which){
       [].concat(body).forEach(function(l){ o.push(l); });
     }
     blk("Weather", (pd.weather||wxLine(state.date))?[pd.weather||wxLine(state.date)]:null);
-    blk("Site works", pd.works?pd.works.split(/\n+/):null);
+    blk("Structures", pd.works?pd.works.split(/\n+/):null);
+    blk("Finishes", pd.finishes?pd.finishes.split(/\n+/):null);
     var sfy=preStanding().map(function(i){return "- "+i.text;});
     if(pd.safety) sfy=sfy.concat(pd.safety.split(/\n+/).map(function(l){return "- "+l;}));
     function bl(b){
@@ -6723,6 +6726,16 @@ async function buildPDF(which){
     doc.text(heads+" on site across "+lab.length+" crews   ·   Areas: "+(Object.keys(areas).sort().join(", ")||"—")+
       "   ·   Crane "+fmtClock(open)+"–"+fmtClock(close),M,y);
     y+=8;
+    var pdw=preDoc();
+    [["Structures",pdw.works],["Finishes",pdw.finishes]].forEach(function(g){
+      head("Site works — "+g[0]);
+      if(!g[1]){none("Nothing written.");return;}
+      doc.setTextColor(43,41,38);doc.setFont("helvetica","normal");doc.setFontSize(9);
+      String(g[1]).split(/\n+/).forEach(function(l){
+        var t=doc.splitTextToSize("- "+l,W-2*M);brk(t.length*4.4);doc.text(t,M,y);y+=t.length*4.4+0.8;
+      });
+      y+=3;
+    });
   }
 
   if(want("safety")){
@@ -6777,7 +6790,7 @@ async function buildPDF(which){
     }
   }
 
-  if(want("jobs")){
+  if(which==="jobs"){
     head("Jobs");
     if(!jobs.length) none("None listed.");
     else{
@@ -7106,7 +7119,7 @@ function buildTeamPDF(){
   txt("TEAM PRESTART",M+30,11.6,"bold",7.4,GOLD);
   txt(longDate(state.date),W-M,9.6,"bold",15,INK,true);
   txt(nlift+" LIFTS   "+durTxt(hook)+" HOOK"+(pourm?("   "+durTxt(pourm)+" CONCRETE POUR"):"")+
-      "   "+dels.length+" DELIVERIES   "+jobs.length+" JOBS",W-M,13,"normal",6.6,INK3,true);
+      "   "+dels.length+" DELIVERIES",W-M,13,"normal",6.6,INK3,true);
   doc.setFillColor(13,99,119);doc.rect(0,14,W,0.9,"F");
   txt("ELISE CONSTRUCTIONS  -  QBCC 15555981  -  SITE MANAGER: HARRY AGNEW",M,H-6,"normal",6,INK3);
   var y0=20;
@@ -7173,36 +7186,21 @@ function buildTeamPDF(){
     y2+=lines.length*4.3+2;
   });
   var spill2=y2+6;
-  // ---- column 3: labour jobs, priority first, running on into the spare room
-  var y3=head(xs[2],y0,"Labour jobs",jobs.length+" OPEN","jobs");
-  var jx=xs[2],spills=[[xs[0],spill1],[xs[1],spill2]];
-  var pri=jobs.filter(function(j){return j.pri;}),rest=jobs.filter(function(j){return !j.pri;});
-  [["Priority",pri,true],["Not priority",rest,false]].forEach(function(g){
-    if(!g[1].length)return;
-    txt(g[0]+"   "+g[1].length,jx,y3,"bold",7.4,g[2]?CRIT:INK3);
-    doc.setDrawColor(RULE[0],RULE[1],RULE[2]);doc.setLineWidth(0.3);doc.line(jx,y3+1.8,jx+cw,y3+1.8);
-    y3+=8;
-    for(var i=0;i<g[1].length;i++){
-      if(y3>H-15){
-        var nx=null;
-        while(spills.length&&!nx){var cand=spills.shift();if(cand[1]<H-45)nx=cand;}
-        if(!nx)break;
-        jx=nx[0];y3=nx[1];
-        txt("Labour jobs continued",jx,y3,"bold",7.4,INK3);
-        doc.setDrawColor(RULE[0],RULE[1],RULE[2]);doc.setLineWidth(0.3);doc.line(jx,y3+1.8,jx+cw,y3+1.8);
-        y3+=8;
-      }
-      var j=g[1][i];
-      tick(jx,y3,false);
-      var who2=UP(j.who||""),wl2=who2?doc.getTextWidth(who2)+3:0;
-      var lines2=wrap(j.text,cw-5.6-wl2,g[2]?"bold":"normal",9);
-      doc.setFont("helvetica",g[2]?"bold":"normal");doc.setFontSize(9);
-      doc.setTextColor(INK[0],INK[1],INK[2]);
-      doc.text(lines2,jx+5.6,y3);
-      if(who2)txt(who2,jx+cw,y3,"bold",7,GOLD,true);
-      y3+=lines2.length*3.7+1.2;
-    }
-    y3+=3;
+  // ---- column 3: site works, structures then finishes
+  var pdt=preDoc(),y3=head(xs[2],y0,"Site works","","jobs");
+  [["Structures",pdt.works],["Finishes",pdt.finishes]].forEach(function(g){
+    txt(g[0],xs[2],y3,"bold",7.4,INK3);
+    doc.setDrawColor(RULE[0],RULE[1],RULE[2]);doc.setLineWidth(0.3);doc.line(xs[2],y3+1.8,xs[2]+cw,y3+1.8);
+    y3+=7;
+    var ls=String(g[1]||"").split(/\n+/).filter(function(l){return l.trim();});
+    if(!ls.length){txt("Nothing written.",xs[2],y3,"italic",9.4,INK3);y3+=8;return;}
+    ls.forEach(function(l){
+      var lines=wrap(l,cw,"normal",9.6);
+      doc.setFont("helvetica","normal");doc.setFontSize(9.6);doc.setTextColor(INK[0],INK[1],INK[2]);
+      doc.text(lines,xs[2],y3);
+      y3+=lines.length*4+1.6;
+    });
+    y3+=4;
   });
   return doc;
 }
