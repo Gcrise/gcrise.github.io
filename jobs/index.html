@@ -460,10 +460,12 @@ function load(){
     rows=res[0]||[];
     dlog={};
     (res[1]||[]).forEach(function(l){ if(!dlog[l.item_id]) dlog[l.item_id]=l; });
-    jobPh={};
+    jobPh={}; var seenPh={};
     (res[2]||[]).forEach(function(d){
       ((d.data&&d.data.items)||[]).forEach(function(ph){
-        if(ph&&ph.job&&ph.id) (jobPh[ph.job]=jobPh[ph.job]||[]).push(ph);
+        /* a job's photos are carried day to day with it, so the same photo sits
+           in several days' records - show each one once */
+        if(ph&&ph.job&&ph.id&&!seenPh[ph.id]){ seenPh[ph.id]=1; (jobPh[ph.job]=jobPh[ph.job]||[]).push(ph); }
       });
     });
     crew=res[3]||[];
