@@ -676,7 +676,7 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .eufycam .eb a:first-child{color:var(--clock)}
 .camgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 14px 4px}
 /* people counted on the deck off the Tikee photo, through the day */
-.deckcount{margin-top:12px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;border:1px solid var(--line-hard);border-radius:4px;padding:10px 12px}
+.deckcount{margin:12px 14px 4px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;border:1px solid var(--line-hard);border-radius:4px;padding:10px 12px}
 .deckcount .dcn{font-family:var(--f-num);font-size:28px;font-weight:700;line-height:1;color:var(--clock)}
 .deckcount .dcl{font-family:var(--f-cond);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
 .deckcount .dcs{font-size:11.5px;color:var(--ink-3)}
@@ -2046,7 +2046,6 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     </div>
     <div class="camgrid">
       <div class="camcol">
-        <div class="deckcount" id="deckCount" hidden></div>
         <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
           <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"></div>
@@ -2062,6 +2061,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
         </div>
       </div>
     </div>
+    <div class="deckcount" id="deckCount" hidden></div>
   </div>
 </section>
 
@@ -2074,7 +2074,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 19:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 07:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
