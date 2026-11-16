@@ -675,6 +675,14 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .eufycam .eb a+a{border-left:1px solid var(--line)}
 .eufycam .eb a:first-child{color:var(--clock)}
 .camgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 14px 4px}
+/* people counted on the deck off the Tikee photo, through the day */
+.deckcount{margin-top:12px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;border:1px solid var(--line-hard);border-radius:4px;padding:10px 12px}
+.deckcount .dcn{font-family:var(--f-num);font-size:28px;font-weight:700;line-height:1;color:var(--clock)}
+.deckcount .dcl{font-family:var(--f-cond);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.deckcount .dcs{font-size:11.5px;color:var(--ink-3)}
+.deckcount .dcbars{display:flex;align-items:flex-end;gap:3px;height:34px;margin-left:auto}
+.deckcount .dcbars i{display:block;width:12px;background:var(--clock);opacity:.75;border-radius:2px 2px 0 0;position:relative}
+.deckcount .dcbars i b{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8.5px;font-style:normal;color:var(--ink-3);font-weight:400;white-space:nowrap}
 @media (max-width:820px){ .camgrid{grid-template-columns:1fr;gap:12px} }
 .camcol{min-width:0}
 .camhd{display:flex;align-items:baseline;gap:8px;margin-top:12px}
@@ -2038,6 +2046,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     </div>
     <div class="camgrid">
       <div class="camcol">
+        <div class="deckcount" id="deckCount" hidden></div>
         <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
           <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"></div>
@@ -2065,7 +2074,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 16:35</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 19:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7614,7 +7623,28 @@ function renderEufy(){
   }).join("");
   if(el("eufyMeta")) el("eufyMeta").textContent=EUFY_CAMS.length+" camera"+(EUFY_CAMS.length===1?"":"s");
 }
+/* Deck headcount: a scheduled check counts the people in the Tikee deck photo
+   through the day; this shows the latest count, the day's peak and each check */
+function deckCount(){
+  var box=el("deckCount"); if(!box||JL_REST.indexOf("http")!==0) return;
+  var day=iso(new Date());
+  fetch(JL_REST+"deck_count?select=at,people,photo_time,note&day=eq."+day+"&order=at.asc",{headers:JLH()})
+    .then(function(r){return r.ok?r.json():[];})
+    .then(function(rows){
+      if(!rows||!rows.length){ box.hidden=false;
+        box.innerHTML='<span class="dcl">On the deck</span><span class="dcs">No count yet today &mdash; checked hourly from 7am off the Tikee photo.</span>'; return; }
+      var last=rows[rows.length-1], peak=Math.max.apply(null,rows.map(function(r){return r.people;}));
+      var tm=function(t){var d=new Date(t);return fmtClock(d.getHours()*60+d.getMinutes());};
+      var bars=rows.map(function(r){ var h=peak?Math.max(3,Math.round(30*r.people/peak)):3;
+        return '<i style="height:'+h+'px" title="'+r.people+' at '+tm(r.at)+'"><b>'+new Date(r.at).getHours()+'</b></i>'; }).join("");
+      box.hidden=false;
+      box.innerHTML='<div><div class="dcl">On the deck</div><div class="dcn">'+last.people+'</div></div>'+
+        '<div class="dcs">at '+tm(last.at)+'<br>peak '+peak+' &middot; '+rows.length+' check'+(rows.length===1?'':'s')+' today</div>'+
+        '<div class="dcbars">'+bars+'</div>';
+    }).catch(function(){});
+}
 function camOpen(){
+  deckCount();
   camLiveLoad();
   if(!camTimer) camTimer=setInterval(function(){
     if(el("v-camera")&&!el("v-camera").hidden&&document.visibilityState==="visible") camLiveLoad();
