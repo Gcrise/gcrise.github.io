@@ -94,6 +94,27 @@ async function refreshIfStale(){
   }catch(e){ /* stay with what we have; RLS will refuse a write and the board says read-only */ }
 }
 
+/* A sign-in lasts an hour. The board sits open all day on the shed screen and
+   in pockets, so keep it fresh: renew every half hour, when the page comes back
+   to the front after a while, and - if a save is still refused as expired -
+   renew and try that save once more, so nothing fails with "try again". */
+function tokenAge(){ return session&&session.expires_at ? session.expires_at*1000-Date.now() : 0; }
+setInterval(function(){ if(session) refreshIfStale(); }, 30*60000);
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible"&&session&&tokenAge()<10*60000) refreshIfStale();
+});
+async function afetch(url,opts){
+  var r=await fetch(url,opts);
+  if((r.status===401||r.status===403)&&session&&session.refresh_token){
+    await refreshIfStale();
+    if(session&&session.access_token){
+      var h=opts.headers||{}; h["Authorization"]="Bearer "+session.access_token; opts.headers=h;
+      r=await fetch(url,opts);
+    }
+  }
+  return r;
+}
+
 /* ============================================================
    FIELD MAPPING
    `lifts` is a real relational table, so SQL on it is readable.
@@ -242,7 +263,7 @@ function docRef(table, id){
       if(!canWrite()) throw Object.assign(new Error("read only"), {code:"invalid_argument"});
       var row = RELATIONAL[table] ? liftIn(body) : {data:body};
       row.id = id;
-      var r = await fetch(REST+table, {
+      var r = await afetch(REST+table, {
         method:"POST",
         headers:H({"Prefer":"resolution=merge-duplicates,return=minimal"}),
         body:JSON.stringify(row)
@@ -260,7 +281,7 @@ function docRef(table, id){
       var row = RELATIONAL[table] ? liftIn(body) : {data:body};
       delete row.id;
       if(!Object.keys(row).length) return true;
-      var r = await fetch(REST+table+"?id=eq."+encodeURIComponent(id), {
+      var r = await afetch(REST+table+"?id=eq."+encodeURIComponent(id), {
         method:"PATCH",
         headers:H({"Prefer":"return=minimal"}),
         body:JSON.stringify(row)
@@ -271,7 +292,7 @@ function docRef(table, id){
     },
     delete: async function(){
       if(!canWrite()) throw Object.assign(new Error("read only"), {code:"invalid_argument"});
-      var r = await fetch(REST+table+"?id=eq."+encodeURIComponent(id), {method:"DELETE", headers:H()});
+      var r = await afetch(REST+table+"?id=eq."+encodeURIComponent(id), {method:"DELETE", headers:H()});
       if(!r.ok) throw Object.assign(new Error("delete "+r.status),
         {code:(r.status===401||r.status===403)?"invalid_argument":"write"});
       return true;
@@ -369,7 +390,7 @@ window.safetyLog = async function(rows){
   if(!rows || !rows.length) return;
   if(!canWrite()){ console.warn("safetyLog: not signed in, nothing recorded"); return; }
   try{
-    var r = await fetch(REST+"safety_log", {
+    var r = await afetch(REST+"safety_log", {
       method:"POST",
       headers:H({"Content-Type":"application/json","Prefer":"return=minimal"}),
       body:JSON.stringify(rows)
@@ -2044,7 +2065,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 13:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 16 Nov 16:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
