@@ -7632,7 +7632,7 @@ function deckCount(){
     .then(function(r){return r.ok?r.json():[];})
     .then(function(rows){
       if(!rows||!rows.length){ box.hidden=false;
-        box.innerHTML='<span class="dcl">On the deck</span><span class="dcs">No count yet today &mdash; counted every hour from 7am off the Tikee photo.</span>'; return; }
+        box.innerHTML='<span class="dcl">On the deck</span><span class="dcs">No count yet today &mdash; counted every hour from 6:30am off the Tikee photo.</span>'; return; }
       var last=rows[rows.length-1], peak=Math.max.apply(null,rows.map(function(r){return r.people;}));
       var tm=function(t){var d=new Date(t);return fmtClock(d.getHours()*60+d.getMinutes());};
       var bars=rows.map(function(r){ var h=peak?Math.max(3,Math.round(30*r.people/peak)):3;
