@@ -81,17 +81,45 @@ function canWrite(){ return !!(session && session.access_token); }
 
 /* refresh an expired token once on boot, so a signed-in user
    stays signed in across days without retyping a password */
-async function refreshIfStale(){
-  if(!session || !session.refresh_token) return;
-  try{
-    var r = await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{
-      method:"POST",
-      headers:{"apikey":SB_KEY,"Content-Type":"application/json"},
-      body:JSON.stringify({refresh_token:session.refresh_token})
-    });
-    var j = await r.json();
-    if(r.ok && j.access_token) saveSession(j);
-  }catch(e){ /* stay with what we have; RLS will refuse a write and the board says read-only */ }
+/* One renewal at a time, across every tab on this device. Supabase hands out
+   a new refresh token each time and treats the old one being used twice as
+   theft - it then kills the whole sign-in. With several watchers and two
+   open tabs all renewing at once, that is exactly what was happening, and
+   saves came back "you can't write". So: share one renewal, and take a
+   newer sign-in another tab has already saved instead of renewing again. */
+var refreshing = null;
+function storedSession(){ try{ return JSON.parse(localStorage.getItem("elise_sb_session")||"null"); }catch(e){ return null; } }
+function adoptNewer(){
+  var st = storedSession();
+  if(st && st.access_token && session && st.refresh_token !== session.refresh_token){ session = st; return true; }
+  return false;
+}
+window.addEventListener("storage", function(e){
+  if(e.key !== "elise_sb_session") return;
+  session = storedSession();
+});
+function refreshIfStale(){
+  if(!session || !session.refresh_token) return Promise.resolve();
+  if(refreshing) return refreshing;
+  refreshing = (async function(){
+    if(adoptNewer()) return;
+    try{
+      var r = await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{
+        method:"POST",
+        headers:{"apikey":SB_KEY,"Content-Type":"application/json"},
+        body:JSON.stringify({refresh_token:session.refresh_token})
+      });
+      var j = await r.json();
+      if(r.ok && j.access_token){ saveSession(j); return; }
+      /* refused: another tab may have just won the race - take its sign-in */
+      if(adoptNewer()) return;
+      if(r.status===400||r.status===401){
+        saveSession(null);
+        try{ document.dispatchEvent(new Event("elise-signedout")); }catch(e){}
+      }
+    }catch(e){ /* offline: keep what we have and try again later */ }
+  })().finally(function(){ refreshing = null; });
+  return refreshing;
 }
 
 /* A sign-in lasts an hour. The board sits open all day on the shed screen and
@@ -2122,7 +2150,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 15:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:05</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -2685,7 +2713,7 @@ function autoQty(v){
       chain=chain.then(function(){return db.collection("lifts").doc(m.id).update(m.data)});
     });
     chain.then(function(){toast(msg)},function(e){
-      toast(e&&e.code==="invalid_argument"?"Not moved — you can't write to this board":"Not moved — try again");
+      toast(e&&e.code==="invalid_argument"?"Not moved — sign in again (padlock, top right)":"Not moved — try again");
     });
   }
   function nudgeSel(delta){
@@ -2728,7 +2756,7 @@ function autoQty(v){
     chain.then(function(){
       toast("Deleted "+list.length+" — hit Undo if that was wrong");
     },function(e){
-      toast(e&&e.code==="invalid_argument"?"Not deleted — you can't write to this board":"Not deleted — try again");
+      toast(e&&e.code==="invalid_argument"?"Not deleted — sign in again (padlock, top right)":"Not deleted — try again");
     });
     setSelMode(false);
   }
@@ -3361,7 +3389,7 @@ function autoQty(v){
       var to=workDay(cur,step);cur=to;subscribe();
       toast("Moved "+moves.length+(moves.length===1?" booking":" bookings")+" to "+DOW[fromIso(to).getDay()]+" "+fromIso(to).getDate());
     },function(e){
-      toast(e&&e.code==="invalid_argument"?"Not moved — you can't write to this board":"Not moved — try again");
+      toast(e&&e.code==="invalid_argument"?"Not moved — sign in again (padlock, top right)":"Not moved — try again");
     }).then(function(){$("rGo").disabled=false;$("rGo").textContent="Move it"});
   };
 
@@ -3777,7 +3805,7 @@ function autoQty(v){
     }).catch(function(e){
       var c=e&&e.code;
       if(c==="rate_limited")toast("Busy right now — give it a few seconds");
-      else if(c==="invalid_argument")toast("Not saved — you can't write to this board");
+      else if(c==="invalid_argument")toast("Not saved — sign in again (padlock, top right)");
       else toast("Couldn't read that one — filling it in by hand");
       if(c!=="rate_limited"&&c!=="invalid_argument"){openSheet(null);$("fDesc").value=text.slice(0,90)}
     }).then(function(){quickBusy(false)});
@@ -3863,7 +3891,7 @@ function autoQty(v){
       if(keys.length&&keys[0]!==cur){cur=keys[0];subscribe()}
       toast("Booked "+rs.length+" off the photo"+(keys.length>1?" across "+keys.length+" days":"")+(slid?" · "+slid+" slid clear of the hook":""));
     },function(e){
-      toast(e&&e.code==="invalid_argument"?"Not saved - you can't write to this board":"Not saved - try again");
+      toast(e&&e.code==="invalid_argument"?"Not saved - sign in again (padlock, top right)":"Not saved - try again");
     });
   }
 
@@ -3917,7 +3945,7 @@ function autoQty(v){
       if(c==="noimg")toast("Photos aren't available on this board");
       else if(c==="rate_limited")toast("Busy right now - give it a few seconds");
       else if(c==="empty")toast("Couldn't find any lifts in that photo");
-      else if(c==="invalid_argument")toast("Not saved - you can't write to this board");
+      else if(c==="invalid_argument")toast("Not saved - sign in again (padlock, top right)");
       else toast("Couldn't read that photo - try a straighter shot");
     }).then(function(){quickBusy(false)});
   }
@@ -4028,7 +4056,7 @@ function autoQty(v){
       if(room.length)t+=" · "+room.length+(room.length===1?" slid back":" slid back");
       toast(t);
     },function(e){
-      toast(e&&e.code==="invalid_argument"?"Not saved — you can't write to this board":"Not saved — try again");
+      toast(e&&e.code==="invalid_argument"?"Not saved — sign in again (padlock, top right)":"Not saved — try again");
     }).then(function(){locked=false;$("saveBtn").disabled=canWrite===false});
   }
   /* Another one the same, dropped into the first gap after it. */
@@ -4043,7 +4071,7 @@ function autoQty(v){
     dref.set(rec).then(function(){
       closeSheet();toast("Copied to "+hhmm(rec.start));
     },function(e){
-      toast(e&&e.code==="invalid_argument"?"Not copied — you can't write to this board":"Not copied — try again");
+      toast(e&&e.code==="invalid_argument"?"Not copied — sign in again (padlock, top right)":"Not copied — try again");
     }).then(function(){locked=false});
   }
   function repeat(){
@@ -8487,6 +8515,10 @@ var loadTimer=setTimeout(function(){if(!state.ready)el("dbState").textContent="S
   var em=document.getElementById("sbEmail"), pw=document.getElementById("sbPass"),
       bi=document.getElementById("sbIn"), bo=document.getElementById("sbOut"),
       who=document.getElementById("sbWho"), msg=document.getElementById("sbMsg");
+  document.addEventListener("elise-signedout",function(){
+    paint(); if(typeof toast==="function") toast("Signed out - tap the padlock to sign back in");
+  });
+  window.addEventListener("storage",function(e){ if(e.key==="elise_sb_session") paint(); });
   function paint(){
     var on=A.canWrite();
     lock.innerHTML = on ? "\u{1F513}" : "\u{1F512}";
