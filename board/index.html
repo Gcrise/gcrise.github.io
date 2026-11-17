@@ -912,6 +912,8 @@ input,textarea,select,option{text-transform:none}
 .logrow:last-child{border-bottom:0}
 .logrow .tick{color:#3F6B46;font-weight:700;flex:none;line-height:1}
 .logrow .ltext{flex:1;min-width:0;color:var(--ink-2)}
+.logrow .lph{width:44px;height:44px;object-fit:cover;border-radius:3px;flex:none;align-self:center}
+.logrow .lnote{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
 .logrow .lwho{flex:none;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--gold,#8C764E)}
 .prelab{display:block;padding:8px 14px 0;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;color:var(--ink-2)}
 .subhead{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap;padding:12px 14px 6px;border-top:1px solid var(--line);font-family:var(--f-cond);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
@@ -2246,7 +2248,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 22:00</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 22:15</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4931,7 +4933,7 @@ function jobLogApply(rows){
   var L={},adds={},gone={};
   rows.forEach(function(r){
     var o=L[r.item_id]||(L[r.item_id]={});
-    if(r.action==="done"||r.action==="reopen") o.done={a:r.action,who:r.who||"",at:r.at,photo:r.photo_id||"",note:r.note||""};
+    if(r.action==="done"||r.action==="reopen") o.done={a:r.action,who:r.who||"",at:r.at,photo:r.photo_id||"",note:r.note||"",text:r.item_text||"",date:r.job_date};
     else if(r.action==="pri"||r.action==="unpri") o.pri={a:r.action};
     else if(r.action==="add"&&!adds[r.item_id]) adds[r.item_id]={id:r.item_id,text:r.item_text||"",from:r.job_date,who:r.who||"",crew:true};
     else if(r.action==="delete") gone[r.item_id]=1;
@@ -4966,7 +4968,7 @@ function pullJobLog(){
     .then(function(rows){ jobLogBusy=false; if(!rows) return;
       var before=JSON.stringify([state.jobLog,state.jobAdds]);
       jobLogApply(rows);
-      if(JSON.stringify([state.jobLog,state.jobAdds])!==before){ if(el("jobs"))renderJobs(); renderFront(); renderTabs(); }
+      if(JSON.stringify([state.jobLog,state.jobAdds])!==before){ if(el("jobs"))renderJobs(); renderFront(); renderTabs(); renderLog(); }
     })
     .catch(function(){ jobLogBusy=false; });
 }
@@ -5052,10 +5054,23 @@ function logDone(prev,next){
   var body={month:m,items:out,ts:Date.now()};
   state.logDocs[m]=body;write("donelog",m,body,true);renderLog();
 }
+/* Completed works is every job closed out, wherever it was ticked: the
+   board's own record (donelog) plus jobs the crew closed on the job sheet
+   (job log), which never reached donelog before. Same job in both shows once,
+   and the crew's close-out photo and note come with it. */
 function logItems(){
-  var all=[];
+  var all=[], byText={};
   Object.keys(state.logDocs).forEach(function(m){
-    (state.logDocs[m].items||[]).forEach(function(e){all.push(e);});
+    (state.logDocs[m].items||[]).forEach(function(e){ var c={}; for(var k in e)c[k]=e[k]; all.push(c); byText[String(e.text||"").trim().toLowerCase()]=c; });
+  });
+  var L=state.jobLog||{};
+  Object.keys(L).forEach(function(id){
+    var d=L[id].done; if(!d||d.a!=="done"||!d.text) return;
+    var k=d.text.trim().toLowerCase(), hit=byText[k];
+    if(hit){ if(!hit.who)hit.who=d.who; hit.photo=hit.photo||d.photo; hit.note=hit.note||d.note; return; }
+    var at=new Date(d.at), day=isNaN(at)?d.date:iso(at);
+    var e={ts:+at||0,date:day||d.date,text:d.text,who:d.who,photo:d.photo,note:d.note};
+    all.push(e); byText[k]=e;
   });
   all.sort(function(a,b){
     if(a.date!==b.date)return a.date<b.date?1:-1;
@@ -5675,7 +5690,8 @@ function renderLog(){
       '<span>'+rows.length+(rows.length===1?" job":" jobs")+'</span></div>'+
       rows.map(function(e){
         return '<div class="logrow"><span class="tick">&#10003;</span>'+
-          '<span class="ltext">'+esc(e.text)+'</span>'+
+          '<span class="ltext">'+esc(e.text)+(e.note?'<small class="lnote">'+esc(e.note)+'</small>':'')+'</span>'+
+          (e.photo?'<a href="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" target="_blank" rel="noopener"><img class="lph" src="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" alt="Photo" loading="lazy"></a>':'')+
           (e.who?'<span class="lwho">'+esc(e.who)+'</span>':'')+'</div>';
       }).join("")+'</div>';
   }).join("");
