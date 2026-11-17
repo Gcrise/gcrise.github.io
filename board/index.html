@@ -875,6 +875,22 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .cpgrid .bar.ms{width:14px;height:14px;border-radius:2px;transform:rotate(45deg);justify-self:center;padding:0;margin:0;background:var(--crit)}
 .cpgrid .st{flex:0 0 auto;font-family:var(--f-cond);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:1px 5px;border-radius:2px;border:1px solid currentColor;white-space:nowrap}
 .cpgrid .st.late{color:var(--crit)}.cpgrid .st.now{color:var(--clock)}.cpgrid .st.ok{color:var(--ink-3)}
+.cppour{display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:baseline;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13px}
+.cppour .d{font-family:var(--f-cond);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.cppour .w{min-width:0}.cppour .w small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:1px}
+.cppour .c{font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.cppour.next .d,.cppour.next .c{color:var(--crit)}
+.cppour.past{opacity:.45}
+.cpmile{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+.cpmile input[type=checkbox]{flex:none;width:18px;height:18px;accent-color:var(--clock)}
+.cpmile .t{flex:1 1 auto;min-width:0}
+.cpmile .t small{display:block;font-size:11px;color:var(--ink-3);margin-top:1px}
+.cpmile.done .t{text-decoration:line-through;opacity:.55}
+.cpmile.prog .t{color:var(--ink-2)}
+.cpmile .dd{flex:none;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.cpmile .dd.late{color:var(--crit)}
+.cpmile .x{flex:none;appearance:none;border:0;background:none;color:var(--ink-3);font-size:16px;cursor:pointer;padding:0 2px}
+.cpadd{gap:8px}.cpadd input{flex:1 1 200px;min-width:0}.cpadd select{flex:0 0 auto}
 .cplv{display:grid;grid-template-columns:minmax(90px,1.2fr) 1fr 1fr 70px;gap:8px;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
 .cplv .l{font-family:var(--f-cond);font-weight:700;letter-spacing:.06em}
 .cplv .d{color:var(--ink-2);font-variant-numeric:tabular-nums}
@@ -1758,7 +1774,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
   <span class="mm-lab">Open</span>
   <a class="mm-it" id="lnkJobs" href="../jobs/" target="_blank" rel="noopener" role="menuitem"><span>Labour</span><i>&#8599;</i></a>
   <a class="mm-it" id="lnkLifts" href="../lifts/" target="_blank" rel="noopener" role="menuitem"><span>Lifts &amp; deliveries</span><i>&#8599;</i></a>
-  <button class="mm-it" type="button" data-go="eufy" role="menuitem"><span>Eufy cameras</span></button>
+  <!-- Eufy retired 17 Nov: <button class="mm-it" type="button" data-go="eufy" role="menuitem"><span>Eufy cameras</span></button> -->
       <button class="mm-it" type="button" data-go="camera" role="menuitem"><span>Live view</span><i>&rsaquo;</i></button>
   <span class="mm-lab">Print</span>
   <button class="mm-it" type="button" id="pdfBtn" data-pdf="all" role="menuitem"><span>Site prestart</span><i>PDF</i></button>
@@ -2231,7 +2247,16 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
   <div class="panel">
     <div class="phead" data-acc="path"><h2>Critical path</h2><span class="meta" id="cpMeta"></span></div>
     <div class="cphero" id="cpHero"></div>
-    <div class="subhead" data-acc="path"><span>This deck, day by day</span><span id="cpWin"></span></div>
+    <div class="subhead" data-acc="path"><span>Pour dates</span><span>Off the programme</span></div>
+    <div id="cpPours"></div>
+    <div class="subhead" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
+    <div id="cpMiles"></div>
+    <div class="addrow cpadd" id="cpMileAdd">
+      <input id="cpMileTxt" placeholder="Add a milestone for the team this week" autocomplete="off">
+      <select id="cpMileDay" aria-label="Due"></select>
+      <button class="addbtn" id="cpMileGo" type="button">Add</button>
+    </div>
+    <div class="subhead" data-acc="path"><span>Critical works</span><span id="cpWin"></span></div>
     <div class="cpwrap"><div class="cpgrid" id="cpGrid"></div></div>
     <div class="subhead" data-acc="path"><span>Levels ahead</span><span>Programme cycle, start to slab</span></div>
     <div id="cpLevels"></div>
@@ -2248,7 +2273,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 22:15</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 22:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4577,7 +4602,9 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["prestart","Prestart"],["safety","Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["path","Critical path"],["weather","Weather"],["camera","Live view"],["eufy","Eufy"],["log","Completed works"]];
+var VIEWS=[["today","Today"],["prestart","Prestart"],["safety","Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["path","Critical path"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
+/* Eufy tab retired 17 Nov at Harry's call - the section, its code and the camera
+   settings are all kept; put ["eufy","Eufy"] back after "camera" above to re-add it. */
 var CUT=1260;      /* one cut a day, 9pm */
 var ROLLOVER=990;  /* 4:30pm - after knock-off you are planning tomorrow */
 /* the day the board opens on: today until 4:30pm, tomorrow after it */
@@ -6620,6 +6647,68 @@ function cpWorkDays(a,b){ /* working days from a to b, Mon-Sat; negative if b be
   for(var d=new Date(A);d<B;d.setDate(d.getDate()+1)){d.setHours(12);if(d.getDay()!==0)n++;}
   return n*sg;
 }
+/* ---------- weekly team milestones ----------
+   What the team commits to this week - set on Monday, ticked as they land.
+   Kept in config "milestones" by the Monday of each week, so anyone signed
+   in can add or tick, and everyone sees the same list. The programme's own
+   critical activities for the week sit under them, read-only. */
+var MILES={weeks:{}}, milesRef=null, milesSeen="";
+function weekMon(d){ var x=parseISO(d||iso(new Date())); var k=(x.getDay()+6)%7; x.setDate(x.getDate()-k); return iso(x); }
+if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
+  if(!db) return; milesRef=db.collection("config").doc("milestones");
+  milesRef.onSnapshot(function(sn){ var d=sn&&sn.data&&sn.data(); if(!d) return; var j=JSON.stringify(d); if(j===milesSeen) return; milesSeen=j; MILES=d; if(!MILES.weeks)MILES.weeks={}; renderMiles(); });
+}).catch(function(){});
+function saveMiles(){
+  if(!milesRef||!(window.eliseAuth&&window.eliseAuth.canWrite())){ toast("Sign in to change the milestones"); return; }
+  MILES.ts=Date.now(); milesSeen=JSON.stringify(MILES);
+  milesRef.set(MILES).catch(function(){ toast("Milestone not saved - try again"); });
+}
+function renderMiles(){
+  var box=el("cpMiles"); if(!box) return;
+  var today=iso(new Date()), wk=weekMon(today), L=(MILES.weeks[wk]||[]).slice();
+  var days=[]; for(var i=0;i<6;i++){ var x=parseISO(wk); x.setDate(x.getDate()+i); days.push(iso(x)); }
+  var DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  el("cpWeek").textContent="Week of "+shortDate(wk);
+  var sel=el("cpMileDay");
+  if(sel&&sel.getAttribute("data-wk")!==wk){ sel.setAttribute("data-wk",wk);
+    sel.innerHTML=days.map(function(d){var x=parseISO(d);return '<option value="'+d+'"'+(d===(today>days[5]?days[5]:(today<wk?wk:today))?' selected':'')+'>By '+DN[x.getDay()]+" "+x.getDate()+'</option>';}).join(""); }
+  var canW=!!(window.eliseAuth&&window.eliseAuth.canWrite());
+  el("cpMileAdd").hidden=!canW;
+  L.sort(function(a,b){return (a.done?1:0)-(b.done?1:0)||(a.day<b.day?-1:a.day>b.day?1:0);});
+  var h=L.map(function(m){
+    var x=parseISO(m.day), late=!m.done&&m.day<today;
+    return '<div class="cpmile'+(m.done?" done":"")+'"><input type="checkbox" data-mile="'+esc(m.id)+'"'+(m.done?" checked":"")+(canW?"":" disabled")+' aria-label="Done">'+
+      '<span class="t">'+esc(m.text)+(m.done&&m.by?'<small>Ticked by '+esc(m.by)+'</small>':'')+'</span>'+
+      '<span class="dd'+(late?" late":"")+'">'+(late?"Due ":"")+DN[x.getDay()]+" "+x.getDate()+'</span>'+
+      (canW?'<button class="x" data-mile-del="'+esc(m.id)+'" title="Remove" aria-label="Remove">&times;</button>':'')+'</div>';
+  }).join("");
+  /* the programme's critical activities finishing this week */
+  var prog=progTasks().filter(function(t){return t.finish>=wk&&t.finish<=days[5]&&(+t.dur||0)<=20&&CP_CRIT.test(t.task)&&!/^slab works|^level/i.test(t.task);})
+    .sort(function(a,b){return a.finish<b.finish?-1:1;});
+  h+=prog.map(function(t){var x=parseISO(t.finish), dn=t.off||t.pct>=100;
+    return '<div class="cpmile prog'+(dn?" done":"")+'"><input type="checkbox" disabled'+(dn?" checked":"")+' aria-label="From the programme">'+
+      '<span class="t">'+esc(t.task.charAt(0)+t.task.slice(1).toLowerCase())+'<small>Programme</small></span>'+
+      '<span class="dd'+(!dn&&t.finish<today?" late":"")+'">'+DN[x.getDay()]+" "+x.getDate()+'</span></div>';}).join("");
+  box.innerHTML=h||'<p class="empty" style="padding:8px 14px">No milestones set for this week yet.</p>';
+}
+document.addEventListener("change",function(e){
+  var c=e.target.closest&&e.target.closest("[data-mile]"); if(!c) return;
+  var wk=weekMon(), L=MILES.weeks[wk]||[], id=c.getAttribute("data-mile");
+  L.forEach(function(m){ if(m.id===id){ m.done=c.checked; m.by=c.checked?(whoAmI()||""):""; } });
+  renderMiles(); saveMiles();
+});
+document.addEventListener("click",function(e){
+  var d=e.target.closest&&e.target.closest("[data-mile-del]");
+  if(d){ var wk=weekMon(); MILES.weeks[wk]=(MILES.weeks[wk]||[]).filter(function(m){return m.id!==d.getAttribute("data-mile-del");}); renderMiles(); saveMiles(); return; }
+  if(e.target.closest&&e.target.closest("#cpMileGo")) addMile();
+});
+document.addEventListener("keydown",function(e){ if(e.target&&e.target.id==="cpMileTxt"&&e.key==="Enter"){ e.preventDefault(); addMile(); } });
+function addMile(){
+  var t=(el("cpMileTxt").value||"").trim(); if(!t) return;
+  var wk=weekMon(); (MILES.weeks[wk]=MILES.weeks[wk]||[]).push({id:"m"+Date.now().toString(36),text:t,day:el("cpMileDay").value||iso(new Date()),done:false});
+  el("cpMileTxt").value=""; renderMiles(); saveMiles();
+}
+
 function renderPath(){
   if(!el("cpGrid"))return;
   var today=iso(new Date()), all=progTasks();
@@ -6649,7 +6738,7 @@ function renderPath(){
   while(back<5){d.setDate(d.getDate()-1);if(d.getDay()!==0)back++;}
   while(days.length<20){if(d.getDay()!==0)days.push(iso(d));d.setDate(d.getDate()+1);}
   var first=days[0], last=days[days.length-1];
-  var rows=leaf.filter(function(t){return t.finish>=first&&t.start<=last;})
+  var rows=leaf.filter(function(t){return t.finish>=first&&t.start<=last&&CP_CRIT.test(t.task)&&!/^slab works/i.test(t.task);})
                .sort(function(a,b){return a.start<b.start?-1:a.start>b.start?1:(+a.id)-(+b.id);});
   el("cpWin").textContent=shortDate(first)+" \u2013 "+shortDate(last);
   var g=el("cpGrid"); g.style.gridTemplateColumns="minmax(150px,1.6fr) repeat("+days.length+",minmax(22px,1fr))";
@@ -6666,6 +6755,32 @@ function renderPath(){
     if(a<=b) h+='<div class="bar'+(ms?" ms":"")+(pour?" pour":crit?" crit":"")+(done(t)?" done":"")+'" style="grid-row:'+r+';grid-column:'+(a+2)+' / '+(b+3)+'" title="'+esc(t.task)+' \u00b7 '+shortDate(t.start)+' \u2013 '+shortDate(t.finish)+'">'+(ms?"":(b-a>=2?esc(t.task):""))+'</div>';
   });
   g.innerHTML=h;
+  /* ---- pour dates: every pour the programme names, then each level's slab
+     pour at the end of its cycle where the programme has not broken it down yet ---- */
+  var pl=[], seenLv={};
+  leaf.filter(function(t){return /pour/i.test(t.task)&&!/^slab works/i.test(t.task);}).forEach(function(t){
+    var lvm=((lv.filter(function(L){return L.finish===t.finish;})[0]||{}).task||"").replace(/ - FRP$/i,"");
+    var what=/^pour slab$/i.test(t.task.trim())&&lvm?lvm+" slab pour":t.task.replace(/\s+/g," ").trim();
+    pl.push({d:t.start,what:what,how:/boom/i.test(t.task)?"Boom pump":(/kibble/i.test(t.task)?"Kibble":""),src:"prog",id:t.id,done:done(t)});
+    if(/pour slab/i.test(t.task)) seenLv[t.finish]=1;
+  });
+  lv.forEach(function(L){
+    if((+L.dur||0)>60||seenLv[L.finish]) return;
+    if(pl.some(function(x){return /pour slab/i.test(x.what)&&x.d===L.finish;})) return;
+    pl.push({d:L.finish,what:L.task.replace(/ - FRP$/i,"")+" slab pour",how:"",src:"cycle"});
+  });
+  pl=pl.filter(function(x){return x.d>=iso(new Date(Date.now()-10*86400000));}).sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0;}).slice(0,10);
+  var nextPour=pl.filter(function(x){return x.d>=today&&/slab/i.test(x.what);})[0];
+  el("cpPours").innerHTML=pl.length?pl.map(function(x){
+    var wd=cpWorkDays(today,x.d), dd=parseISO(x.d);
+    var away=x.d<today?(x.done?"done":"past"):(wd===0?"today":wd+" day"+(wd===1?"":"s"));
+    return '<div class="cppour'+(x===nextPour?" next":"")+(x.d<today?" past":"")+'"><span class="d">'+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dd.getDay()]+" "+shortDate(x.d)+'</span>'+
+      '<span class="w">'+esc(x.what.charAt(0)+x.what.slice(1).toLowerCase())+(x.src==="cycle"?'<small>End of the level\u2019s cycle</small>':'')+'</span>'+
+      '<span class="c">'+away+'</span></div>';
+  }).join(""):'<p class="empty" style="padding:8px 14px">No pours on the programme.</p>';
+
+  renderMiles();
+
   /* ---- levels ahead ---- */
   el("cpLevels").innerHTML=lv.filter(function(t){return t.finish>=iso(new Date(Date.now()-21*86400000));}).slice(0,8).map(function(t){
     var cls=t.finish<today?" past":(t.start<=today?" cur":"");
