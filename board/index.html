@@ -933,6 +933,13 @@ input,textarea,select,option{text-transform:none}
 .item.pri{box-shadow:inset 3px 0 0 var(--gold)}
 .item.pri .txt{font-weight:600}
 .item.done.pri .txt{font-weight:400}
+.prisel{flex:none;appearance:none;-webkit-appearance:none;cursor:pointer;font:600 10.5px/1 var(--f-cond),Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);background:transparent;border:1px solid var(--line-hard);border-radius:3px;padding:4px 18px 4px 6px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 9px) 50%,calc(100% - 5px) 50%;background-size:4px 4px;background-repeat:no-repeat}
+.prisel.on{color:var(--clock);border-color:var(--clock)}
+.prisel option{color:#111;background:#fff}
+
 .flag{background:none;border:none;color:var(--ink-3);cursor:pointer;font-size:14px;line-height:1;padding:1px 2px;flex:none}
 .who{flex:none;width:78px;background:none;border:1px solid var(--line);border-radius:3px;color:var(--gold);
   font-family:var(--f-cond);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 5px;min-width:0}
@@ -1757,7 +1764,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     </form>
     <div class="subhead" data-acc="jobs"><span>Jobs today</span><span id="jobsMeta"></span><span class="right"><button class="mini" id="rollJobsBtn" title="Carry anything still open from the last day over to this one">Carry over</button><button class="mini" data-copy="jobs">Copy</button><button class="mini" data-pdf="jobs">PDF</button></span></div>
     <form class="addrow top" id="jobForm">
-      <select id="jfPri"><option value="">Normal</option><option value="1">Priority</option></select>
+      <select id="jfPri"><option value="">Non-priority</option><option value="1">Priority</option></select>
       <input id="jfText" placeholder="Type a job and hit enter" autocomplete="off">
       <input id="jfWho" class="who" list="crewNames" placeholder="Who's on it" autocomplete="off" spellcheck="false">
       <button class="jcam" id="jfCam" type="button" hidden title="Shoot a photo and add the job with it"></button>
@@ -2150,7 +2157,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:50</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5647,7 +5654,7 @@ function jobRow(j,i){
   var np=jobPhotos(j).length, th=jobThumbs(j);
   return '<div class="item'+(j.done?' done':'')+(j.pri?' pri':'')+(th?' hasph':'')+'">'+
     '<input type="checkbox" data-job="'+i+'"'+(j.done?' checked':'')+' aria-label="Done">'+
-    '<button class="flag" data-pri="'+i+'" title="'+(j.pri?"Drop off priority":"Make priority")+'" aria-pressed="'+(!!j.pri)+'">'+(j.pri?"★":"☆")+'</button>'+
+    '<select class="prisel'+(j.pri?' on':'')+'" data-pri="'+i+'" aria-label="Priority"><option value="1"'+(j.pri?' selected':'')+'>Priority</option><option value="0"'+(j.pri?'':' selected')+'>Non-priority</option></select>'+
     '<span class="txt" contenteditable="true" data-jobtxt="'+i+'">'+esc(j.text)+'</span>'+
     '<span class="jmeta">'+
       (j.from?'<span class="pill carry" title="Carried from '+esc(shortDate(j.from))+'">'+esc(shortDate(j.from))+'</span>':'')+
@@ -5829,11 +5836,11 @@ function renderJobs(){
   ["jobs","jobsDone"].forEach(function(holder){
     var box=el(holder); if(!box) return;
     Array.prototype.forEach.call(box.querySelectorAll("[data-pri]"),function(b){
-      b.addEventListener("click",function(){
-        var i=+b.getAttribute("data-pri");
+      b.addEventListener("change",function(){
+        var i=+b.getAttribute("data-pri"), want=b.value==="1";
         saveJobs(dayJobs().map(function(x,n){
           if(n!==i)return x;
-          var o={};for(var k in x)o[k]=x[k];o.pri=!x.pri;return o;
+          var o={};for(var k in x)o[k]=x[k];o.pri=want;return o;
         }));
       });
     });

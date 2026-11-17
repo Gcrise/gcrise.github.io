@@ -139,6 +139,17 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .dwrap .job.pri::before{display:none}
 .dwrap .job{grid-template-columns:22px 1fr auto}
 
+/* Priority or not - a plain drop-down, on every row and in the job sheet */
+.prisel{flex:0 0 auto;align-self:center;appearance:none;-webkit-appearance:none;cursor:pointer;
+  font:600 11px/1 inherit;font-family:inherit;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);
+  background-color:transparent;border:1px solid var(--rule);border-radius:4px;padding:6px 20px 6px 7px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 10px) 50%,calc(100% - 6px) 50%;background-size:4px 4px;background-repeat:no-repeat}
+.prisel.on{color:var(--pri);border-color:var(--pri)}
+.prisel option{color:#111;background:#fff}
+.prisel.big{width:100%;margin-top:6px;font-size:14px;padding:11px 26px 11px 12px;text-transform:none;letter-spacing:0}
+.prilab{display:block;margin-top:16px}
+@media (max-width:520px){.prisel:not(.big){font-size:10px;padding:5px 16px 5px 5px;letter-spacing:.03em;background-position:calc(100% - 8px) 50%,calc(100% - 4px) 50%}}
 /* Priority is a state you set, not a form field, so it reads as a switch. */
 .prib{display:flex;align-items:center;gap:10px;width:100%;margin-top:16px;
   appearance:none;font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;
@@ -330,9 +341,8 @@ html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-r
              style="flex:0 0 auto;padding:10px 16px;text-align:center">Take a photo</label>
       <img id="shotImg" hidden alt="">
     </div>
-    <button class="prib" id="priBtn" type="button">
-      <span class="pdot"></span><span id="priLabel">Make it priority</span>
-    </button>
+    <label for="priBtn" class="prilab">Priority</label>
+    <select class="prisel big" id="priBtn"><option value="0">Non-priority</option><option value="1">Priority</option></select>
     <div class="acts">
       <button class="btn" id="jobCancel">Cancel</button>
       <button class="btn" id="priSave" hidden>Save priority</button>
@@ -546,9 +556,9 @@ function jobRow(j){
       '<span><span class="jt">'+esc(j.item_text)+'</span>'+
       (meta.length?'<span class="meta">'+meta.join("")+'</span>':'')+ev+'</span>'+
     '</button>'+
-    (j.done?'':'<button class="star" type="button" data-star="'+esc(j.item_id)+'" '+
-      'aria-pressed="'+(!!j.priority)+'" title="'+(j.priority?'Drop off priority':'Make priority')+'">'+
-      (j.priority?'\u2605':'\u2606')+'</button>')+
+    ((j.done||/^daily-/.test(j.item_id))?'':'<select class="prisel'+(j.priority?' on':'')+'" data-star="'+esc(j.item_id)+'" aria-label="Priority">'+
+      '<option value="1"'+(j.priority?' selected':'')+'>Priority</option>'+
+      '<option value="0"'+(j.priority?'':' selected')+'>Non-priority</option></select>')+
     phs+'</div>';
 }
 
@@ -561,20 +571,17 @@ async function starJob(id, btn){
   var j=rows.filter(function(x){return x.item_id===id})[0]
         || dailyFor(iso(dateFor(day))).filter(function(x){return x.item_id===id})[0];
   if(!j) return;
-  var want=!j.priority, was=btn.innerHTML;
+  var want=btn.value==="1";
+  if(want===!!j.priority) return;
   btn.disabled=true;
-  btn.setAttribute("aria-pressed",String(want));
-  btn.innerHTML = want?"\u2605":"\u2606";
-  btn.title = want?"Drop off priority":"Make priority";
+  btn.classList.toggle("on",want);
   try{
     await logRows([{item_id:id, job_date:j.job_date, action: want?"pri":"unpri",
       item_text:j.item_text, who:me, note:"", photo_id:""}]);
     j.priority=want;
     load();
   }catch(e){
-    btn.innerHTML=was;
-    btn.setAttribute("aria-pressed",String(!want));
-    btn.title = want?"Make priority":"Drop off priority";
+    btn.value=want?"0":"1"; btn.classList.toggle("on",!want);
     toast("Couldn't change it - try again");
   }
   btn.disabled=false;
@@ -641,7 +648,8 @@ function render(){
     b.addEventListener("click",function(){ openJob(b.getAttribute("data-id")); });
   });
   Array.prototype.forEach.call(el("list").querySelectorAll("[data-star]"),function(b){
-    b.addEventListener("click",function(ev){
+    b.addEventListener("click",function(ev){ ev.stopPropagation(); });
+    b.addEventListener("change",function(ev){
       ev.stopPropagation();
       starJob(b.getAttribute("data-star"), b);
     });
@@ -714,8 +722,7 @@ function openJob(id){
 }
 function paintPri(){
   var b=el("priBtn");
-  b.setAttribute("aria-pressed", priWant?"true":"false");
-  el("priLabel").textContent = priWant ? "Priority" : "Make it priority";
+  b.value = priWant?"1":"0"; b.classList.toggle("on",priWant);
   /* Marking something priority is not the same as finishing it, so the save
      for it appears on its own as soon as the toggle differs. */
   el("priSave").hidden = !pending || (priWant === !!pending.priority);
@@ -742,7 +749,7 @@ el("priSave").addEventListener("click", async function(){
   }
   b.disabled=false;
 });
-el("priBtn").addEventListener("click",function(){ priWant=!priWant; paintPri(); });
+el("priBtn").addEventListener("change",function(){ priWant=this.value==="1"; paintPri(); });
 el("jobCancel").addEventListener("click",function(){ el("jobScrim").hidden=true; });
 el("shotBtn").addEventListener("keydown",function(e){
   if(e.key==="Enter"||e.key===" "){ e.preventDefault(); el("shotIn").click(); }
