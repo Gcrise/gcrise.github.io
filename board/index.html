@@ -1017,6 +1017,30 @@ input,textarea,select,option{text-transform:none}
 #v-prestart .subhead span:last-child:not(:first-child),#v-safety .subhead > span:not(:first-child){color:var(--ink-3);font-size:10.5px}
 #v-prestart .addrow,#v-safety .addrow{background:transparent;border:0;padding:8px 14px}
 #v-prestart .srow,#v-safety .srow{padding:6px 14px}
+.pretype{display:flex;margin:12px 14px 2px;border:1px solid var(--clock);border-radius:4px;overflow:hidden}
+.pretype button{flex:1 1 0;appearance:none;border:0;background:transparent;color:var(--clock);cursor:pointer;
+  font:700 12px/1 var(--f-cond),Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:10px 6px}
+.pretype button[aria-pressed="true"]{background:var(--clock);color:var(--paper)}
+.pretype button:disabled{cursor:default}
+.pcline{display:flex;gap:8px;align-items:baseline;padding:4px 14px;font-size:13px;line-height:1.35;min-width:0}
+.pcline .tm{flex:0 0 auto;font-family:var(--f-cond);font-weight:700;font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;min-width:86px}
+.pcline .co{flex:0 0 auto;font-weight:700}
+.pcline .ds{flex:1 1 auto;min-width:0;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcline .n{flex:0 0 auto;font-family:var(--f-cond);font-weight:700;font-size:12px;color:var(--clock)}
+.pcmore{appearance:none;border:0;background:transparent;color:var(--ink-3);cursor:pointer;font:600 11px var(--f-cond),Arial,sans-serif;
+  letter-spacing:.08em;text-transform:uppercase;padding:4px 14px 8px}
+.signrow{display:flex;align-items:center;gap:10px;padding:6px 14px;border-bottom:1px solid var(--line);font-size:13px}
+.signrow .nm{flex:1 1 auto;min-width:0}.signrow .nm b{display:block}.signrow .nm small{color:var(--ink-3)}
+.signrow img{height:34px;width:auto;max-width:120px;background:#fff;border-radius:3px}
+.signrow .t{font-family:var(--f-cond);font-size:11px;color:var(--ink-3)}
+.presign{gap:8px;align-items:center}
+.presign input{flex:1 1 200px;min-width:0;font-size:12px}
+.sigpad{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.sigpad .box{background:var(--surface);border:1px solid var(--line-hard);border-radius:6px;padding:14px;width:min(520px,100%);display:flex;flex-direction:column;gap:8px}
+.sigpad h3{margin:0;font-family:var(--f-cond);letter-spacing:.1em;text-transform:uppercase;font-size:14px;color:var(--clock)}
+.sigpad input{width:100%}
+.sigpad canvas{width:100%;height:150px;background:#fff;border-radius:4px;touch-action:none;cursor:crosshair}
+.sigpad .row{display:flex;gap:8px;justify-content:flex-end}
 #v-prestart #preSafeList .srow{padding:4px 14px 4px 28px;position:relative}
 #v-prestart #preSafeList .srow::before{content:"";position:absolute;left:16px;top:12px;width:5px;height:5px;border-radius:50%;background:var(--ink-3)}
 #v-prestart #preSafeList .srow .tx{font-size:12.5px;line-height:1.35}
@@ -2070,6 +2094,9 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     </div>
 
     <div id="preDate" hidden></div>
+    <div class="pretype" id="preType" role="group" aria-label="Prestart type">
+      <button type="button" data-ptype="daily">Daily prestart</button><button type="button" data-ptype="hr">High risk prestart</button>
+    </div>
 
     <div class="subhead" data-acc="prestart"><span>Weather</span><span id="preWxMeta"></span></div>
     <div class="addrow top prewx"><span class="prewx-ico" id="preWxIco"></span><input id="preWeather" placeholder="Fine, 26, light NE &mdash; or wet, windy, hot" autocomplete="off"></div>
@@ -2094,6 +2121,17 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <div id="preSafeList"></div>
     <div class="addrow top"><textarea id="preSafety" rows="1" placeholder="Anything raised this morning"></textarea></div>
 
+
+    <div id="preSignBox" hidden>
+      <div class="subhead" data-acc="prestart"><span>Signatures</span><span id="preSignMeta"></span></div>
+      <p class="prenote">Everyone on the high risk work signs that they were briefed. Send the link to their phones, or hand this one round.</p>
+      <div id="preSigns"></div>
+      <div class="addrow top presign">
+        <button class="mini" id="preSignLink" type="button">Send sign link</button>
+        <button class="mini" id="preSignHere" type="button">Sign on this device</button>
+        <input id="preLinkTxt" readonly aria-label="Sign link" hidden>
+      </div>
+    </div>
 
     <div class="addrow">
       <input id="preBy" class="who" list="crewNames" placeholder="Who ran it" autocomplete="off" spellcheck="false">
@@ -2209,7 +2247,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 17:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 17:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5296,11 +5334,79 @@ function preSafetyAll(){
   });
 }
 
+/* ---------- high risk prestart signatures ----------
+   Kept in their own table, prestart_sign: anyone with the link can add their
+   name for yesterday, today or tomorrow, nobody can change or remove one. The
+   drawn signature is only readable signed in; the public link shows names. */
+var SIGNS={}, signBusy={};
+function signUrl(day){ return location.origin+location.pathname.replace(/board\/?(index\.html)?$/,"")+"sign/?d="+day; }
+function loadSigns(day){
+  if(signBusy[day]) return; signBusy[day]=true;
+  var signed=!!(window.eliseAuth&&window.eliseAuth.canWrite());
+  jlGet(JL_REST+"prestart_sign?day=eq."+day+"&order=at.asc&select="+(signed?"*":"id,name,company,at"))
+    .then(function(r){return r.ok?r.json():[];}).catch(function(){return [];})
+    .then(function(rows){ SIGNS[day]=rows||[]; signBusy[day]=false; paintSigns(day); });
+}
+function paintSigns(day){
+  if(day!==state.date) return;
+  var L=SIGNS[day]||[], box=el("preSigns"); if(!box) return;
+  box.innerHTML=L.length?L.map(function(r){
+    var t=new Date(r.at);
+    return '<div class="signrow"><span class="nm"><b>'+esc(r.name)+'</b><small>'+esc(r.company||"")+'</small></span>'+
+      (r.sig?'<img src="'+esc(r.sig)+'" alt="Signature of '+esc(r.name)+'">':'')+
+      '<span class="t">'+esc(fmtClock(t.getHours()*60+t.getMinutes()))+'</span></div>';
+  }).join(""):'<p class="prenote">Nobody has signed yet.</p>';
+  var m=el("preSignMeta"); if(m) m.textContent=L.length?L.length+" signed":"";
+}
+setInterval(function(){ if(state.view==="prestart"&&preDoc().type==="hr"&&document.visibilityState==="visible") loadSigns(state.date); },20000);
+document.addEventListener("click",function(e){
+  if(e.target.closest&&e.target.closest("#preSignLink")){
+    var u=signUrl(state.date), inp=el("preLinkTxt");
+    inp.value=u; inp.hidden=false; inp.select();
+    var msg="ELISE high risk prestart "+shortDate(state.date)+" - read it and sign here: ";
+    if(navigator.share){ navigator.share({title:"ELISE high risk prestart",text:msg,url:u}).catch(function(){}); }
+    else if(navigator.clipboard){ navigator.clipboard.writeText(msg+u).then(function(){toast("Sign link copied - paste it into the group");},function(){}); }
+  }
+  if(e.target.closest&&e.target.closest("#preSignHere")) sigPad(state.date);
+});
+function sigPad(day){
+  var w=document.createElement("div"); w.className="sigpad";
+  w.innerHTML='<div class="box"><h3>Sign the high risk prestart</h3>'+
+    '<input id="spName" placeholder="Your name" autocomplete="name" maxlength="80">'+
+    '<input id="spCo" placeholder="Company" maxlength="80">'+
+    '<canvas id="spCv"></canvas><div class="row"><button class="mini" data-sp="clear">Clear</button>'+
+    '<button class="mini" data-sp="cancel">Cancel</button><button class="addbtn" data-sp="save">Sign</button></div></div>';
+  document.body.appendChild(w);
+  var cv=w.querySelector("#spCv"), r=cv.getBoundingClientRect(); cv.width=600; cv.height=180;
+  var cx=cv.getContext("2d"); cx.lineWidth=3; cx.lineCap="round"; cx.lineJoin="round"; cx.strokeStyle="#111";
+  var down=false, inked=false;
+  function pt(ev){var b=cv.getBoundingClientRect();return [(ev.clientX-b.left)*cv.width/b.width,(ev.clientY-b.top)*cv.height/b.height];}
+  cv.addEventListener("pointerdown",function(ev){down=true;cv.setPointerCapture(ev.pointerId);var p=pt(ev);cx.beginPath();cx.moveTo(p[0],p[1]);});
+  cv.addEventListener("pointermove",function(ev){if(!down)return;var p=pt(ev);cx.lineTo(p[0],p[1]);cx.stroke();inked=true;});
+  cv.addEventListener("pointerup",function(){down=false;});
+  w.addEventListener("click",function(ev){
+    var b=ev.target.closest("[data-sp]"); if(!b) return;
+    var a=b.getAttribute("data-sp");
+    if(a==="clear"){cx.clearRect(0,0,cv.width,cv.height);inked=false;}
+    if(a==="cancel") w.remove();
+    if(a==="save"){
+      var nm=(w.querySelector("#spName").value||"").trim(), co=(w.querySelector("#spCo").value||"").trim();
+      if(!nm){toast("Put your name in");return;}
+      if(!inked){toast("Sign in the white box");return;}
+      b.disabled=true;
+      fetch(JL_REST+"prestart_sign",{method:"POST",headers:Object.assign({},JLH(),{"Content-Type":"application/json","Prefer":"return=minimal"}),
+        body:JSON.stringify({day:day,name:nm,company:co,sig:cv.toDataURL("image/png")})})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); w.remove(); toast("Signed - thanks "+nm); signBusy[day]=false; loadSigns(day); })
+      .catch(function(){ b.disabled=false; toast("Didn't save - try again"); });
+    }
+  });
+}
+
 function savePre(patch){
   var d=preDoc(), body={
     date:state.date,
     weather:d.weather||"", works:d.works||"", finishes:d.finishes||"", safety:d.safety||"",
-    risk:d.risk||"",
+    risk:d.risk||"", type:d.type||"daily",
     ticks:d.ticks||{}, note:d.note||"", by:d.by||"", at:d.at||0, ts:Date.now()
   };
   for(var k in patch) body[k]=patch[k];
@@ -5408,8 +5514,27 @@ function renderPrestart(){
       '<span class="tx"><b>'+esc(who)+'</b> &mdash; '+esc(b.desc||"")+
       '<small>'+esc(preKind(b)+qty+leg+tbc+(b.notes?(" \u00b7 "+b.notes):""))+'</small></span></div>';
   }
-  preRows(dels.map(bookLine).join(""),"preDels","No deliveries booked for today.");
-  preRows(lifts.map(bookLine).join(""),"preLifts","No crane lifts booked for today.");
+  /* The prestart only needs the shape of the day, not every pick: one line a
+     truck, and the lifts rolled up a line a trade - first hook to last, how
+     many. The crane tab has the full run. */
+  function hhmmB(m){return fmtClock(m);}
+  var delHtml=dels.map(function(b){
+    return '<div class="pcline"><span class="tm">'+esc(hhmmB(toMin(b.start)))+'</span><span class="co">'+esc(b.co||"")+'</span>'+
+      '<span class="ds">'+esc(b.desc||"")+(b.status==="req"?" (TBC)":"")+'</span></div>';
+  }).join("");
+  var byCo={};
+  lifts.forEach(function(b){
+    var k=b.co2?(b.co+"/"+b.co2):b.co, s0=toMin(b.start), e0=s0+(+b.dur||0);
+    var g=byCo[k]||(byCo[k]={co:k,s:s0,e:e0,n:0,what:[]});
+    g.s=Math.min(g.s,s0); g.e=Math.max(g.e,e0); g.n+=Math.max(1,+b.qty||1);
+    var w=String(b.desc||"").split(/\s+-\s+|\(/)[0].trim(); if(w&&g.what.indexOf(w)<0) g.what.push(w);
+  });
+  var liftHtml=Object.keys(byCo).map(function(k){return byCo[k];}).sort(function(a,b){return a.s-b.s;}).map(function(g){
+    return '<div class="pcline"><span class="tm">'+esc(hhmmB(g.s))+'\u2013'+esc(hhmmB(g.e))+'</span><span class="co">'+esc(g.co)+'</span>'+
+      '<span class="ds">'+esc(g.what.join(", "))+'</span><span class="n">'+g.n+(g.n===1?" lift":" lifts")+'</span></div>';
+  }).join("");
+  preRows(delHtml,"preDels","No deliveries booked for today.");
+  preRows(liftHtml,"preLifts","No crane lifts booked for today.");
   var dm=el("preDelMeta");
   if(dm) dm.textContent=dels.length?dels.length+(dels.length===1?" truck":" trucks"):"";
   var lm=el("preLiftMeta");
@@ -5433,6 +5558,14 @@ function renderPrestart(){
     if(document.activeElement!==byEl) byEl.value=d.by||whoAmI()||"";
     byEl.disabled=signed;
   }
+  var ptype=d.type==="hr"?"hr":"daily";
+  Array.prototype.forEach.call(document.querySelectorAll("#preType [data-ptype]"),function(b){
+    b.setAttribute("aria-pressed",String(b.getAttribute("data-ptype")===ptype));
+    b.disabled=signed;
+    b.onclick=function(){ if(!signed&&ptype!==b.getAttribute("data-ptype")) savePre({type:b.getAttribute("data-ptype")}); };
+  });
+  var hd=document.querySelector("#v-prestart .phead h2"); if(hd) hd.textContent=ptype==="hr"?"High risk prestart":"Daily prestart";
+  var sb=el("preSignBox"); if(sb){ sb.hidden=ptype!=="hr"; if(ptype==="hr") loadSigns(state.date); }
   if(btn){ btn.hidden=signed; btn.textContent="Complete prestart"; btn.onclick=completePre; }
   if(ro){ ro.hidden=!signed; ro.onclick=reopenPre; }
 }
@@ -6771,6 +6904,7 @@ function sectionText(which){
       [].concat(body).forEach(function(l){ o.push(l); });
     }
     blk("Weather", (pd.weather||wxLine(state.date))?[pd.weather||wxLine(state.date)]:null);
+    blk("Type", [pd.type==="hr"?"High risk prestart":"Daily prestart"]);
     blk("Structures", pd.works?pd.works.split(/\n+/):null);
     blk("Finishes", pd.finishes?pd.finishes.split(/\n+/):null);
     var sfy=preStanding().map(function(i){return "- "+i.text;});
@@ -6937,7 +7071,7 @@ async function buildPDF(which){
   doc.setTextColor(242,237,228);doc.setFont("helvetica","normal");doc.setFontSize(15);
   doc.text("E L I S E",M,11);
   doc.setFontSize(8);
-  doc.text((which==="all"?"DAY SHEET":String(SECTIONS[which]||"").toUpperCase())+"  ·  3 TWENTY FIFTH AVE, PALM BEACH",M,17);
+  doc.text((which==="all"?(preDoc().type==="hr"?"HIGH RISK PRESTART":"DAILY PRESTART"):String(SECTIONS[which]||"").toUpperCase())+"  ·  3 TWENTY FIFTH AVE, PALM BEACH",M,17);
   doc.setFontSize(11);
   doc.text(dayName(d)+" "+d.getDate()+" "+monName(d)+" "+d.getFullYear(),W-M,13,{align:"right"});
   y=30;
@@ -7290,6 +7424,27 @@ async function buildPDF(which){
     head("Photos");
     if(!ph.length) none(dayPhotos().length?"All shown under their jobs above.":"None on this day.");
     else await plates(ph,"");
+  }
+
+  if(which==="all"&&preDoc().type==="hr"){
+    head("Signatures - briefed on the high risk works");
+    var sg=[];
+    try{
+      var signedIn=!!(window.eliseAuth&&window.eliseAuth.canWrite());
+      var rs=await jlGet(JL_REST+"prestart_sign?day=eq."+state.date+"&order=at.asc&select="+(signedIn?"*":"id,name,company,at"));
+      sg=rs.ok?await rs.json():[];
+    }catch(e){ sg=SIGNS[state.date]||[]; }
+    if(!sg.length) none("Nobody signed.");
+    sg.forEach(function(r){
+      brk(14);
+      var t=new Date(r.at);
+      doc.setTextColor(43,41,38);doc.setFont("helvetica","bold");doc.setFontSize(9.5);doc.text(String(r.name||""),M,y);
+      doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.text(String(r.company||""),M+60,y);
+      doc.text(fmtClock(t.getHours()*60+t.getMinutes()),M+110,y);
+      if(r.sig){ try{ doc.addImage(r.sig,"PNG",M+128,y-7,40,12); }catch(e){} }
+      else { doc.setDrawColor(200,196,186);doc.line(M+128,y+1,M+168,y+1); }
+      y+=14;
+    });
   }
 
   var pages=doc.internal.getNumberOfPages();
