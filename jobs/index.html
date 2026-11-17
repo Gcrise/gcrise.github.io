@@ -140,16 +140,21 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .dwrap .job{grid-template-columns:22px 1fr auto}
 
 /* Priority or not - a plain drop-down, on every row and in the job sheet */
+/* the row: job button full width, the priority drop-down tucked into the
+   bottom right on the who / date line, so it costs no width */
+.jmain{position:relative;flex:1 1 100%;min-width:0;display:flex}
+.jmain .prisel:not(.big){position:absolute;right:0;bottom:9px}
+.meta.withpri{padding-right:78px;min-height:20px}
 .prisel{flex:0 0 auto;align-self:center;appearance:none;-webkit-appearance:none;cursor:pointer;
-  font:600 11px/1 inherit;font-family:inherit;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);
-  background-color:transparent;border:1px solid var(--rule);border-radius:4px;padding:6px 20px 6px 7px;
+  font:600 9.5px/1 inherit;font-family:inherit;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);
+  background-color:transparent;border:1px solid var(--rule);border-radius:4px;padding:3px 15px 3px 5px;height:20px;
   background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
-  background-position:calc(100% - 10px) 50%,calc(100% - 6px) 50%;background-size:4px 4px;background-repeat:no-repeat}
+  background-position:calc(100% - 8px) 50%,calc(100% - 5px) 50%;background-size:3px 3px;background-repeat:no-repeat}
 .prisel.on{color:var(--pri);border-color:var(--pri)}
 .prisel option{color:#111;background:#fff}
 .prisel.big{width:100%;margin-top:6px;font-size:14px;padding:11px 26px 11px 12px;text-transform:none;letter-spacing:0}
 .prilab{display:block;margin-top:16px}
-@media (max-width:520px){.prisel:not(.big){font-size:10px;padding:5px 16px 5px 5px;letter-spacing:.03em;background-position:calc(100% - 8px) 50%,calc(100% - 4px) 50%}}
+
 /* Priority is a state you set, not a form field, so it reads as a switch. */
 .prib{display:flex;align-items:center;gap:10px;width:100%;margin-top:16px;
   appearance:none;font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;
@@ -551,14 +556,16 @@ function jobRow(j){
   /* The star has to live outside the row button - a button inside a button
      is not a thing, and on a phone the two would fight over the same tap. */
   return '<div class="jobrow'+(j.done?' done':'')+'">'+
+    '<div class="jmain">'+
     '<button class="'+cls+'" data-id="'+esc(j.item_id)+'" type="button">'+
       '<span class="box">&#10003;</span>'+
       '<span><span class="jt">'+esc(j.item_text)+'</span>'+
-      (meta.length?'<span class="meta">'+meta.join("")+'</span>':'')+ev+'</span>'+
+      ((meta.length||!(j.done||/^daily-/.test(j.item_id)))?'<span class="meta'+(!(j.done||/^daily-/.test(j.item_id))?' withpri':'')+'">'+meta.join("")+'</span>':'')+ev+'</span>'+
     '</button>'+
     ((j.done||/^daily-/.test(j.item_id))?'':'<select class="prisel'+(j.priority?' on':'')+'" data-star="'+esc(j.item_id)+'" aria-label="Priority">'+
       '<option value="1"'+(j.priority?' selected':'')+'>Priority</option>'+
-      '<option value="0"'+(j.priority?'':' selected')+'>Non-priority</option></select>')+
+      '<option value="0"'+(j.priority?'':' selected')+'>Non-pri</option></select>')+
+    '</div>'+
     phs+'</div>';
 }
 
