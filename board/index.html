@@ -2150,7 +2150,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:25</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -6860,8 +6860,12 @@ async function buildPDF(which){
       "   ·   Crane "+fmtClock(open)+"–"+fmtClock(close),M,y);
     y+=8;
     var pdw=preDoc();
-    [["Structures",pdw.works],["Finishes",pdw.finishes]].forEach(function(g){
-      head("Site works — "+g[0]);
+    if(pdw.at){ var sd=new Date(pdw.at);
+      doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(43,41,38);
+      doc.text("Prestart signed off by "+(pdw.by||"-")+" at "+fmtClock(sd.getHours()*60+sd.getMinutes()),M,y); y+=6; }
+    [["Weather",pdw.weather],["Structures",pdw.works],["Finishes",pdw.finishes],["High risk works",pdw.risk],["Safety notes",pdw.safety]].forEach(function(g){
+      if(!g[1]&&(g[0]==="Safety notes"||g[0]==="Weather")) return;
+      head((g[0]==="Structures"||g[0]==="Finishes")?"Site works — "+g[0]:g[0]);
       if(!g[1]){none("Nothing written.");return;}
       doc.setTextColor(43,41,38);doc.setFont("helvetica","normal");doc.setFontSize(9);
       String(g[1]).split(/\n+/).forEach(function(l){
