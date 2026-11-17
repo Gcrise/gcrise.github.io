@@ -900,6 +900,17 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .cpmile{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
 .cpmile input[type=checkbox]{flex:none;width:18px;height:18px;accent-color:var(--clock)}
 .cpmile .t{flex:1 1 auto;min-width:0}
+.cpmile .mt[contenteditable]{outline:none;border-bottom:1px dashed transparent;cursor:text}
+.cpmile .mt[contenteditable]:focus{border-bottom-color:var(--clock)}
+.cpmile .mdel{flex:none;appearance:none;background:none;border:1px solid var(--line-hard);border-radius:3px;color:var(--ink-3);cursor:pointer;
+  font:600 9.5px/1 var(--f-cond),Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:0 7px;height:22px}
+.cpmile .mdel.arm{color:var(--crit);border-color:var(--crit)}
+.cpmile{flex-wrap:wrap;row-gap:6px}
+.cpmile .t{flex:1 1 calc(100% - 40px)}
+.cpmile .ctl{flex:1 1 100%;display:flex;gap:6px;align-items:center;padding-left:28px}
+.cpmile .ctl .mdel{margin-left:auto}
+#cpMileAdd{flex-wrap:wrap}
+#cpMileAdd #cpMileTxt{flex:1 1 100%}
 .cpmile .t small{display:block;font-size:11px;color:var(--ink-3);margin-top:1px}
 .cpmile.done .t{text-decoration:line-through;opacity:.55}
 .cpmile.prog .t{color:var(--ink-2)}
@@ -2287,7 +2298,8 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <div class="subhead" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
     <div id="cpMiles"></div>
     <div class="addrow cpadd" id="cpMileAdd">
-      <input id="cpMileTxt" placeholder="Add a milestone for the team this week" autocomplete="off">
+      <input id="cpMileTxt" placeholder="Type a milestone for the team this week" autocomplete="off">
+      <select id="cpMileWho" aria-label="Who"><option value="">Who?</option><option>James</option><option>Anthony</option><option>Harry</option><option>Rick</option><option>Kayla</option></select>
       <select id="cpMileDay" aria-label="Due"></select>
       <button class="addbtn" id="cpMileGo" type="button">Add</button>
     </div>
@@ -2311,7 +2323,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 09:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 10:05</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -6774,6 +6786,7 @@ document.addEventListener("keydown",function(e){ if(e.target&&e.target.id==="ord
    in can add or tick, and everyone sees the same list. The programme's own
    critical activities for the week sit under them, read-only. */
 var MILES={weeks:{}}, milesRef=null, milesSeen="";
+var MILE_TEAM=["James","Anthony","Harry","Rick","Kayla"];
 function weekMon(d){ var x=parseISO(d||iso(new Date())); var k=(x.getDay()+6)%7; x.setDate(x.getDate()-k); return iso(x); }
 if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
   if(!db) return; milesRef=db.collection("config").doc("milestones");
@@ -6799,25 +6812,25 @@ function renderMiles(){
   var h=L.map(function(m){
     var x=parseISO(m.day), late=!m.done&&m.day<today;
     return '<div class="cpmile'+(m.done?" done":"")+'"><input type="checkbox" data-mile="'+esc(m.id)+'"'+(m.done?" checked":"")+(canW?"":" disabled")+' aria-label="Done">'+
-      '<span class="t">'+esc(m.text)+(m.done&&m.by?'<small>Ticked by '+esc(m.by)+'</small>':'')+'</span>'+
+      '<span class="t"><span class="mt"'+(canW?' contenteditable="true" data-mile-txt="'+esc(m.id)+'" spellcheck="true"':'')+'>'+esc(m.text)+'</span>'+
+        (m.done&&m.by?'<small>Ticked by '+esc(m.by)+'</small>':'')+'</span>'+'<span class="ctl">'+
+      (canW&&!m.done
+        ? '<select class="prisel'+(m.who?' on':'')+'" data-mile-who="'+esc(m.id)+'" aria-label="Who">'+'<option value="">Who?</option>'+
+            MILE_TEAM.concat(m.who&&MILE_TEAM.indexOf(m.who)<0?[m.who]:[]).map(function(n){return '<option'+(n===m.who?' selected':'')+'>'+esc(n)+'</option>';}).join("")+'</select>'
+        : (m.who?'<span class="dd">'+esc(m.who)+'</span>':''))+
       (canW&&!m.done
         ? '<select class="prisel'+(late?" late":"")+'" data-mile-day="'+esc(m.id)+'" aria-label="Due">'+
             days.map(function(dd){var y=parseISO(dd);return '<option value="'+dd+'"'+(dd===m.day?' selected':'')+'>'+(late&&dd===m.day?"Due ":"By ")+DN[y.getDay()]+" "+y.getDate()+'</option>';}).join("")+
             (days.indexOf(m.day)<0?'<option value="'+esc(m.day)+'" selected>'+DN[x.getDay()]+" "+x.getDate()+'</option>':'')+
           '</select>'
         : '<span class="dd'+(late?" late":"")+'">'+(late?"Due ":"")+DN[x.getDay()]+" "+x.getDate()+'</span>')+
-      (canW?'<button class="x" data-mile-del="'+esc(m.id)+'" title="Remove" aria-label="Remove">&times;</button>':'')+'</div>';
+      (canW?'<button class="mdel" data-mile-del="'+esc(m.id)+'" type="button" aria-label="Delete milestone">Delete</button>':'')+'</span></div>';
   }).join("");
-  /* the programme's critical activities finishing this week */
-  var prog=progTasks().filter(function(t){return t.finish>=wk&&t.finish<=days[5]&&(+t.dur||0)<=20&&CP_CRIT.test(t.task)&&!/^slab works|^level/i.test(t.task);})
-    .sort(function(a,b){return a.finish<b.finish?-1:1;});
-  h+=prog.map(function(t){var x=parseISO(t.finish), dn=t.off||t.pct>=100;
-    return '<div class="cpmile prog'+(dn?" done":"")+'"><input type="checkbox" disabled'+(dn?" checked":"")+' aria-label="From the programme">'+
-      '<span class="t">'+esc(t.task.charAt(0)+t.task.slice(1).toLowerCase())+'<small>Programme</small></span>'+
-      '<span class="dd'+(!dn&&t.finish<today?" late":"")+'">'+DN[x.getDay()]+" "+x.getDate()+'</span></div>';}).join("");
-  box.innerHTML=h||'<p class="empty" style="padding:8px 14px">No milestones set for this week yet.</p>';
+  box.innerHTML=h||'<p class="empty" style="padding:8px 14px">No milestones yet - type the team\u2019s goals for the week below.</p>';
 }
 document.addEventListener("change",function(e){
+  var wsel=e.target.closest&&e.target.closest("[data-mile-who]");
+  if(wsel){ (MILES.weeks[weekMon()]||[]).forEach(function(m){ if(m.id===wsel.getAttribute("data-mile-who")) m.who=wsel.value; }); renderMiles(); saveMiles(); return; }
   var ds=e.target.closest&&e.target.closest("[data-mile-day]");
   if(ds){ var wk0=weekMon(); (MILES.weeks[wk0]||[]).forEach(function(m){ if(m.id===ds.getAttribute("data-mile-day")) m.day=ds.value; }); renderMiles(); saveMiles(); return; }
   var c=e.target.closest&&e.target.closest("[data-mile]"); if(!c) return;
@@ -6827,13 +6840,27 @@ document.addEventListener("change",function(e){
 });
 document.addEventListener("click",function(e){
   var d=e.target.closest&&e.target.closest("[data-mile-del]");
-  if(d){ var wk=weekMon(); MILES.weeks[wk]=(MILES.weeks[wk]||[]).filter(function(m){return m.id!==d.getAttribute("data-mile-del");}); renderMiles(); saveMiles(); return; }
+  if(d){
+    if(!d.dataset.arm){ d.dataset.arm="1"; d.textContent="Sure?"; d.classList.add("arm"); setTimeout(function(){ if(d.isConnected){ delete d.dataset.arm; d.textContent="Delete"; d.classList.remove("arm"); } },2500); return; }
+    var wk=weekMon(); MILES.weeks[wk]=(MILES.weeks[wk]||[]).filter(function(m){return m.id!==d.getAttribute("data-mile-del");}); renderMiles(); saveMiles(); return; }
   if(e.target.closest&&e.target.closest("#cpMileGo")) addMile();
 });
-document.addEventListener("keydown",function(e){ if(e.target&&e.target.id==="cpMileTxt"&&e.key==="Enter"){ e.preventDefault(); addMile(); } });
+document.addEventListener("keydown",function(e){
+  if(e.target&&e.target.id==="cpMileTxt"&&e.key==="Enter"){ e.preventDefault(); addMile(); }
+  if(e.target&&e.target.getAttribute&&e.target.getAttribute("data-mile-txt")&&e.key==="Enter"){ e.preventDefault(); e.target.blur(); }
+});
+/* a milestone's wording is edited in place - tap it, type, done */
+document.addEventListener("focusout",function(e){
+  var t=e.target&&e.target.getAttribute&&e.target.getAttribute("data-mile-txt"); if(!t) return;
+  var v=(e.target.textContent||"").trim(), L=MILES.weeks[weekMon()]||[], hit=null;
+  L.forEach(function(m){ if(m.id===t) hit=m; });
+  if(!hit) return;
+  if(!v){ e.target.textContent=hit.text; return; }
+  if(v!==hit.text){ hit.text=v; saveMiles(); }
+});
 function addMile(){
   var t=(el("cpMileTxt").value||"").trim(); if(!t) return;
-  var wk=weekMon(); (MILES.weeks[wk]=MILES.weeks[wk]||[]).push({id:"m"+Date.now().toString(36),text:t,day:el("cpMileDay").value||iso(new Date()),done:false});
+  var wk=weekMon(); (MILES.weeks[wk]=MILES.weeks[wk]||[]).push({id:"m"+Date.now().toString(36),text:t,who:el("cpMileWho").value||"",day:el("cpMileDay").value||iso(new Date()),done:false});
   el("cpMileTxt").value=""; renderMiles(); saveMiles();
 }
 
