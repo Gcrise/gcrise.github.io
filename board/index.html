@@ -2150,7 +2150,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:05</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:25</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -3590,6 +3590,34 @@ function autoQty(v){
       var code=String(t[0]||"").toLowerCase().replace(/[^a-z0-9]/g,"");
       if(code && new RegExp("\\b"+esc(code)+"\\b","i").test(head)){ co=t[0]; drop(code); }
     });
+    /* Then the work itself. On site nobody types the company - they type
+       "scaffold", "formwork", "reo", "PT". Earliest word in the line wins,
+       same as the names, and only for codes that are on this board. */
+    var byWork=false;
+    if(!co){
+      var WORK=[["NS",/\bscaff(?:old(?:ing|ers?)?|y|ies)?\b|\bnewnhams?\b/],
+        ["GLF",/\bform\s?work\b|\bformies?\b|\bply(?:wood)?\b|\bprops?\b|\bstrip(?:ping)?\b|\btables?\b|\bg\s?\+\s?l\b/],
+        ["RZE",/\breo\b|\brebar\b|\bsteel\s?fix(?:ers?|ing)?\b|\bmesh\b|\bbar\s?chairs?\b|\bbundles?\b|\bstarters?\b/],
+        ["EEC",/\bpt\b|\bpost\s?tension(?:ing)?\b|\bstrand\b|\bstress(?:ing)?\b|\bducts?\b|\bducting\b|\bcoils?\b|\banchors?\b/],
+        ["AP",/\bprecast\b|\bpanels?\b|\bspin\s?ups?\b/],
+        ["BUT",/\bboom\s?pump\b/],
+        ["EVS",/\bshotcrete\b/],
+        ["MDP",/\bplumb(?:er|ers|ing)?\b|\bhydraulics?\b|\bpipes?\b|\bpvc\b/],
+        ["MC",/\bmech(?:anical)?\b|\bair\s?con\b|\bhvac\b|\bcondensers?\b/],
+        ["LRC",/\bsparks?\b|\bsparkies?\b|\belec(?:trical|tricians?)?\b|\bcable\s?drums?\b|\bconduit\b/],
+        ["ACF",/\bfire\s?(?:services?|pipes?|sprinklers?)?\b|\bsprinklers?\b/],
+        ["S4U",/\bskips?\b/],
+        ["EC",/\bfirst\s?aid\b|\brubbish\b|\bsite\s?bins?\b|\bbins?\b|\bsheds?\b|\btoilets?\b|\bhoard(?:ing)?\b/]];
+      var have={}; (cfg.trades||[]).forEach(function(t){ have[t[0]]=1; });
+      var bw=null;
+      WORK.forEach(function(w){
+        if(!have[w[0]]) return;
+        var mm=low.match(w[1]); if(!mm) return;
+        var at=low.indexOf(mm[0]);
+        if(!bw||at<bw.at) bw={at:at,code:w[0]};
+      });
+      if(bw){ co=bw.code; byWork=true; }
+    }
     /* A name that is not on the trade list - a new supplier like Lindores -
        used to make the whole line unreadable and throw you into the form.
        Book it as OTH and mark it TBC instead: a booking you can correct
@@ -3623,8 +3651,10 @@ function autoQty(v){
 
     /* ---- how many ---- */
     var qty=null;
-    if((m=low.match(/\b(\d{1,3})\s*(lifts?|loads?|picks?)\b/))){ qty=+m[1]; drop(m[0]); }
-    else if((m=low.match(/\b(\d{1,3})\s*(panels?|bundles?|pallets?|skips?|cages?|coils?|bracesets?|bins?)\b/))){
+    var liftsSaid=false;
+    if((m=low.match(/\b(\d{1,3})\s*(?:x\s*)?(lifts?|picks?|hooks?)\b/))||(m=low.match(/\b(?:lifts?|picks?)\s*(?:x|of|:)?\s*(\d{1,3})\b/))){ qty=+m[1]; drop(m[0]); liftsSaid=true; }
+    else if((m=low.match(/\b(\d{1,3})\s*(?:x\s*)?(loads?)\b/))){ qty=+m[1]; drop(m[0]); }
+    else if((m=low.match(/\b(\d{1,3})\s*(?:x\s*)?(panels?|bundles?|pallets?|skips?|cages?|coils?|bracesets?|bins?|packs?|stillages?|bays?)\b/))){
       /* the noun is the material, not a counting word, so it stays in the
          description and only the number goes */
       qty=+m[1]; drop(m[1]);
@@ -3699,7 +3729,9 @@ function autoQty(v){
       statedDur=Math.max(5,Math.min(600,statedDur));
     }
 
-    var out={co:co, co2:co2, start:start, desc:desc, to:to, from:from,
+    /* reo coming in on a truck is Neumann's; once it is on the hook it is Rize's */
+    if(byWork&&co==="RZE"&&type==="del") co=(cfg.trades||[]).some(function(t){return t[0]==="NEU";})?"NEU":co;
+    var out={co:co, co2:co2, start:start, desc:desc, to:to, from:from, liftsSaid:liftsSaid,
              type:type, kind:kind, date:date||cur,
              status:(guessed?"req":status)};
     if(qty!==null)   out.qty=qty;
@@ -3754,6 +3786,26 @@ function autoQty(v){
             type:"del", kind:"CONC", crane:"none", from:"STREET", to:"GROUND",
             date:quick.date, status:quick.status,
             desc:"Concrete for "+quick.desc, notes:"Added with the kibble - a pour is a delivery and crane time"});
+        }
+        /* A truck that needs the hook is a delivery AND a run of lifts. "6 lifts"
+           on a delivery used to land as a delivery with no crane time at all.
+           The lifts follow the truck, one per lift slot, and slide clear of
+           the breaks like any other run. */
+        if(quick.type==="del"&&quick.kind!=="CONC"){
+          var nL=0, lCo=quick.co;
+          if(quick.liftsSaid&&quick.qty>0) nL=quick.qty;
+          else if(quick.co==="NEU"&&quick.kg>0) nL=Math.ceil(quick.kg/1000);
+          else if(quick.co==="GLF"&&/\btrucks?\b/i.test(text)){
+            var tm=text.match(/\b(\d{1,2})\s*(?:x\s*)?trucks?\b/i); nL=12*(tm?+tm[1]:1);
+          }
+          if(quick.co==="NEU"&&(cfg.trades||[]).some(function(t){return t[0]==="RZE";})) lCo="RZE";
+          if(nL>0){
+            quick.qty=0; quick.kgKeep=quick.kg; if(!quick.dur) quick.dur=30;
+            items.push({co:lCo, co2:"", start:quick.start+10, qty:nL, kg:quick.kg||0, type:"lift",
+              kind:(lCo==="RZE"?"DECK":(lCo==="GLF"?"LOAD":"")), crane:"tower",
+              from:"GROUND", to:quick.to||"LIVE DECK", date:quick.date, status:quick.status,
+              desc:quick.desc, notes:"Lifts off the "+quick.co+" truck - "+nL+" x "+perCo(lCo)+" min"});
+          }
         }
         if(quick.noTime) setTimeout(function(){
           toast("No time given - parked at "+clock(quick.start)+" as TBC, drag it where it goes");
