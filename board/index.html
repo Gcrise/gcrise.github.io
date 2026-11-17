@@ -2078,7 +2078,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 07:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 10:25</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4732,12 +4732,21 @@ function JLH(extra){
   if(extra) for(var x in extra) h[x]=extra[x];
   return h;
 }
+/* public reads: a stale sign-in token gets a 401, so fall back to the
+   plain public key rather than showing nothing */
+function jlGet(url){
+  return fetch(url,{headers:JLH()}).then(function(r){
+    if(r.status!==401&&r.status!==403) return r;
+    var k=(window.ELISE_CONFIG||{}).key||"";
+    return fetch(url,{headers:{"apikey":k,"Authorization":"Bearer "+k}});
+  });
+}
 var jobLogBusy=false;
 function pullJobLog(){
   if(jobLogBusy||JL_REST.indexOf("http")!==0) return;
   jobLogBusy=true;
   var since=iso(new Date(Date.now()-60*86400000));
-  fetch(JL_REST+"job_log?select=item_id,job_date,action,item_text,who,at,seq,photo_id,note&job_date=gte."+since+"&order=at.asc,seq.asc",{headers:JLH()})
+  jlGet(JL_REST+"job_log?select=item_id,job_date,action,item_text,who,at,seq,photo_id,note&job_date=gte."+since+"&order=at.asc,seq.asc")
     .then(function(r){return r.ok?r.json():null;})
     .then(function(rows){ jobLogBusy=false; if(!rows) return;
       var before=JSON.stringify([state.jobLog,state.jobAdds]);
@@ -6829,7 +6838,7 @@ async function buildPDF(which){
   if(want("crane")){
     /* drawn like the crew's run sheet - a full-width bar in the trade colour,
        every lift of a run on its own line, breaks called out across the page */
-    var cT=M+2.5,cTR=M+16,cF=M+27,cTo=M+45,cD=M+63,cKG=W-M-46,chX=W-M-44,chW=30,cQ=W-M-2;
+    var cT=M+2.5,cTR=M+16,cF=M+27,cTo=M+45,cD=M+63,chX=W-M-34,chW=22,cKG=chX-16,cQ=W-M-2;
     var ROWH=7.4,SUBH=4.8,BRKC=[200,57,46];
     function rgbOf(h){
       h=String(h||"#938C80").replace("#","");
@@ -6856,9 +6865,14 @@ async function buildPDF(which){
       doc.setFontSize(7.2);doc.setFont("helvetica","bold");
       doc.text(fit(b.from||"",cTo-cF-2,7.2),cF,base);
       doc.text(fit(b.to||"",cD-cTo-2,7.2),cTo,base);
-      doc.setFontSize(9);
-      doc.text(fit(String(b.desc||"").toUpperCase(),cKG-cD-4,9),cD,base);
-      var kg=+b.kg||0;
+      /* the description stops short of the weight, TBC and type, never runs under them */
+      var kg=+b.kg||0, dEnd=(kg?cKG-11:(b.status==="req"?chX-16:chX))-3;
+      var dTxt=String(b.desc||"").toUpperCase(),dSz=9;
+      doc.setFont("helvetica","bold");
+      while(dSz>6.6){doc.setFontSize(dSz);if(doc.getTextWidth(dTxt)<=dEnd-cD)break;dSz-=0.4;}
+      doc.setFontSize(dSz);
+      if(doc.getTextWidth(dTxt)>dEnd-cD)dTxt=fit(dTxt,dEnd-cD-3,dSz)+"...";
+      doc.text(dTxt,cD,base);
       if(kg){doc.setFontSize(7.5);doc.text((kg>=1000?(Math.round(kg/100)/10)+"t":kg+"kg"),cKG,base,{align:"right"});}
       if(kindName){
         doc.setFillColor(ink[0],ink[1],ink[2]);
@@ -7626,7 +7640,7 @@ function renderEufy(){
 function deckCount(){
   var box=el("deckCount"); if(!box||JL_REST.indexOf("http")!==0) return;
   var day=iso(new Date());
-  fetch(JL_REST+"deck_count?select=at,people,photo_time,note&day=eq."+day+"&order=at.asc",{headers:JLH()})
+  jlGet(JL_REST+"deck_count?select=at,people,photo_time,note&day=eq."+day+"&order=at.asc")
     .then(function(r){return r.ok?r.json():[];})
     .then(function(rows){
       if(!rows||!rows.length){ box.hidden=false;
