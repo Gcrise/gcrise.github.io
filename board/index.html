@@ -841,6 +841,46 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 #v-safety{--acc:var(--crit);--acc-ink:var(--crit)}
 #v-labour{--acc:var(--line);--acc-ink:var(--ink-2)}
 #v-crane{--acc:var(--line);--acc-ink:var(--ink-2)}
+#v-path{--acc:var(--clock);--acc-ink:var(--clock)}
+#v-path .subhead{padding:12px 0 6px;margin:0 14px;border-top:0;border-bottom:2px solid var(--clock);font-size:12px}
+#v-path .subhead > span:first-child{color:var(--clock)}
+#v-path .subhead > span:not(:first-child){color:var(--ink-3);font-size:10.5px}
+.cphero{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.cphero > div{background:var(--surface);padding:12px 14px;min-width:0}
+.cphero .k{font-family:var(--f-cond);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.cphero .v{font-family:var(--f-cond);font-size:clamp(20px,5vw,26px);font-weight:700;line-height:1.1;color:var(--ink);margin-top:3px;font-variant-numeric:tabular-nums}
+.cphero .v small{font-size:13px;font-weight:600;color:var(--ink-2);letter-spacing:.04em;margin-left:4px}
+.cphero .s{font-size:12px;color:var(--ink-2);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.cphero .v small{display:block;margin:2px 0 0}
+.cphero .late .v{color:var(--crit)}
+.cpwrap{overflow-x:auto;padding:8px 14px 12px}
+.cpgrid{display:grid;min-width:640px;font-size:12px;position:relative}
+.cpgrid .hd{font-family:var(--f-cond);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:center;padding:2px 0 6px;border-bottom:1px solid var(--line)}
+.cpgrid .hd b{display:block;font-size:13px;color:var(--ink-2);letter-spacing:0}
+.cpgrid .hd.today{color:var(--clock)}.cpgrid .hd.today b{color:var(--clock)}
+.cpgrid .hd.mon{border-left:1px solid var(--line-hard)}
+.cpgrid .nm{grid-column:1;padding:5px 10px 5px 0;border-bottom:1px solid var(--line);min-width:0;line-height:1.25;display:flex;align-items:center;gap:6px}
+.cpgrid .nm > span:first-child{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cpgrid .nm.crit > span:first-child{font-weight:700;color:var(--ink)}
+.cpgrid .nm:not(.crit) > span:first-child{color:var(--ink-2)}
+.cpgrid .nm.done > span:first-child{text-decoration:line-through;opacity:.55}
+.cpgrid .cell{border-bottom:1px solid var(--line);position:relative}
+.cpgrid .cell.mon{border-left:1px solid var(--line-hard)}
+.cpgrid .cell.today{background:color-mix(in srgb,var(--clock) 10%,transparent)}
+.cpgrid .bar{align-self:center;height:16px;border-radius:3px;background:var(--line-hard);margin:0 2px;z-index:1;
+  font:700 9.5px/16px var(--f-cond),Arial,sans-serif;letter-spacing:.04em;color:var(--paper);padding:0 5px;overflow:hidden;white-space:nowrap}
+.cpgrid .bar.crit{background:var(--clock)}
+.cpgrid .bar.pour{background:var(--crit);color:#fff}
+.cpgrid .bar.done{opacity:.4}
+.cpgrid .bar.ms{width:14px;height:14px;border-radius:2px;transform:rotate(45deg);justify-self:center;padding:0;margin:0;background:var(--crit)}
+.cpgrid .st{flex:0 0 auto;font-family:var(--f-cond);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:1px 5px;border-radius:2px;border:1px solid currentColor;white-space:nowrap}
+.cpgrid .st.late{color:var(--crit)}.cpgrid .st.now{color:var(--clock)}.cpgrid .st.ok{color:var(--ink-3)}
+.cplv{display:grid;grid-template-columns:minmax(90px,1.2fr) 1fr 1fr 70px;gap:8px;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
+.cplv .l{font-family:var(--f-cond);font-weight:700;letter-spacing:.06em}
+.cplv .d{color:var(--ink-2);font-variant-numeric:tabular-nums}
+.cplv .w{text-align:right;color:var(--ink-3);font-size:12px}
+.cplv.cur .l{color:var(--clock)}
+.cplv.past{opacity:.5}
 #cbapp .sechead{color:var(--ink-2);border-bottom:1px solid var(--line)}
 
 
@@ -2148,6 +2188,18 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
   </div>
 </section>
 
+<section id="v-path" class="view" hidden>
+  <div class="panel">
+    <div class="phead" data-acc="path"><h2>Critical path</h2><span class="meta" id="cpMeta"></span></div>
+    <div class="cphero" id="cpHero"></div>
+    <div class="subhead" data-acc="path"><span>This deck, day by day</span><span id="cpWin"></span></div>
+    <div class="cpwrap"><div class="cpgrid" id="cpGrid"></div></div>
+    <div class="subhead" data-acc="path"><span>Levels ahead</span><span>Programme cycle, start to slab</span></div>
+    <div id="cpLevels"></div>
+    <p class="note" id="cpNote"></p>
+  </div>
+</section>
+
 <section id="v-log" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="log"><h2>Completed works</h2><span class="meta" id="logMeta"></span>
@@ -2157,7 +2209,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 16:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 17:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4486,7 +4538,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["prestart","Prestart / Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["weather","Weather"],["camera","Live view"],["eufy","Eufy"],["log","Completed works"]];
+var VIEWS=[["today","Today"],["prestart","Prestart"],["safety","Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["path","Critical path"],["weather","Weather"],["camera","Live view"],["eufy","Eufy"],["log","Completed works"]];
 var CUT=1260;      /* one cut a day, 9pm */
 var ROLLOVER=990;  /* 4:30pm - after knock-off you are planning tomorrow */
 /* the day the board opens on: today until 4:30pm, tomorrow after it */
@@ -4545,14 +4597,11 @@ function thumbs(list,owner,i){
 
 /* ---------- navigation ---------- */
 function go(v){
-  /* safety now sits on the prestart page */
-  if(v==="safety")v="prestart";
   if(!VIEWS.some(function(x){return x[0]===v;}))v="today";
   state.view=v;
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
-  if(el("v-safety")) el("v-safety").hidden = v!=="prestart";
-  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy");
+  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path");
   if(v==="camera")camOpen();
   if(v==="eufy")renderEufy();
   if(v==="crane"&&window.__cbRail)setTimeout(window.__cbRail,30);
@@ -4570,8 +4619,6 @@ function tabCount(v){
   if(v==="crane"){var n=dayRows().length;return n?{n:n}:null;}
   if(v==="safety"){var s=openSafety();return s.length?{n:s.length,alert:s.some(function(i){return i.kind==="INC";})}:null;}
   if(v==="prestart"){
-    var so=openSafety();
-    if(so.length) return {n:so.length,alert:so.some(function(i){return i.kind==="INC";})};
     var pd=preDoc();
     /* signed off is the only "done" there is now, so an unsigned prestart
        shows a single flag rather than a count of boxes */
@@ -4711,7 +4758,7 @@ function progStatus(t,todayISO){
 
 function renderAll(){
   renderDayStrip();renderFront();renderLabour();renderJobs();renderPhotos();renderSafety();renderPour();
-  renderDelays();renderPour();renderProg();renderLog();renderPrestart();renderFeeds();renderTabs();renderNowStrip();
+  renderDelays();renderPour();renderProg();renderPath();renderLog();renderPrestart();renderFeeds();renderTabs();renderNowStrip();
 }
 function renderDayStrip(){
   var d=parseISO(state.date);
@@ -6410,6 +6457,73 @@ function removeThumb(spec){
   });
   if(which==="safety")saveSafety(next);else saveDelays(next);
   if(assets) assets.delete(gone).catch(function(){});
+}
+
+/* ---------- critical path ----------
+   The structure's critical path is the slab cycle: precast and wet joints,
+   formwork deck, bottom reo, services, PT, top reo, set-downs, pour. The
+   programme carries no float, so the critical path is read off the work
+   itself: those activities are bold, the pour is red, and the rest sit grey
+   beside them. Days are working days, Monday to Saturday. */
+var CP_CRIT=/pour|formwork deck|reinforcement|post tension|precast install|wet joint|set ?downs?|slab complete|strip/i;
+function cpWorkDays(a,b){ /* working days from a to b, Mon-Sat; negative if b before a */
+  var A=parseISO(a),B=parseISO(b),sg=1,n=0;
+  if(B<A){var t=A;A=B;B=t;sg=-1;}
+  for(var d=new Date(A);d<B;d.setDate(d.getDate()+1)){d.setHours(12);if(d.getDay()!==0)n++;}
+  return n*sg;
+}
+function renderPath(){
+  if(!el("cpGrid"))return;
+  var today=iso(new Date()), all=progTasks();
+  var leaf=all.filter(function(t){return t.start&&t.finish&&(+t.dur||0)<=20&&!/ - FRP$|^LEVEL \d+/i.test(t.task);});
+  var lv=all.filter(function(t){return /^LEVEL [\d\/ A-Z]+- FRP$/i.test(t.task.trim());})
+            .sort(function(a,b){return a.finish<b.finish?-1:1;});
+  var p=state.progDoc;
+  el("cpMeta").textContent=(p.rev?"Programme rev "+p.rev:"Programme")+(p.dataDate?" \u00b7 data date "+shortDate(p.dataDate):"");
+  if(!leaf.length){
+    el("cpHero").innerHTML="";el("cpGrid").innerHTML='<p class="empty" style="padding:12px 0">No programme loaded yet.</p>';
+    el("cpLevels").innerHTML="";return;
+  }
+  function done(t){return t.off||t.pct>=100;}
+  /* ---- the next pour and where the deck sits ---- */
+  var pours=leaf.filter(function(t){return /pour slab/i.test(t.task)&&t.finish>=today;}).sort(function(a,b){return a.start<b.start?-1:1;});
+  var np=pours[0], late=leaf.filter(function(t){return t.finish<today&&!done(t)&&CP_CRIT.test(t.task);});
+  var nowT=leaf.filter(function(t){return t.start<=today&&t.finish>=today&&CP_CRIT.test(t.task);});
+  var curLv=lv.filter(function(t){return t.start<=today&&t.finish>=today;})[0]||lv.filter(function(t){return t.start>today;})[0];
+  var hero='';
+  if(np){var wd=cpWorkDays(today,np.start);
+    hero+='<div><div class="k">Next slab pour</div><div class="v">'+shortDate(np.start)+'<small>'+(wd<=0?"today":wd+" working day"+(wd===1?"":"s"))+'</small></div><div class="s">'+esc(curLv?curLv.task.replace(/ - FRP$/i,""):"")+'</div></div>';}
+  hero+='<div><div class="k">On the path today</div><div class="v">'+nowT.length+'</div><div class="s">'+esc(nowT.map(function(t){return t.task.toLowerCase();}).join(", ")||"nothing critical today")+'</div></div>';
+  hero+='<div class="'+(late.length?"late":"")+'"><div class="k">Past finish, not ticked off</div><div class="v">'+late.length+'</div><div class="s">'+esc(late.map(function(t){return t.task.toLowerCase();}).join(", ")||"all clear")+'</div></div>';
+  el("cpHero").innerHTML=hero;
+  /* ---- the day grid: a week back, three weeks on, working days only ---- */
+  var days=[], d=parseISO(today); var back=0;
+  while(back<5){d.setDate(d.getDate()-1);if(d.getDay()!==0)back++;}
+  while(days.length<20){if(d.getDay()!==0)days.push(iso(d));d.setDate(d.getDate()+1);}
+  var first=days[0], last=days[days.length-1];
+  var rows=leaf.filter(function(t){return t.finish>=first&&t.start<=last;})
+               .sort(function(a,b){return a.start<b.start?-1:a.start>b.start?1:(+a.id)-(+b.id);});
+  el("cpWin").textContent=shortDate(first)+" \u2013 "+shortDate(last);
+  var g=el("cpGrid"); g.style.gridTemplateColumns="minmax(150px,1.6fr) repeat("+days.length+",minmax(22px,1fr))";
+  var DN=["Su","Mo","Tu","We","Th","Fr","Sa"], h='<div class="hd" style="text-align:left">Activity</div>';
+  days.forEach(function(x){var dd=parseISO(x);h+='<div class="hd'+(x===today?" today":"")+(dd.getDay()===1?" mon":"")+'">'+DN[dd.getDay()]+'<b>'+dd.getDate()+'</b></div>';});
+  rows.forEach(function(t,ri){
+    var r=ri+2, crit=CP_CRIT.test(t.task), pour=/^pour|slab complete/i.test(t.task), ms=(+t.dur===0);
+    var st=done(t)?'<span class="st ok">done</span>':(t.finish<today?(crit?'<span class="st late">late</span>':''):(t.start<=today?'<span class="st now">on</span>':''));
+    h+='<div class="nm'+(crit?" crit":"")+(done(t)?" done":"")+'" style="grid-row:'+r+'"><span title="'+esc(t.task)+'">'+esc(t.task)+'</span>'+st+'</div>';
+    days.forEach(function(x,ci){var dd=parseISO(x);h+='<div class="cell'+(x===today?" today":"")+(dd.getDay()===1?" mon":"")+'" style="grid-row:'+r+';grid-column:'+(ci+2)+'"></div>';});
+    var a=0,b=days.length-1;
+    while(a<days.length&&days[a]<t.start)a++;
+    while(b>=0&&days[b]>t.finish)b--;
+    if(a<=b) h+='<div class="bar'+(ms?" ms":"")+(pour?" pour":crit?" crit":"")+(done(t)?" done":"")+'" style="grid-row:'+r+';grid-column:'+(a+2)+' / '+(b+3)+'" title="'+esc(t.task)+' \u00b7 '+shortDate(t.start)+' \u2013 '+shortDate(t.finish)+'">'+(ms?"":(b-a>=2?esc(t.task):""))+'</div>';
+  });
+  g.innerHTML=h;
+  /* ---- levels ahead ---- */
+  el("cpLevels").innerHTML=lv.filter(function(t){return t.finish>=iso(new Date(Date.now()-21*86400000));}).slice(0,8).map(function(t){
+    var cls=t.finish<today?" past":(t.start<=today?" cur":"");
+    return '<div class="cplv'+cls+'"><span class="l">'+esc(t.task.replace(/ - FRP$/i,""))+'</span><span class="d">'+shortDate(t.start)+'</span><span class="d">'+shortDate(t.finish)+'</span><span class="w">'+((+t.dur||0)>60?'':(t.dur||0)+' days')+'</span></div>';
+  }).join("");
+  el("cpNote").textContent=(state.progNote?state.progNote+" ":"")+"Bold rows are the slab cycle - formwork, reo, PT, precast and wet joints, set-downs and the pour. Tick tasks off on the programme to clear them here.";
 }
 
 /* ---------- programme ---------- */
@@ -8560,10 +8674,11 @@ var loadTimer=setTimeout(function(){if(!state.ready)el("dbState").textContent="S
   db.doc("programme/current").onSnapshot(function(snap){
     var o=snap.data()||{};
     state.progDoc={rev:o.rev||"",dataDate:o.dataDate||"",tasks:o.tasks||[]};
-    renderProg();renderFront();
+    state.progNote=o.note||"";
+    renderProg();renderPath();renderFront();
   },fail);
-  db.doc("progress/pct").onSnapshot(function(snap){state.progress=snap.data()||{};renderProg();},function(){});
-  db.doc("progress/done").onSnapshot(function(snap){state.done=snap.data()||{};renderProg();},function(){});
+  db.doc("progress/pct").onSnapshot(function(snap){state.progress=snap.data()||{};renderProg();renderPath();},function(){});
+  db.doc("progress/done").onSnapshot(function(snap){state.done=snap.data()||{};renderProg();renderPath();},function(){});
   db.collection("feeds").onSnapshot(function(snap){
     var m={};snap.docs.forEach(function(d){m[d.id]=d.data()||{};});state.feeds=m;renderFeeds();
   },function(){});
