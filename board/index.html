@@ -842,6 +842,22 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 #v-labour{--acc:var(--line);--acc-ink:var(--ink-2)}
 #v-crane{--acc:var(--line);--acc-ink:var(--ink-2)}
 #v-path{--acc:var(--clock);--acc-ink:var(--clock)}
+#v-orders{--acc:var(--clock);--acc-ink:var(--clock)}
+#v-orders .subhead{padding:12px 0 6px;margin:0 14px;border-top:0;border-bottom:2px solid var(--clock);font-size:12px}
+#v-orders .subhead > span:first-child{color:var(--clock)}
+#v-orders .subhead > span:not(:first-child){color:var(--ink-3);font-size:10.5px}
+.ordadd{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.ordadd #ordItem{flex:1 1 100%;min-width:0}
+.ordadd #ordSup,.ordadd #ordFor{flex:1 1 120px;min-width:0}
+.ordadd #ordBy{flex:0 0 auto}
+.ordrow{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+.ordrow .t{flex:1 1 auto;min-width:0}
+.ordrow .t b{font-weight:600;display:block}
+.ordrow .t small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:2px}
+.ordrow .due{flex:none;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:right}
+.ordrow .due.late{color:var(--crit)}
+.ordrow .x{flex:none;appearance:none;border:0;background:none;color:var(--ink-3);font-size:16px;cursor:pointer;padding:0 2px}
+.ordrow.arr .t{opacity:.6}
 #v-path .subhead{padding:12px 0 6px;margin:0 14px;border-top:0;border-bottom:2px solid var(--clock);font-size:12px}
 #v-path .subhead > span:first-child{color:var(--clock)}
 #v-path .subhead > span:not(:first-child){color:var(--ink-3);font-size:10.5px}
@@ -888,7 +904,8 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .cpmile.done .t{text-decoration:line-through;opacity:.55}
 .cpmile.prog .t{color:var(--ink-2)}
 .cpmile .dd{flex:none;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
-.cpmile .dd.late{color:var(--crit)}
+.cpmile .dd.late,.cpmile .prisel.late{color:var(--crit);border-color:var(--crit)}
+#v-path #cpMiles + .cpadd{border-bottom:1px solid var(--line)}
 .cpmile .x{flex:none;appearance:none;border:0;background:none;color:var(--ink-3);font-size:16px;cursor:pointer;padding:0 2px}
 .cpadd{gap:8px}.cpadd input{flex:1 1 200px;min-width:0}.cpadd select{flex:0 0 auto}
 .cplv{display:grid;grid-template-columns:minmax(90px,1.2fr) 1fr 1fr 70px;gap:8px;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
@@ -2243,12 +2260,30 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
   </div>
 </section>
 
+<section id="v-orders" class="view" hidden>
+  <div class="panel">
+    <div class="phead" data-acc="orders"><h2>Site orders</h2><span class="meta" id="ordMeta"></span></div>
+    <div class="ordadd" id="ordAdd">
+      <input id="ordItem" placeholder="What's needed - e.g. 20 x ply sheets 17mm" autocomplete="off">
+      <input id="ordSup" placeholder="Supplier" list="ordSups" autocomplete="off">
+      <input id="ordFor" placeholder="Who for" list="crewNames" autocomplete="off">
+      <input id="ordBy" type="date" aria-label="Needed by">
+      <button class="addbtn" id="ordGo" type="button">Add order</button>
+      <datalist id="ordSups"></datalist>
+    </div>
+    <div class="subhead" data-acc="orders"><span>To order</span><span id="ordN0"></span></div>
+    <div id="ordList0"></div>
+    <div class="subhead" data-acc="orders"><span>Ordered - waiting on it</span><span id="ordN1"></span></div>
+    <div id="ordList1"></div>
+    <div class="subhead" data-acc="orders"><span>Arrived</span><span>Last 14 days</span></div>
+    <div id="ordList2"></div>
+    <p class="note">General site orders - consumables, tools, hire, PPE, materials not on a trade's scope. Anyone can see the list; sign in to add or change one.</p>
+  </div>
+</section>
+
 <section id="v-path" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="path"><h2>Critical path</h2><span class="meta" id="cpMeta"></span></div>
-    <div class="cphero" id="cpHero"></div>
-    <div class="subhead" data-acc="path"><span>Pour dates</span><span>Off the programme</span></div>
-    <div id="cpPours"></div>
     <div class="subhead" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
     <div id="cpMiles"></div>
     <div class="addrow cpadd" id="cpMileAdd">
@@ -2256,6 +2291,9 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <select id="cpMileDay" aria-label="Due"></select>
       <button class="addbtn" id="cpMileGo" type="button">Add</button>
     </div>
+    <div class="cphero" id="cpHero"></div>
+    <div class="subhead" data-acc="path"><span>Pour dates</span><span>Off the programme</span></div>
+    <div id="cpPours"></div>
     <div class="subhead" data-acc="path"><span>Critical works</span><span id="cpWin"></span></div>
     <div class="cpwrap"><div class="cpgrid" id="cpGrid"></div></div>
     <div class="subhead" data-acc="path"><span>Levels ahead</span><span>Programme cycle, start to slab</span></div>
@@ -2273,7 +2311,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 08:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 09:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4609,7 +4647,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["prestart","Prestart"],["safety","Safety"],["labour","Labour & jobs"],["crane","Crane & deliveries"],["path","Critical path"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
+var VIEWS=[["today","Today"],["prestart","Prestart"],["safety","Safety"],["labour","Labour & jobs"],["orders","Site orders"],["crane","Crane & deliveries"],["path","Critical path"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
 /* Eufy tab retired 17 Nov at Harry's call - the section, its code and the camera
    settings are all kept; put ["eufy","Eufy"] back after "camera" above to re-add it. */
 var CUT=1260;      /* one cut a day, 9pm */
@@ -4674,7 +4712,7 @@ function go(v){
   state.view=v;
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
-  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path");
+  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders");
   if(v==="camera")camOpen();
   if(v==="eufy")renderEufy();
   if(v==="crane"&&window.__cbRail)setTimeout(window.__cbRail,30);
@@ -4689,6 +4727,8 @@ function renderTabs(){
   }).join("");
 }
 function tabCount(v){
+  if(v==="orders"){var o=(ORDERS.items||[]).filter(function(x){return x.st!=="arr";}),t=o.filter(function(x){return x.st==="to";});
+    return o.length?{n:t.length||o.length,alert:o.some(function(x){return x.st!=="arr"&&x.by&&x.by<iso(new Date());})}:null;}
   if(v==="crane"){var n=dayRows().length;return n?{n:n}:null;}
   if(v==="safety"){var s=openSafety();return s.length?{n:s.length,alert:s.some(function(i){return i.kind==="INC";})}:null;}
   if(v==="prestart"){
@@ -4831,7 +4871,7 @@ function progStatus(t,todayISO){
 
 function renderAll(){
   renderDayStrip();renderFront();renderLabour();renderJobs();renderPhotos();renderSafety();renderPour();
-  renderDelays();renderPour();renderProg();renderPath();renderLog();renderPrestart();renderFeeds();renderTabs();renderNowStrip();
+  renderDelays();renderPour();renderProg();renderPath();renderOrders();renderLog();renderPrestart();renderFeeds();renderTabs();renderNowStrip();
 }
 function renderDayStrip(){
   var d=parseISO(state.date);
@@ -6660,6 +6700,74 @@ function cpWorkDays(a,b){ /* working days from a to b, Mon-Sat; negative if b be
   for(var d=new Date(A);d<B;d.setDate(d.getDate()+1)){d.setHours(12);if(d.getDay()!==0)n++;}
   return n*sg;
 }
+/* ---------- site orders ----------
+   General orders for site - consumables, tools, hire, PPE. One shared list
+   in config "orders": To order -> Ordered -> Arrived. Anyone sees it; you
+   need to be signed in to add or move one. */
+var ORDERS={items:[]}, ordRef=null, ordSeen="";
+if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
+  if(!db) return; ordRef=db.collection("config").doc("orders");
+  ordRef.onSnapshot(function(sn){ var d=sn&&sn.data&&sn.data(); if(!d) return; var j=JSON.stringify(d); if(j===ordSeen) return; ordSeen=j; ORDERS=d; if(!ORDERS.items)ORDERS.items=[]; renderOrders(); if(typeof renderTabs==="function") renderTabs(); });
+}).catch(function(){});
+function saveOrders(){
+  if(!ordRef||!(window.eliseAuth&&window.eliseAuth.canWrite())){ toast("Sign in to change site orders"); return; }
+  ORDERS.ts=Date.now(); ordSeen=JSON.stringify(ORDERS);
+  ordRef.set(ORDERS).catch(function(){ toast("Order not saved - try again"); });
+  if(typeof renderTabs==="function") renderTabs();
+}
+function renderOrders(){
+  if(!el("ordList0")) return;
+  var today=iso(new Date()), canW=!!(window.eliseAuth&&window.eliseAuth.canWrite());
+  el("ordAdd").hidden=!canW;
+  var L=ORDERS.items||[], sups={};
+  L.forEach(function(o){ if(o.sup) sups[o.sup]=1; });
+  el("ordSups").innerHTML=Object.keys(sups).sort().map(function(x){return '<option value="'+esc(x)+'">';}).join("");
+  function row(o){
+    var late=o.st!=="arr"&&o.by&&o.by<today, sub=[];
+    if(o.sup) sub.push(o.sup); if(o.for) sub.push("for "+o.for);
+    if(o.st==="ord"&&o.ordAt) sub.push("ordered "+shortDate(o.ordAt)+(o.ordBy?" by "+o.ordBy:""));
+    if(o.st==="arr"&&o.arrAt) sub.push("arrived "+shortDate(o.arrAt));
+    if(o.added) sub.push("added "+shortDate(o.added)+(o.addBy?" by "+o.addBy:""));
+    var sel='<select class="prisel'+(o.st==="to"?' on':'')+'" data-ord-st="'+esc(o.id)+'"'+(canW?'':' disabled')+' aria-label="Status">'+
+      [["to","To order"],["ord","Ordered"],["arr","Arrived"]].map(function(x){return '<option value="'+x[0]+'"'+(o.st===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join("")+'</select>';
+    return '<div class="ordrow'+(o.st==="arr"?" arr":"")+'"><span class="t"><b>'+esc(o.item)+'</b>'+(sub.length?'<small>'+esc(sub.join(" \u00b7 "))+'</small>':'')+'</span>'+
+      (o.by&&o.st!=="arr"?'<span class="due'+(late?" late":"")+'">'+(late?"Was due ":"By ")+shortDate(o.by)+'</span>':'')+sel+
+      (canW?'<button class="x" data-ord-del="'+esc(o.id)+'" title="Remove" aria-label="Remove">&times;</button>':'')+'</div>';
+  }
+  var cut=iso(new Date(Date.now()-14*86400000));
+  var g0=L.filter(function(o){return o.st==="to";}), g1=L.filter(function(o){return o.st==="ord";}), g2=L.filter(function(o){return o.st==="arr"&&(o.arrAt||"")>=cut;});
+  function byDue(a,b){return (a.by||"9")<(b.by||"9")?-1:(a.by||"9")>(b.by||"9")?1:0;}
+  el("ordList0").innerHTML=g0.sort(byDue).map(row).join("")||'<p class="empty" style="padding:8px 14px">Nothing waiting to be ordered.</p>';
+  el("ordList1").innerHTML=g1.sort(byDue).map(row).join("")||'<p class="empty" style="padding:8px 14px">Nothing on order.</p>';
+  el("ordList2").innerHTML=g2.sort(function(a,b){return (b.arrAt||"")<(a.arrAt||"")?-1:1;}).map(row).join("")||'<p class="empty" style="padding:8px 14px">Nothing arrived in the last two weeks.</p>';
+  el("ordN0").textContent=g0.length?g0.length+" item"+(g0.length===1?"":"s"):"";
+  el("ordN1").textContent=g1.length?g1.length+" item"+(g1.length===1?"":"s"):"";
+  el("ordMeta").textContent=(g0.length+g1.length)?(g0.length+" to order \u00b7 "+g1.length+" on order"):"All clear";
+}
+function addOrder(){
+  var it=(el("ordItem").value||"").trim(); if(!it){ el("ordItem").focus(); return; }
+  (ORDERS.items=ORDERS.items||[]).push({id:"o"+Date.now().toString(36),item:it,sup:(el("ordSup").value||"").trim(),
+    for:(el("ordFor").value||"").trim(),by:el("ordBy").value||"",st:"to",added:iso(new Date()),addBy:whoAmI()||""});
+  el("ordItem").value=""; el("ordSup").value=""; el("ordFor").value=""; el("ordBy").value="";
+  renderOrders(); saveOrders();
+}
+document.addEventListener("click",function(e){
+  if(e.target.closest&&e.target.closest("#ordGo")) addOrder();
+  var d=e.target.closest&&e.target.closest("[data-ord-del]");
+  if(d){ var id=d.getAttribute("data-ord-del");
+    if(d.dataset.arm){ ORDERS.items=(ORDERS.items||[]).filter(function(o){return o.id!==id;}); renderOrders(); saveOrders(); }
+    else { d.dataset.arm="1"; d.textContent="Sure?"; setTimeout(function(){ delete d.dataset.arm; d.innerHTML="&times;"; },2500); } }
+});
+document.addEventListener("change",function(e){
+  var c=e.target.closest&&e.target.closest("[data-ord-st]"); if(!c) return;
+  var id=c.getAttribute("data-ord-st"), st=c.value;
+  (ORDERS.items||[]).forEach(function(o){ if(o.id!==id) return; o.st=st;
+    if(st==="ord"){ o.ordAt=iso(new Date()); o.ordBy=whoAmI()||""; }
+    if(st==="arr"){ o.arrAt=iso(new Date()); } });
+  renderOrders(); saveOrders();
+});
+document.addEventListener("keydown",function(e){ if(e.target&&e.target.id==="ordItem"&&e.key==="Enter"){ e.preventDefault(); addOrder(); } });
+
 /* ---------- weekly team milestones ----------
    What the team commits to this week - set on Monday, ticked as they land.
    Kept in config "milestones" by the Monday of each week, so anyone signed
@@ -6692,7 +6800,12 @@ function renderMiles(){
     var x=parseISO(m.day), late=!m.done&&m.day<today;
     return '<div class="cpmile'+(m.done?" done":"")+'"><input type="checkbox" data-mile="'+esc(m.id)+'"'+(m.done?" checked":"")+(canW?"":" disabled")+' aria-label="Done">'+
       '<span class="t">'+esc(m.text)+(m.done&&m.by?'<small>Ticked by '+esc(m.by)+'</small>':'')+'</span>'+
-      '<span class="dd'+(late?" late":"")+'">'+(late?"Due ":"")+DN[x.getDay()]+" "+x.getDate()+'</span>'+
+      (canW&&!m.done
+        ? '<select class="prisel'+(late?" late":"")+'" data-mile-day="'+esc(m.id)+'" aria-label="Due">'+
+            days.map(function(dd){var y=parseISO(dd);return '<option value="'+dd+'"'+(dd===m.day?' selected':'')+'>'+(late&&dd===m.day?"Due ":"By ")+DN[y.getDay()]+" "+y.getDate()+'</option>';}).join("")+
+            (days.indexOf(m.day)<0?'<option value="'+esc(m.day)+'" selected>'+DN[x.getDay()]+" "+x.getDate()+'</option>':'')+
+          '</select>'
+        : '<span class="dd'+(late?" late":"")+'">'+(late?"Due ":"")+DN[x.getDay()]+" "+x.getDate()+'</span>')+
       (canW?'<button class="x" data-mile-del="'+esc(m.id)+'" title="Remove" aria-label="Remove">&times;</button>':'')+'</div>';
   }).join("");
   /* the programme's critical activities finishing this week */
@@ -6705,6 +6818,8 @@ function renderMiles(){
   box.innerHTML=h||'<p class="empty" style="padding:8px 14px">No milestones set for this week yet.</p>';
 }
 document.addEventListener("change",function(e){
+  var ds=e.target.closest&&e.target.closest("[data-mile-day]");
+  if(ds){ var wk0=weekMon(); (MILES.weeks[wk0]||[]).forEach(function(m){ if(m.id===ds.getAttribute("data-mile-day")) m.day=ds.value; }); renderMiles(); saveMiles(); return; }
   var c=e.target.closest&&e.target.closest("[data-mile]"); if(!c) return;
   var wk=weekMon(), L=MILES.weeks[wk]||[], id=c.getAttribute("data-mile");
   L.forEach(function(m){ if(m.id===id){ m.done=c.checked; m.by=c.checked?(whoAmI()||""):""; } });
