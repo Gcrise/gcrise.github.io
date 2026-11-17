@@ -2273,7 +2273,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 22:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 06:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5402,6 +5402,12 @@ function paintSigns(day){
 setInterval(function(){ if(state.view==="prestart"&&preDoc().type==="hr"&&document.visibilityState==="visible") loadSigns(state.date); },20000);
 document.addEventListener("click",function(e){
   if(e.target.closest&&e.target.closest("#preSignLink")){
+    /* the link shows the prestart as it stands, so save every box first -
+       including the forecast that was only filled in, never typed over */
+    var patch={}, d0=preDoc();
+    PREFIELDS.forEach(function(f){ var x=el(f[0]); if(x) patch[f[1]]=(x.value||"").trim(); });
+    if(Object.keys(patch).some(function(k){return patch[k]!==(d0[k]||"");})) savePre(patch);
+    if(!patch.risk) toast("High risk works is empty - fill it in so the crew see what they're signing for");
     var u=signUrl(state.date), inp=el("preLinkTxt");
     inp.value=u; inp.hidden=false; inp.select();
     var msg="ELISE high risk prestart "+shortDate(state.date)+" - read it and sign here: ";

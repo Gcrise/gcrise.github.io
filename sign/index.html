@@ -63,14 +63,48 @@ var DN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
 (function(){var p=DAY.split("-"),d=new Date(+p[0],+p[1]-1,+p[2]);el("date").textContent=DN[d.getDay()]+" "+d.getDate()+" "+MN[d.getMonth()]+" "+d.getFullYear();})();
 try{var m=JSON.parse(localStorage.getItem("elise.sign.me")||"{}");el("nm").value=m.n||"";el("co").value=m.c||"";}catch(e){}
 
-function block(t,v,cls){return v?'<div class="card'+(cls?" "+cls:"")+'"><h2>'+esc(t)+'</h2><p>'+esc(v)+'</p></div>':"";}
-fetch(URL_+"/rest/v1/prestart?id=eq."+DAY+"&select=data",{headers:H}).then(function(r){return r.json();}).then(function(rows){
-  var d=(rows[0]&&rows[0].data)||null;
-  if(!d){el("body").innerHTML='<p class="muted">The prestart for this day has not been written yet. Check with the site manager.</p>';return;}
-  el("body").innerHTML=block("High risk works",d.risk,"risk")+block("Structures",d.works)+block("Finishes",d.finishes)+
-    block("Safety",d.safety)+block("Weather",d.weather)+(d.by?'<p class="muted">Run by '+esc(d.by)+'</p>':"");
-  el("form").hidden=false;
-}).catch(function(){el("body").innerHTML='<p class="muted">Couldn’t load the prestart — check your signal and refresh.</p>';});
+function block(t,v,cls,empty){
+  return '<div class="card'+(cls?" "+cls:"")+'"><h2>'+esc(t)+'</h2>'+(v?'<p>'+esc(v)+'</p>':'<p class="muted">'+(empty||"Not filled in yet")+'</p>')+'</div>';
+}
+function hm(m){var h=Math.floor(m/60),mi=m%60,ap=h<12?"am":"pm";return (h%12||12)+(mi?":"+pad(mi):"")+ap;}
+function getJ(u){return fetch(URL_+"/rest/v1/"+u,{headers:H}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];});}
+var shownOnce=false;
+/* The whole prestart, as it stands - read again every 30 seconds so anything
+   the site manager adds while people are signing turns up here too. */
+function loadPrestart(){
+  Promise.all([
+    getJ("prestart?id=eq."+DAY+"&select=data"),
+    getJ("lifts?date=eq."+DAY+"&select=start_min,dur,co,co2,descr,qty,type,crane,status&order=start_min.asc"),
+    getJ("safety?select=id,data"),
+    getJ("config?id=eq.prestart&select=data")
+  ]).then(function(R){
+    var d=(R[0][0]&&R[0][0].data)||null;
+    if(!d){ if(!shownOnce) el("body").innerHTML='<p class="muted">The prestart for this day has not been started yet. This page will fill in as soon as it is.</p>'; return; }
+    shownOnce=true;
+    var lifts=R[1].filter(function(b){return b.type!=="del"&&b.crane!=="none";}), dels=R[1].filter(function(b){return b.type==="del"||b.crane==="none";});
+    var by={}; lifts.forEach(function(b){var k=b.co2?b.co+"/"+b.co2:b.co,s=b.start_min,e=s+(+b.dur||0),g=by[k]||(by[k]={k:k,s:s,e:e,n:0,w:[]});g.s=Math.min(g.s,s);g.e=Math.max(g.e,e);g.n+=Math.max(1,+b.qty||1);var w=String(b.descr||"").split(/\s+-\s+|\(/)[0].trim();if(w&&g.w.indexOf(w)<0)g.w.push(w);});
+    var liftTxt=Object.keys(by).map(function(k){return by[k];}).sort(function(a,b){return a.s-b.s;}).map(function(g){return hm(g.s)+"-"+hm(g.e)+"  "+g.k+"  "+g.n+(g.n===1?" lift":" lifts")+(g.w.length?" - "+g.w.join(", "):"");}).join("\n");
+    var delTxt=dels.map(function(b){return hm(b.start_min)+"  "+b.co+"  "+(b.descr||"")+(b.status==="req"?" (TBC)":"");}).join("\n");
+    var open=[]; R[2].forEach(function(r){(r.data&&r.data.items||[]).forEach(function(i){if(!i.done&&(r.id<=DAY))open.push((i.kind==="INC"?"Incident: ":i.kind==="CRIT"?"Critical: ":"")+i.text);});});
+    var checks=((R[3][0]&&R[3][0].data&&R[3][0].data.items)||[]), ticks=d.ticks||{};
+    var chkTxt=checks.map(function(c){return (ticks[c.n]?"\u2713 ":"\u2610 ")+c.text;}).join("\n");
+    el("body").innerHTML=
+      (d.type==="hr"?"":'<p class="muted">This is the daily prestart.</p>')+
+      block("High risk works",d.risk,"risk","None listed yet - ask the site manager before you start")+
+      block("Weather",d.weather)+
+      block("Structures",d.works)+
+      block("Finishes",d.finishes)+
+      block("Crane lifts",liftTxt,"","No crane lifts booked")+
+      block("Deliveries",delTxt,"","No deliveries booked")+
+      (d.safety?block("Safety notes",d.safety):"")+
+      block("Open safety items",open.join("\n"),"","Nothing open")+
+      (chkTxt?block("Prestart checks",chkTxt):"")+
+      (d.by?'<p class="muted">Run by '+esc(d.by)+'</p>':"");
+    el("form").hidden=false;
+  });
+}
+var signedHere=false;
+loadPrestart(); setInterval(function(){ if(document.visibilityState==="visible") loadPrestart(); },30000);
 
 function loadWho(){
   fetch(URL_+"/rest/v1/prestart_sign?day=eq."+DAY+"&select=name,company,at&order=at.asc",{headers:H}).then(function(r){return r.ok?r.json():[];}).then(function(L){
@@ -100,7 +134,7 @@ el("go").onclick=function(){
   .then(function(r){
     if(!r.ok) throw new Error(r.status);
     try{localStorage.setItem("elise.sign.me",JSON.stringify({n:nm,c:co}));}catch(e){}
-    el("form").innerHTML='<div class="card done"><b>Signed</b>Thanks '+esc(nm)+'. You can close this page.</div>';
+    signedHere=true; el("form").innerHTML='<div class="card done"><b>Signed</b>Thanks '+esc(nm)+'. You can close this page.</div>';
     loadWho();
   }).catch(function(){b.disabled=false;msg.style.color="var(--stop)";msg.textContent="Didn’t go through. This link only works on the day — check your signal and try again.";});
 };
