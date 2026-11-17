@@ -160,7 +160,16 @@ async function fetchRows(table, filters){
     var op  = OPS[f[1]] || "eq";
     qs.push(encodeURIComponent(col)+"="+op+"."+encodeURIComponent(f[2]));
   });
-  var r = await fetch(REST+table+"?"+qs.join("&"), {headers:H()});
+  var url = REST+table+"?"+qs.join("&");
+  var r = await fetch(url, {headers:H()});
+  /* a stale or revoked sign-in must never freeze the board: renew it, and if
+     that fails read with the public key - every table is readable to anyone */
+  if((r.status===401||r.status===403)&&session){
+    await refreshIfStale();
+    r = await fetch(url, {headers:H()});
+  }
+  if(r.status===401||r.status===403)
+    r = await fetch(url, {headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}});
   if(!r.ok) throw Object.assign(new Error("read "+table+" "+r.status), {code:r.status===401?"revoked":"read"});
   return await r.json();
 }
@@ -206,8 +215,15 @@ function watch(table, filters, cb, errcb){
     if(settled) return; settled = true;
     if(chan){ try{ chan.unsubscribe(); }catch(e){} chan = null; }
     killRealtime();                       /* every other watcher polls too */
-    if(!timer) timer = setInterval(pull, 30000);
   }
+  /* Always poll as well. A live socket dies silently when a phone sleeps or
+     the wifi drops, and nothing reconnects it - the board then sat frozen on
+     whatever it had. Polling every 30s, and the moment the page comes back
+     to the front, keeps it current whatever the socket is doing. */
+  timer = setInterval(pull, 30000);
+  function onVis(){ if(document.visibilityState==="visible") pull(); }
+  document.addEventListener("visibilitychange", onVis);
+  window.addEventListener("online", pull);
   if(c){
     try{
       chan = c.channel("rt_"+table+"_"+Math.random().toString(36).slice(2))
@@ -218,12 +234,12 @@ function watch(table, filters, cb, errcb){
         });
       setTimeout(function(){ fallback("timeout"); }, 8000);
     }catch(e){ fallback("threw"); }
-  } else {
-    timer = setInterval(pull, 30000);
   }
 
   return function unsub(){
     alive = false;
+    document.removeEventListener("visibilitychange", onVis);
+    window.removeEventListener("online", pull);
     if(timer) clearInterval(timer);
     if(chan){ try{ chan.unsubscribe(); }catch(e){} }
   };
@@ -2106,7 +2122,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 14:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 17 Nov 15:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
