@@ -2273,7 +2273,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 06:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 08:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -3585,6 +3585,12 @@ function autoQty(v){
     var d=Math.round(+it.dur);
     if(!isFinite(d)||d<per)d=Math.max(per,qty*per);
     d=Math.min(Math.round(d/per)*per,600);
+    /* RULE (Harry, 18 Nov): a loading bay install holds the crane for an hour
+       a bay. Anything booked shorter is stretched to it; longer stands. */
+    if(type==="lift"&&(String(it.kind||"").toUpperCase()==="BAYS"||(/loading\s*bay/i.test(String(it.desc||""))&&!/\b(back\s*load|remove|strip|dismantle|drop\s*off|deliver)/i.test(String(it.desc||""))))){
+      it.kind="BAYS";
+      var bays=Math.max(1,qty||1); d=Math.max(d,Math.min(600,bays*60));
+    }
     var cr=oneOf(it.crane,CRANES,type==="lift"?"tower":"none");
     if(cr!=="none")start=pushBreak(start,d,validIso(it.date)?it.date:cur);
     var pFrom=place(it.from),pTo=place(it.to);
@@ -3711,6 +3717,7 @@ function autoQty(v){
     if(!co) (cfg.trades||[]).forEach(function(t){
       if(co) return;
       var code=String(t[0]||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+      if(code==="bay" && /\bloading\s?bays?\b/.test(low)) return;   /* "loading bay" is the job, not Bayleys */
       if(code && new RegExp("\\b"+esc(code)+"\\b","i").test(head)){ co=t[0]; drop(code); }
     });
     /* Then the work itself. On site nobody types the company - they type
@@ -3800,7 +3807,7 @@ function autoQty(v){
        is the parser's vocabulary. SPIN and SNGL matter beyond colour: a
        panel day takes one crane break instead of two. */
     var kind="";
-    var KINDWORDS=[["BOOM",/\bboom\s?pump\b|\bboom\b/],["KIB",/\bkibble\b/],
+    var KINDWORDS=[["BAYS",/\bloading\s?bays?\b/],["BOOM",/\bboom\s?pump\b|\bboom\b/],["KIB",/\bkibble\b/],
       ["SPIN",/\bspin(\s?up)?\b/],["SNGL",/\bsingle(\s?height)?\b/],["DECK",/\bdeck\s?lift\b/],
       ["FLY",/\bfly(ing)?\b/],["BACK",/\bback\s?load\b/],["SET",/\bset\s?up\b|\bdismantle\b/],
       ["BIN",/\bbins?\s?out\b/],["LOAD",/\bload\s?in\b|\bpre\s?load\b/],["MOVE",/\bmove\b|\brelocate\b/],
