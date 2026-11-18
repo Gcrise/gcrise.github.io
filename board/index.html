@@ -597,7 +597,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:
 
 /* iPhone zooms the page into any text box set smaller than 16px - keep every
    box at 16px on touch screens so typing never zooms */
-@media (pointer:coarse){input,textarea,select,[contenteditable="true"]{font-size:16px!important}}
+@media (pointer:coarse){input,textarea,select:not(.prisel),[contenteditable="true"]{font-size:16px!important}}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 
@@ -855,10 +855,13 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .ordadd{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .ordadd #ordItem{flex:1 1 100%;min-width:0}
 .ordadd #ordSup,.ordadd #ordFor{flex:1 1 120px;min-width:0}
-.ordadd #ordBy{flex:0 0 auto}
+.ordadd #ordBy{flex:1 1 140px;min-width:0;color:var(--ink);min-height:34px}
+.ordbylab{align-self:center;font-family:var(--f-cond);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.ordadd .addbtn{flex:0 0 auto}
 .ordrow{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
 .ordrow .t{flex:1 1 auto;min-width:0}
-.ordrow .t b{font-weight:600;display:block}
+.ordrow .t b{font-weight:600;display:block;text-transform:none;letter-spacing:0}
+.ordrow .t small{text-transform:none;letter-spacing:0}
 .ordrow .t small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:2px}
 .ordrow .due{flex:none;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:right}
 .ordrow .due.late{color:var(--crit)}
@@ -916,7 +919,10 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .cpmile{flex-wrap:wrap;row-gap:6px}
 
 .cpmile .t{flex:1 1 calc(100% - 40px)}
-.cpmile .ctl{flex:1 1 100%;display:flex;gap:6px;align-items:center;padding-left:28px}
+.cpmile .ctl{flex:1 1 100%;display:flex;gap:6px;align-items:center;padding-left:28px;min-width:0}
+.cpmile .ctl .prisel{min-width:0;max-width:48%;overflow:hidden;text-overflow:ellipsis}
+.cpmile .mt{text-transform:none;letter-spacing:0}
+#v-path,#v-orders{max-width:100%;overflow-x:hidden}
 .cpmile .ctl .mdel{margin-left:auto}
 #cpMileAdd{flex-wrap:wrap}
 #cpMileAdd #cpMileTxt{flex:1 1 100%}
@@ -2283,11 +2289,11 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 <section id="v-orders" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="orders"><h2>Site orders</h2><span class="meta" id="ordMeta"></span></div>
-    <div class="ordadd" id="ordAdd">
+    <div class="addrow ordadd" id="ordAdd">
       <input id="ordItem" placeholder="What's needed - e.g. 20 x ply sheets 17mm" autocomplete="off">
       <input id="ordSup" placeholder="Supplier" list="ordSups" autocomplete="off">
       <input id="ordFor" placeholder="Who for" list="crewNames" autocomplete="off">
-      <input id="ordBy" type="date" aria-label="Needed by">
+      <label class="ordbylab" for="ordBy">Needed by</label><input id="ordBy" type="date" aria-label="Needed by">
       <button class="addbtn" id="ordGo" type="button">Add order</button>
       <datalist id="ordSups"></datalist>
     </div>
@@ -2332,7 +2338,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 20:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 20:50</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -6758,9 +6764,10 @@ function renderOrders(){
   function row(o){
     var late=o.st!=="arr"&&o.by&&o.by<today, sub=[];
     if(o.sup) sub.push(o.sup); if(o.for) sub.push("for "+o.for);
-    if(o.st==="ord"&&o.ordAt) sub.push("ordered "+shortDate(o.ordAt)+(o.ordBy?" by "+o.ordBy:""));
+    if(o.st==="ord"&&o.ordAt) sub.push("ordered "+shortDate(o.ordAt)+((o.ordBy&&o.ordBy.indexOf("@")<0)?" by "+o.ordBy:""));
     if(o.st==="arr"&&o.arrAt) sub.push("arrived "+shortDate(o.arrAt));
-    if(o.added) sub.push("added "+shortDate(o.added)+(o.addBy?" by "+o.addBy:""));
+    var nm=function(w){ return (w&&w.indexOf("@")<0)?w:""; };
+    if(o.added) sub.push("added "+shortDate(o.added)+(nm(o.addBy)?" by "+o.addBy:""));
     var sel='<select class="prisel'+(o.st==="to"?' on':'')+'" data-ord-st="'+esc(o.id)+'"'+(canW?'':' disabled')+' aria-label="Status">'+
       [["to","To order"],["ord","Ordered"],["arr","Arrived"]].map(function(x){return '<option value="'+x[0]+'"'+(o.st===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join("")+'</select>';
     return '<div class="ordrow'+(o.st==="arr"?" arr":"")+'"><span class="t"><b>'+esc(o.item)+'</b>'+(sub.length?'<small>'+esc(sub.join(" \u00b7 "))+'</small>':'')+'</span>'+
