@@ -624,6 +624,11 @@ button,input,select{font:inherit;color:inherit}
   padding:7px 13px 6px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
 .tab:hover{opacity:.9}
 .tab[aria-current="true"]{opacity:1;border-bottom-color:var(--clock);color:var(--ink)}
+/* Critical path stands out in the tab row - light red, solid when open */
+.tab.tabred{opacity:1;background:rgba(226,68,68,.18);color:#FF8A80;border-radius:3px 3px 0 0}
+.tab.tabred[aria-current="true"]{background:#D32F2F;color:#fff;border-bottom-color:#D32F2F}
+:root[data-theme="light"] .tab.tabred:not([aria-current="true"]){color:#C62828}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .tab.tabred:not([aria-current="true"]){color:#C62828}}
 .tab b{font-family:var(--f-num);font-size:10px;font-weight:500;background:#8884;border-radius:8px;padding:1px 5px;letter-spacing:0}
 .tab b.alert{background:var(--crit);color:#fff}
 
@@ -906,8 +911,7 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
   font:600 9.5px/1 var(--f-cond),Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:0 7px;height:22px}
 .cpmile .mdel.arm{color:var(--crit);border-color:var(--crit)}
 .cpmile{flex-wrap:wrap;row-gap:6px}
-#v-path .subhead.cpmilehd{background:#C62828;border-bottom:0;margin:10px 14px 0;padding:9px 10px;border-radius:3px}
-#v-path .subhead.cpmilehd > span,#v-path .subhead.cpmilehd > span:first-child{color:#fff}
+
 .cpmile .t{flex:1 1 calc(100% - 40px)}
 .cpmile .ctl{flex:1 1 100%;display:flex;gap:6px;align-items:center;padding-left:28px}
 .cpmile .ctl .mdel{margin-left:auto}
@@ -2297,7 +2301,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 <section id="v-path" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="path"><h2>Critical path</h2><span class="meta" id="cpMeta"></span></div>
-    <div class="subhead cpmilehd" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
+    <div class="subhead" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
     <div id="cpMiles"></div>
     <div class="addrow cpadd" id="cpMileAdd">
       <input id="cpMileTxt" placeholder="Type a milestone for the team" autocomplete="off">
@@ -2325,7 +2329,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:20</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4736,7 +4740,7 @@ function go(v){
 function renderTabs(){
   el("tabs").innerHTML=VIEWS.map(function(x){
     var n=tabCount(x[0]);
-    return '<button class="tab" data-go="'+x[0]+'" aria-current="'+(state.view===x[0])+'">'+esc(x[1])+
+    return '<button class="tab'+(x[0]==="path"?" tabred":"")+'" data-go="'+x[0]+'" aria-current="'+(state.view===x[0])+'">'+esc(x[1])+
       (n?'<b class="'+(n.alert?"alert":"")+'">'+n.n+'</b>':'')+'</button>';
   }).join("");
 }
