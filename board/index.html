@@ -730,7 +730,8 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .tkhd span{flex:1 1 auto;min-width:0}
 /* Tikee's viewer is drawn at a fixed desktop size and cropped to just the
    photo (its slider sits inside the photo), so none of Tikee's blue page shows */
-.tkbox{position:relative;margin:6px 14px 0;border-radius:3px;overflow:hidden;background:#000}
+.tkbox{position:relative;margin:8px 0 0;border-radius:0;overflow:hidden;background:#000}
+@media (min-width:821px){ .tkbox:not(.camfull) .tkcrop{max-width:none} }
 .tkcrop{position:relative;width:100%;aspect-ratio:7360/2650;overflow:hidden;background:#000}
 .tkcrop iframe{position:absolute;left:0;top:0;width:1000px;height:560px;border:0;transform-origin:0 0}
 /* phones get Tikee's phone layout, drawn at a fixed 338px wide and cropped to
@@ -757,7 +758,7 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .dcband .dcs b{color:var(--ink-2);font-weight:600}
 .dcband .dcbars{display:inline-flex;align-items:flex-end;gap:2px;height:18px}
 .dcband .dcbars i{display:block;width:6px;background:var(--clock);opacity:.75;border-radius:1px 1px 0 0}
-@media (max-width:600px){ .dcband .dcbars{display:none} }
+@media (max-width:600px){ .dcband .dcbars{display:none} #v-camera .panel{overflow:visible} }
 .deckcount{margin:12px 14px 4px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;border:1px solid var(--line-hard);border-radius:4px;padding:10px 12px}
 .deckcount .dcn{font-family:var(--f-num);font-size:28px;font-weight:700;line-height:1;color:var(--clock)}
 .deckcount .dcl{font-family:var(--f-cond);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
@@ -2305,7 +2306,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
     </div>
     <div class="camgrid">
-      <div class="camcol">
+      <div class="camcol camlatest" hidden>
         <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" id="inkHide" hidden>Hide marks</button><button class="mini" type="button" id="inkBtn">Mark up</button><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
           <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><div class="camzoom" id="camZoom"><div class="camstage" id="camStage"><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"><svg id="camInk" viewBox="0 0 7360 2650" preserveAspectRatio="none" aria-label="Mark-up on the deck photo"></svg></div></div></div>
@@ -2383,7 +2384,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 22:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 22:15</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
