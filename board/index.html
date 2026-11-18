@@ -2361,7 +2361,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 21:05</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 21:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -8221,6 +8221,28 @@ async function savePDF(which,btn,fmt){
   }catch(e){toast("Couldn't build that PDF");}
   finally{if(btn){btn.disabled=false;btn.textContent=was;}}
 }
+
+/* ---------- stay on the latest board ----------
+   Phones (a home-screen board above all) hang on to an old copy for days.
+   Every few minutes, and whenever the board comes back to the front, read
+   the build stamp off the live page; if it has moved on, reload - straight
+   away if nobody is typing, otherwise on the next return to the front. */
+(function(){
+  var mine=((document.querySelector(".buildstamp")||{}).textContent||"").trim(), pending=false, busy=false;
+  if(!mine) return;
+  function typing(){ var a=document.activeElement; return a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable); }
+  function check(){
+    if(busy) return; busy=true;
+    fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():"";}).then(function(t){
+      busy=false;
+      var m=t&&t.match(/class="buildstamp"[^>]*>([^<]+)</); if(!m) return;
+      if(m[1].trim()!==mine){ pending=true; if(!typing()&&!document.querySelector(".sigpad,.camfull")) location.reload(); }
+    }).catch(function(){ busy=false; });
+  }
+  setInterval(check,5*60000);
+  document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible"){ if(pending&&!typing()) location.reload(); else check(); } });
+  setTimeout(check,20000);
+})();
 
 /* ---------- events ---------- */
 el("prevDay").addEventListener("click",function(){shiftDate(-1);});
