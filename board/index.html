@@ -896,10 +896,12 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .cpgrid .bar.ms{width:14px;height:14px;border-radius:2px;transform:rotate(45deg);justify-self:center;padding:0;margin:0;background:var(--crit)}
 .cpgrid .st{flex:0 0 auto;font-family:var(--f-cond);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:1px 5px;border-radius:2px;border:1px solid currentColor;white-space:nowrap}
 .cpgrid .st.late{color:var(--crit)}.cpgrid .st.now{color:var(--clock)}.cpgrid .st.ok{color:var(--ink-3)}
-.cppour{display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:baseline;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13px}
+.cppour{display:grid;grid-template-columns:120px 1fr auto;gap:10px;align-items:baseline;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13px}
 .cppour .d{font-family:var(--f-cond);font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .cppour .w{min-width:0}.cppour .w small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:1px}
-.cppour .c{font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.cppour .cpdate{font:inherit;font-size:12px;padding:3px 4px;max-width:118px;background:transparent;color:inherit;border:1px solid var(--line-hard);border-radius:3px}
+.cppour .cyc{display:block;font-size:13px;color:var(--ink);letter-spacing:.02em}
+.cppour .c{text-align:right;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
 .cppour.next .d,.cppour.next .c{color:var(--crit)}
 .cppour.past{opacity:.45}
 .cpmile{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
@@ -2329,7 +2331,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:20</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -6886,6 +6888,23 @@ function addMile(){
   el("cpMileTxt").value=""; renderMiles(); saveMiles();
 }
 
+/* site-set pour dates, over the programme's - config "pours" {ov:{name:date}} */
+var POURS={ov:{}}, poursRef=null, poursSeen="";
+if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
+  if(!db) return; poursRef=db.collection("config").doc("pours");
+  poursRef.onSnapshot(function(sn){ var d=sn&&sn.data&&sn.data(); if(!d) return; var j=JSON.stringify(d); if(j===poursSeen) return; poursSeen=j; POURS=d; if(!POURS.ov)POURS.ov={}; renderPath(); });
+}).catch(function(){});
+document.addEventListener("change",function(e){
+  var c=e.target.closest&&e.target.closest("[data-pour]"); if(!c) return;
+  if(!poursRef||!(window.eliseAuth&&window.eliseAuth.canWrite())){ toast("Sign in to change pour dates"); return; }
+  var k=c.getAttribute("data-pour"), v=c.value, prog=c.getAttribute("data-prog");
+  POURS.ov=POURS.ov||{};
+  if(!v||v===prog) delete POURS.ov[k]; else POURS.ov[k]=v;
+  POURS.ts=Date.now(); poursSeen=JSON.stringify(POURS);
+  poursRef.set(POURS).catch(function(){ toast("Pour date not saved - try again"); });
+  renderPath();
+});
+
 function renderPath(){
   if(!el("cpGrid"))return;
   var today=iso(new Date()), all=progTasks();
@@ -6946,13 +6965,30 @@ function renderPath(){
     if(pl.some(function(x){return /pour slab/i.test(x.what)&&x.d===L.finish;})) return;
     pl.push({d:L.finish,what:L.task.replace(/ - FRP$/i,"")+" slab pour",how:"",src:"cycle"});
   });
-  pl=pl.filter(function(x){return x.d>=iso(new Date(Date.now()-10*86400000));}).sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0;}).slice(0,10);
+  /* site's own pour dates override the programme's, and the cycle is the
+     working days from the slab pour before it */
+  var OV=(POURS.ov||{});
+  pl.forEach(function(x){ x.key=x.what.toLowerCase(); x.prog=x.d; if(OV[x.key]){ x.d=OV[x.key]; x.moved=x.d!==x.prog; } });
+  pl.sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0;});
+  var prevSlab=null;
+  pl.forEach(function(x){ if(/slab pour/i.test(x.what)){ if(prevSlab) x.cycle=cpWorkDays(prevSlab.d,x.d); prevSlab=x; } });
+  pl=pl.filter(function(x){return x.d>=iso(new Date(Date.now()-10*86400000));}).slice(0,10);
   var nextPour=pl.filter(function(x){return x.d>=today&&/slab/i.test(x.what);})[0];
+  var canWP=!!(window.eliseAuth&&window.eliseAuth.canWrite());
+  if(nextPour&&el("cpHero").firstChild){ var wdn=cpWorkDays(today,nextPour.d);
+    el("cpHero").firstChild.innerHTML='<div class="k">Next slab pour</div><div class="v">'+shortDate(nextPour.d)+'<small>'+(wdn<=0?"today":wdn+" working day"+(wdn===1?"":"s"))+'</small></div><div class="s">'+esc(nextPour.what.replace(/ slab pour$/i,""))+(nextPour.cycle?" \u00b7 "+nextPour.cycle+" day cycle":"")+'</div>'; }
   el("cpPours").innerHTML=pl.length?pl.map(function(x){
     var wd=cpWorkDays(today,x.d), dd=parseISO(x.d);
     var away=x.d<today?(x.done?"done":"past"):(wd===0?"today":wd+" day"+(wd===1?"":"s"));
-    return '<div class="cppour'+(x===nextPour?" next":"")+(x.d<today?" past":"")+'"><span class="d">'+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dd.getDay()]+" "+shortDate(x.d)+'</span>'+
-      '<span class="w">'+esc(x.what.charAt(0)+x.what.slice(1).toLowerCase())+(x.src==="cycle"?'<small>End of the level\u2019s cycle</small>':'')+'</span>'+
+    var sub=[];
+    if(x.cycle) sub.push(x.cycle+" day cycle");
+    if(x.moved) sub.push("programme "+shortDate(x.prog));
+    else if(x.src==="cycle"&&!x.cycle) sub.push("end of the level\u2019s cycle");
+    return '<div class="cppour'+(x===nextPour?" next":"")+(x.d<today?" past":"")+'"><span class="d">'+
+      (canWP&&x.d>=today
+        ? '<input type="date" class="cpdate" data-pour="'+esc(x.key)+'" data-prog="'+esc(x.prog)+'" value="'+x.d+'" aria-label="Pour date">'
+        : ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dd.getDay()]+" "+shortDate(x.d))+'</span>'+
+      '<span class="w">'+esc(x.what.charAt(0)+x.what.slice(1).toLowerCase())+(sub.length?'<small>'+esc(sub.join(" \u00b7 "))+'</small>':'')+'</span>'+
       '<span class="c">'+away+'</span></div>';
   }).join(""):'<p class="empty" style="padding:8px 14px">No pours on the programme.</p>';
 
