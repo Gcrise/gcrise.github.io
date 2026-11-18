@@ -597,7 +597,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:
 
 /* iPhone zooms the page into any text box set smaller than 16px - keep every
    box at 16px on touch screens so typing never zooms */
-@media (pointer:coarse){input,textarea,select:not(.prisel),[contenteditable="true"]{font-size:16px!important}}
+@media (pointer:coarse){input,textarea,select:not(.prisel),[contenteditable="true"]:not(.txt):not(.mt){font-size:16px!important}}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
 
@@ -860,7 +860,7 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .ordadd .addbtn{flex:0 0 auto}
 .ordrow{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
 .ordrow .t{flex:1 1 auto;min-width:0}
-.ordrow .t b{font-weight:600;display:block;text-transform:none;letter-spacing:0}
+.ordrow .t b{display:block}
 .ordrow .t small{text-transform:none;letter-spacing:0}
 .ordrow .t small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:2px}
 .ordrow .due{flex:none;font-family:var(--f-cond);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:right}
@@ -921,8 +921,14 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .cpmile .t{flex:1 1 calc(100% - 40px)}
 .cpmile .ctl{flex:1 1 100%;display:flex;gap:6px;align-items:center;padding-left:28px;min-width:0}
 .cpmile .ctl .prisel{min-width:0;max-width:48%;overflow:hidden;text-overflow:ellipsis}
-.cpmile .mt{text-transform:none;letter-spacing:0}
+
 #v-path,#v-orders{max-width:100%;overflow-x:hidden}
+/* one size for a line of work everywhere - labour jobs, team milestones, site orders */
+#v-labour .item .txt,.cpmile .mt,.ordrow .t b{font-size:13.5px!important;line-height:1.35;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+#v-labour .item.done .txt,.cpmile.done .mt{font-weight:400}
+#v-labour .item .jmeta{flex-wrap:wrap;row-gap:6px;min-width:0}
+#v-labour .item .jmeta .who{max-width:120px;min-width:70px}
+@media (max-width:560px){.ordrow{flex-wrap:wrap;row-gap:6px}.ordrow .t{flex:1 1 100%}.ordrow .due{margin-left:0;margin-right:auto;text-align:left}}
 .cpmile .ctl .mdel{margin-left:auto}
 #cpMileAdd{flex-wrap:wrap}
 #cpMileAdd #cpMileTxt{flex:1 1 100%}
@@ -2338,7 +2344,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 20:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 20:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4674,7 +4680,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["prestart","Prestart"],["safety","Safety"],["labour","Labour & jobs"],["orders","Site orders"],["crane","Crane & deliveries"],["path","Critical path"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
+var VIEWS=[["today","Today"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["labour","Labour & jobs"],["orders","Site orders"],["crane","Crane & deliveries"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
 /* Eufy tab retired 17 Nov at Harry's call - the section, its code and the camera
    settings are all kept; put ["eufy","Eufy"] back after "camera" above to re-add it. */
 var CUT=1260;      /* one cut a day, 9pm */
