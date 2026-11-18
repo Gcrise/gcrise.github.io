@@ -2332,7 +2332,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 20:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5407,6 +5407,17 @@ function renderWind(){
   }
 }
 function preDoc(){ return state.preDocs[state.date]||{}; }
+/* the safety notes carry forward: a new day's prestart starts with the last
+   prestart's safety lines already in the box, ready to edit - they are only
+   recorded for the day when it is signed off */
+function lastSafety(day){
+  var best="", bestDay="";
+  Object.keys(state.preDocs||{}).forEach(function(k){
+    var v=(state.preDocs[k]&&state.preDocs[k].safety||"").trim();
+    if(k<day&&v&&v.toLowerCase()!=="no"&&k>bestDay){ best=v; bestDay=k; }
+  });
+  return best;
+}
 function preStanding(){
   var c=state.preCfg&&state.preCfg.items;
   return (c&&c.length?c:[]).map(function(i,n){
@@ -5663,7 +5674,8 @@ function renderPrestart(){
     var e=el(f[0]); if(!e) return;
     /* the pulled forecast fills the box only while it is still untouched, so
        it never writes over what the person actually saw out the window */
-    var seed=(f[1]==="weather"&&!d.weather&&!signed)?wx:"";
+    var seed=(f[1]==="weather"&&!d.weather&&!signed)?wx:
+             (f[1]==="safety"&&!d.safety&&!signed)?lastSafety(state.date):"";
     if(document.activeElement!==e) e.value=d[f[1]]||seed;
     e.disabled=signed;
     e.onchange=function(){ var patch={}; patch[f[1]]=(e.value||"").trim(); savePre(patch); };
@@ -7462,7 +7474,8 @@ async function buildPDF(which){
     if(pdw.at){ var sd=new Date(pdw.at);
       doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(43,41,38);
       doc.text("Prestart signed off by "+(pdw.by||"-")+" at "+fmtClock(sd.getHours()*60+sd.getMinutes()),M,y); y+=6; }
-    [["Weather",pdw.weather],["Structures",pdw.works],["Finishes",pdw.finishes],["High risk works",pdw.risk],["Safety notes",pdw.safety]].forEach(function(g){
+    var stdChecks=preStanding().map(function(i){ return ((pdw.ticks||{})[i.n]?"[x] ":"[ ] ")+i.text; }).join("\n");
+    [["Weather",pdw.weather],["Structures",pdw.works],["Finishes",pdw.finishes],["High risk works",pdw.risk],["Safety - standing checks",stdChecks],["Safety notes",pdw.safety||lastSafety(state.date)]].forEach(function(g){
       if(!g[1]&&(g[0]==="Safety notes"||g[0]==="Weather")) return;
       head((g[0]==="Structures"||g[0]==="Finishes")?"Site works — "+g[0]:g[0]);
       if(!g[1]){none("Nothing written.");return;}
