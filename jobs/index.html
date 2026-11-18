@@ -274,7 +274,7 @@ label.btn{display:inline-flex;align-items:center;justify-content:center}
 
 /* iPhone zooms the page into any text box set smaller than 16px - keep every
    box at 16px on touch screens so typing never zooms */
-@media (pointer:coarse){input,textarea,select,[contenteditable="true"]{font-size:16px!important}}
+@media (pointer:coarse){input,textarea,select:not(.prisel),.prisel.big,[contenteditable="true"]{font-size:16px!important}}
 .jobrow > .job{flex:1 1 0}
 .jphs{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap;padding:0 0 10px 34px}
 .jphs img{width:72px;height:54px;object-fit:cover;border-radius:4px;border:1px solid var(--rule);display:block}
