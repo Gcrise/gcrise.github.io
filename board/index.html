@@ -2304,7 +2304,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 <section id="v-path" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="path"><h2>Critical path</h2><span class="meta" id="cpMeta"></span></div>
-    <div class="subhead" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
+    <div class="subhead" data-acc="path"><span>Weekly team milestones</span><span><span id="cpWeek"></span> <button class="mini" type="button" data-pdf="miles" style="margin-left:8px">Print</button></span></div>
     <div id="cpMiles"></div>
     <div class="addrow cpadd" id="cpMileAdd">
       <input id="cpMileTxt" placeholder="Type a milestone for the team" autocomplete="off">
@@ -2332,7 +2332,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:35</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7377,7 +7377,7 @@ function imgData(id, bkt){
     img.src=PHOTO(id, bkt);
   });
 }
-var SECTIONS={all:"Day sheet",labour:"Labour",jobs:"Jobs",safety:"Safety",
+var SECTIONS={miles:"Team milestones",all:"Day sheet",labour:"Labour",jobs:"Jobs",safety:"Safety",
   crane:"Crane & deliveries",delays:"Delays",
   photos:"Photos",safetyphotos:"Safety photos",log:"Completed works",prepour:"Pre-pour",pourphotos:"Pre-pour photos",
   team:"Team prestart",logistics:"Logistics prestart"};
@@ -7843,6 +7843,53 @@ async function pdfToJpegs(doc,scale){
 /* Team day sheet - landscape, three columns, big enough to read standing up.
    Hook on the left, what stops the pour in the middle, labour jobs on the right,
    and the job list runs on into whatever space the other two leave. */
+/* Team milestones, one A4 to pin up or hand round: everything open plus what
+   was ticked this week, grouped by who has it, with a box to tick by hand. */
+function buildMilesPDF(){
+  if(!window.jspdf||!window.jspdf.jsPDF){toast("PDF builder didn\u2019t load \u2014 reload the page");return null;}
+  var doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
+  var W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight(),M=14,y=M;
+  var today=iso(new Date()), wk=weekMon(today);
+  var L=mileAll().filter(function(m){return !m.done||weekMon(m.day)===wk;});
+  doc.setFillColor(35,39,26);doc.rect(0,0,W,24,"F");
+  doc.setTextColor(232,226,216);doc.setFont("helvetica","bold");doc.setFontSize(16);doc.text("ELISE",M,11);
+  doc.setFontSize(11);doc.text("TEAM MILESTONES",M,18);
+  doc.setFont("helvetica","normal");doc.setFontSize(9);
+  doc.text("Week of "+mileLabel(wk)+"   |   printed "+mileLabel(today),W-M,18,{align:"right"});
+  y=34;
+  if(!L.length){doc.setTextColor(90,90,80);doc.setFontSize(11);doc.text("No milestones set.",M,y);return doc;}
+  var groups={}, order=[];
+  L.forEach(function(m){var k=m.who||"Unassigned"; if(!groups[k]){groups[k]=[];order.push(k);} groups[k].push(m);});
+  order.sort(function(a,b){ if(a==="Unassigned")return 1; if(b==="Unassigned")return -1; var ia=MILE_TEAM.indexOf(a),ib=MILE_TEAM.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+  order.forEach(function(k){
+    var G=groups[k].sort(function(a,b){return (a.done?1:0)-(b.done?1:0)||(a.day<b.day?-1:1);});
+    if(y>H-30){doc.addPage();y=M;}
+    doc.setTextColor(35,39,26);doc.setFont("helvetica","bold");doc.setFontSize(11.5);doc.text(k.toUpperCase(),M,y);
+    doc.setDrawColor(35,39,26);doc.setLineWidth(.5);doc.line(M,y+2,W-M,y+2); y+=8;
+    G.forEach(function(m){
+      var late=!m.done&&m.day<today;
+      var lines=doc.splitTextToSize(m.text,W-2*M-58);
+      var hgt=Math.max(8,lines.length*5+3);
+      if(y+hgt>H-14){doc.addPage();y=M;}
+      doc.setDrawColor(90,90,80);doc.setLineWidth(.35);doc.rect(M,y-4,4.5,4.5);
+      if(m.done){doc.setDrawColor(35,39,26);doc.setLineWidth(.6);doc.line(M+.8,y-1.8,M+1.9,y-.5);doc.line(M+1.9,y-.5,M+3.8,y-3.4);}
+      doc.setFont("helvetica",m.done?"normal":"bold");doc.setFontSize(10.5);
+      doc.setTextColor(m.done?140:30,m.done?140:30,m.done?130:25);
+      doc.text(lines,M+8,y);
+      doc.setFont("helvetica","bold");doc.setFontSize(9.5);
+      if(late) doc.setTextColor(198,40,40); else doc.setTextColor(70,70,60);
+      doc.text((m.done?"Done ":late?"DUE ":"By ")+mileLabel(m.day),W-M,y,{align:"right"});
+      if(m.done&&m.by){doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(140,140,130);doc.text("ticked by "+m.by,W-M,y+4,{align:"right"});}
+      doc.setDrawColor(220,215,205);doc.setLineWidth(.2);doc.line(M,y+hgt-4,W-M,y+hgt-4);
+      y+=hgt;
+    });
+    y+=5;
+  });
+  doc.setFontSize(7.5);doc.setTextColor(150,150,140);doc.setFont("helvetica","normal");
+  doc.text("ELISE Constructions  |  3 Twenty Fifth Avenue, Palm Beach",M,H-8);
+  return doc;
+}
+
 function buildTeamPDF(){
   if(!window.jspdf||!window.jspdf.jsPDF){toast("PDF builder didn\u2019t load — reload the page");return null;}
   var doc=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"landscape"});
@@ -8097,11 +8144,11 @@ function durTxt(m){var h=Math.floor(m/60),x=m%60;
 async function savePDF(which,btn,fmt){
   if(btn){btn.disabled=true;var was=btn.textContent;btn.textContent="…";}
   try{
-    var doc=(which==="team")?buildTeamPDF():
+    var doc=(which==="team")?buildTeamPDF():(which==="miles")?buildMilesPDF():
             (which==="logistics")?buildLogisticsPDF():await buildPDF(which);
     if(!doc)return;
     var slug=which==="all"?"day_sheet":which;
-    var base="ELISE_"+slug+"_"+state.date;
+    var base="ELISE_"+(which==="miles"?"team_milestones":slug)+"_"+(which==="miles"?iso(new Date()):state.date);
     var label=SECTIONS[which]||"Sheet";
     if(fmt==="jpg"){
       var imgs;
