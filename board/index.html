@@ -732,9 +732,7 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
    photo (its slider sits inside the photo), so none of Tikee's blue page shows */
 .tkbox{position:relative;margin:6px 14px 0;border-radius:3px;overflow:hidden;background:#000}
 .tkcrop{position:relative;width:100%;aspect-ratio:7360/2650;overflow:hidden;background:#000}
-.tkbox.raw .tkcrop{aspect-ratio:1000/600}
-.tkbox.raw.camfull .tkcrop,.tkbox.raw:fullscreen .tkcrop{width:min(100vw,calc(100dvh * 1000 / 600))}
-.tkcrop iframe{position:absolute;left:0;top:0;width:1000px;height:600px;border:0;transform-origin:0 0}
+.tkcrop iframe{position:absolute;left:0;top:0;width:1000px;height:560px;border:0;transform-origin:0 0}
 .tkbox.camfull,.tkbox:fullscreen{display:flex;align-items:center;justify-content:center}
 .tkbox.camfull .tkcrop,.tkbox:fullscreen .tkcrop{width:min(100vw,100vh * 7360 / 2650);width:min(100vw,calc(100dvh * 7360 / 2650))}
 .tkbox:not(.camfull) .camclose{display:none}
@@ -2292,7 +2290,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     </div>
     <div class="camhd tkhd"><b>Photo browser</b><span>Tap the arrow under the picture, then drag back through every shot</span>
       <a class="mini" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener">Open in Tikee</a>
-      <button class="mini" type="button" id="tkRaw">Whole page</button><button class="mini" type="button" data-camfull="tkBox">Full screen</button></div>
+      <button class="mini" type="button" data-camfull="tkBox">Full screen</button></div>
     <div class="tkbox" id="tkBox"><div class="tkcrop" id="tkCrop">
       <iframe id="tkFrame" title="ELISE deck - Tikee photo browser" allow="fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
@@ -2320,7 +2318,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
         </div>
       </div>
     </div>
-    <p class="note tknote">First time on a phone or PC Tikee asks about cookies - if the picture won&rsquo;t respond, tap Whole page, choose Reject all, then tap Photo only.</p>
+    <p class="note tknote">Tikee asks about cookies when it loads - tap Reject all on the picture.</p>
   </div>
 </section>
 
@@ -2376,7 +2374,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 21:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 21:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -8307,12 +8305,8 @@ var TK_CROP={L:18,T:102,W:953};   /* the photo's box inside Tikee's viewer at 10
 function tkFit(){
   var c=el("tkCrop"),f=el("tkFrame"); if(!c||!f) return;
   var w=c.clientWidth; if(!w) return;
-  if(el("tkBox").classList.contains("raw")) f.style.transform="scale("+(w/1000)+")";
-  else f.style.transform="scale("+(w/TK_CROP.W)+") translate(-"+TK_CROP.L+"px,-"+TK_CROP.T+"px)";
+  f.style.transform="scale("+(w/TK_CROP.W)+") translate(-"+TK_CROP.L+"px,-"+TK_CROP.T+"px)";
 }
-if(el("tkRaw")) el("tkRaw").addEventListener("click",function(){
-  var on=el("tkBox").classList.toggle("raw"); this.textContent=on?"Photo only":"Whole page"; requestAnimationFrame(tkFit);
-});
 function camFit(){
   tkFit();
   var b=el("tlBox"),f=el("camFrame");
