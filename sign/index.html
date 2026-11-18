@@ -87,7 +87,7 @@ function loadPrestart(){
     var delTxt=dels.map(function(b){return hm(b.start_min)+"  "+b.co+"  "+(b.descr||"")+(b.status==="req"?" (TBC)":"");}).join("\n");
     var open=[]; R[2].forEach(function(r){(r.data&&r.data.items||[]).forEach(function(i){if(!i.done&&(r.id<=DAY))open.push((i.kind==="INC"?"Incident: ":i.kind==="CRIT"?"Critical: ":"")+i.text);});});
     var checks=((R[3][0]&&R[3][0].data&&R[3][0].data.items)||[]), ticks=d.ticks||{};
-    var chkTxt=checks.map(function(c){return (ticks[c.n]?"\u2713 ":"\u2610 ")+c.text;}).join("\n");
+    var chkTxt=checks.map(function(c){return "\u2022 "+c.text;}).join("\n");
     el("body").innerHTML=
       (d.type==="hr"?"":'<p class="muted">This is the daily prestart.</p>')+
       block("High risk works",d.risk,"risk","None listed yet - ask the site manager before you start")+
@@ -98,7 +98,7 @@ function loadPrestart(){
       block("Deliveries",delTxt,"","No deliveries booked")+
       (d.safety?block("Safety notes",d.safety):"")+
       block("Open safety items",open.join("\n"),"","Nothing open")+
-      (chkTxt?block("Prestart checks",chkTxt):"")+
+      (chkTxt?block("Safety",chkTxt):"")+
       (d.by?'<p class="muted">Run by '+esc(d.by)+'</p>':"");
     el("form").hidden=false;
   });
