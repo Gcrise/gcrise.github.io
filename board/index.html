@@ -733,10 +733,15 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .tkbox{position:relative;margin:6px 14px 0;border-radius:3px;overflow:hidden;background:#000}
 .tkcrop{position:relative;width:100%;aspect-ratio:7360/2650;overflow:hidden;background:#000}
 .tkcrop iframe{position:absolute;left:0;top:0;width:1000px;height:560px;border:0;transform-origin:0 0}
-/* phones get Tikee's own phone layout: it scrolls itself to its cookie box, so it can't be cropped reliably */
-.tkbox.tkphone .tkcrop{aspect-ratio:auto;height:min(62vh,520px)}
-.tkbox.tkphone .tkcrop iframe{width:100%;height:100%;transform:none!important}
-.tkbox.tkphone.camfull .tkcrop,.tkbox.tkphone:fullscreen .tkcrop{width:100%;height:100%}
+/* phones get Tikee's phone layout, drawn at a fixed 338px wide and cropped to
+   the photo card - picture, slide bar and date - nothing else */
+.tkbox.tkphone .tkcrop{aspect-ratio:326/246}
+.tkbox.tkphone .tkcrop iframe{width:338px;height:640px}
+.tkbox.tkphone.camfull .tkcrop,.tkbox.tkphone:fullscreen .tkcrop{width:min(100vw,calc(100dvh * 326 / 246))}
+.tkbox.tkphone.raw .tkcrop{aspect-ratio:auto;height:min(70vh,560px)}
+.tkbox.tkphone.raw .tkcrop iframe{width:100%;height:100%;transform:none!important}
+.tkbox.tkphone.raw.camfull .tkcrop{width:100%;height:100%}
+#tkRaw{display:none}.tkphone~* #tkRaw,.tkhd.tkph #tkRaw{display:inline-block}
 .tkbox.camfull,.tkbox:fullscreen{display:flex;align-items:center;justify-content:center}
 .tkbox.camfull .tkcrop,.tkbox:fullscreen .tkcrop{width:min(100vw,100vh * 7360 / 2650);width:min(100vw,calc(100dvh * 7360 / 2650))}
 .tkbox:not(.camfull) .camclose{display:none}
@@ -2294,7 +2299,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     </div>
     <div class="camhd tkhd"><b>Photo browser</b><span>Tap the arrow under the picture, then drag back through every shot</span>
       <a class="mini" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener">Open in Tikee</a>
-      <button class="mini" type="button" data-camfull="tkBox">Full screen</button></div>
+      <button class="mini" type="button" id="tkRaw">Whole page</button><button class="mini" type="button" data-camfull="tkBox">Full screen</button></div>
     <div class="tkbox" id="tkBox"><div class="tkcrop" id="tkCrop">
       <iframe id="tkFrame" title="ELISE deck - Tikee photo browser" allow="fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
@@ -2322,7 +2327,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
         </div>
       </div>
     </div>
-    <p class="note tknote">Tikee asks about cookies when it loads - tap Reject all on the picture.</p>
+    <p class="note tknote">If Tikee&rsquo;s cookie box covers the picture: on a PC tap Reject all on it; on a phone tap Whole page, Reject all, then Photo only.</p>
   </div>
 </section>
 
@@ -2378,7 +2383,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 21:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 22:05</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -8307,12 +8312,17 @@ window.addEventListener("hashchange",function(){go(location.hash.slice(1));});
 /* the deck camera: Tikee's public share page, sized to the screen */
 var TK_CROP={L:18,T:102,W:953};   /* the photo's box inside Tikee's viewer at 1000px wide */
 var TK_PHONE=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
-if(TK_PHONE&&el("tkBox")) el("tkBox").classList.add("tkphone");
+var TK_PCROP={L:6,T:146,W:326};   /* the photo card inside Tikee's phone layout at 338px wide */
+if(TK_PHONE&&el("tkBox")){ el("tkBox").classList.add("tkphone"); var th=document.querySelector(".tkhd"); if(th) th.classList.add("tkph"); }
 function tkFit(){
-  var c=el("tkCrop"),f=el("tkFrame"); if(!c||!f||TK_PHONE) return;
+  var c=el("tkCrop"),f=el("tkFrame"); if(!c||!f) return;
   var w=c.clientWidth; if(!w) return;
-  f.style.transform="scale("+(w/TK_CROP.W)+") translate(-"+TK_CROP.L+"px,-"+TK_CROP.T+"px)";
+  var k=TK_PHONE?TK_PCROP:TK_CROP;
+  f.style.transform="scale("+(w/k.W)+") translate(-"+k.L+"px,-"+k.T+"px)";
 }
+if(el("tkRaw")) el("tkRaw").addEventListener("click",function(){
+  var on=el("tkBox").classList.toggle("raw"); this.textContent=on?"Photo only":"Whole page"; requestAnimationFrame(tkFit);
+});
 function camFit(){
   tkFit();
   var b=el("tlBox"),f=el("camFrame");
