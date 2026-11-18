@@ -624,11 +624,12 @@ button,input,select{font:inherit;color:inherit}
   padding:7px 13px 6px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
 .tab:hover{opacity:.9}
 .tab[aria-current="true"]{opacity:1;border-bottom-color:var(--clock);color:var(--ink)}
-/* Critical path stands out in the tab row - light red, solid when open */
-.tab.tabred{opacity:1;background:rgba(226,68,68,.18);color:#FF8A80;border-radius:3px 3px 0 0}
-.tab.tabred[aria-current="true"]{background:#D32F2F;color:#fff;border-bottom-color:#D32F2F}
-:root[data-theme="light"] .tab.tabred:not([aria-current="true"]){color:#C62828}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .tab.tabred:not([aria-current="true"]){color:#C62828}}
+/* Critical path stands out in the tab row - red lettering only */
+.tab.tabred{opacity:1;color:#FF6B6B}
+.tab.tabred[aria-current="true"]{color:#FF6B6B;border-bottom-color:#FF6B6B}
+:root[data-theme="light"] .tab.tabred{color:#C62828}
+:root[data-theme="light"] .tab.tabred[aria-current="true"]{border-bottom-color:#C62828}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .tab.tabred{color:#C62828}:root:not([data-theme="dark"]) .tab.tabred[aria-current="true"]{border-bottom-color:#C62828}}
 .tab b{font-family:var(--f-num);font-size:10px;font-weight:500;background:#8884;border-radius:8px;padding:1px 5px;letter-spacing:0}
 .tab b.alert{background:var(--crit);color:#fff}
 
@@ -2331,7 +2332,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
