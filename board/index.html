@@ -906,6 +906,8 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
   font:600 9.5px/1 var(--f-cond),Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:0 7px;height:22px}
 .cpmile .mdel.arm{color:var(--crit);border-color:var(--crit)}
 .cpmile{flex-wrap:wrap;row-gap:6px}
+#v-path .subhead.cpmilehd{background:#C62828;border-bottom:0;margin:10px 14px 0;padding:9px 10px;border-radius:3px}
+#v-path .subhead.cpmilehd > span,#v-path .subhead.cpmilehd > span:first-child{color:#fff}
 .cpmile .t{flex:1 1 calc(100% - 40px)}
 .cpmile .ctl{flex:1 1 100%;display:flex;gap:6px;align-items:center;padding-left:28px}
 .cpmile .ctl .mdel{margin-left:auto}
@@ -2295,10 +2297,10 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 <section id="v-path" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="path"><h2>Critical path</h2><span class="meta" id="cpMeta"></span></div>
-    <div class="subhead" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
+    <div class="subhead cpmilehd" data-acc="path"><span>Weekly team milestones</span><span id="cpWeek"></span></div>
     <div id="cpMiles"></div>
     <div class="addrow cpadd" id="cpMileAdd">
-      <input id="cpMileTxt" placeholder="Type a milestone for the team this week" autocomplete="off">
+      <input id="cpMileTxt" placeholder="Type a milestone for the team" autocomplete="off">
       <select id="cpMileWho" aria-label="Who"><option value="">Who?</option><option>James</option><option>Anthony</option><option>Harry</option><option>Rick</option><option>Kayla</option></select>
       <select id="cpMileDay" aria-label="Due"></select>
       <button class="addbtn" id="cpMileGo" type="button">Add</button>
@@ -2323,7 +2325,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 10:05</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 11:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -6797,20 +6799,40 @@ function saveMiles(){
   MILES.ts=Date.now(); milesSeen=JSON.stringify(MILES);
   milesRef.set(MILES).catch(function(){ toast("Milestone not saved - try again"); });
 }
+/* Milestones live under the Monday of the week they are due. The list shows
+   everything still open, whatever week it is due (so a slipped one stays in
+   front of everyone), plus what was ticked off this week. Due dates run eight
+   weeks ahead. */
+function mileAll(){ var out=[]; Object.keys(MILES.weeks||{}).forEach(function(w){ (MILES.weeks[w]||[]).forEach(function(m){ out.push(m); }); }); return out; }
+function mileFind(id){ var hit=null; mileAll().forEach(function(m){ if(m.id===id) hit=m; }); return hit; }
+function mileRemove(id){ Object.keys(MILES.weeks||{}).forEach(function(w){ MILES.weeks[w]=(MILES.weeks[w]||[]).filter(function(m){return m.id!==id;}); if(!MILES.weeks[w].length) delete MILES.weeks[w]; }); }
+function mileFile(m){ var w=weekMon(m.day||iso(new Date())); (MILES.weeks[w]=MILES.weeks[w]||[]).push(m); }
+function mileDays(){ var out=[], x=parseISO(weekMon()); for(var i=0;i<56;i++){ if(x.getDay()!==0) out.push(iso(x)); x.setDate(x.getDate()+1); } return out; }
+var MDN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function mileLabel(d){ var x=parseISO(d); return MDN[x.getDay()]+" "+x.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][x.getMonth()]; }
+function mileOpts(sel,pre){
+  var today=iso(new Date()), days=mileDays(), h="", lastWk="";
+  days.forEach(function(d){
+    var w=weekMon(d);
+    if(w!==lastWk){ if(lastWk) h+='</optgroup>'; h+='<optgroup label="'+(w===weekMon(today)?"This week":"Week of "+shortDate(w))+'">'; lastWk=w; }
+    h+='<option value="'+d+'"'+(d===sel?' selected':'')+'>'+(pre||"By ")+mileLabel(d)+(d===today?" (today)":"")+'</option>';
+  });
+  if(lastWk) h+='</optgroup>';
+  if(sel&&days.indexOf(sel)<0) h='<option value="'+esc(sel)+'" selected>'+(pre||"By ")+mileLabel(sel)+'</option>'+h;
+  return h;
+}
 function renderMiles(){
   var box=el("cpMiles"); if(!box) return;
-  var today=iso(new Date()), wk=weekMon(today), L=(MILES.weeks[wk]||[]).slice();
-  var days=[]; for(var i=0;i<6;i++){ var x=parseISO(wk); x.setDate(x.getDate()+i); days.push(iso(x)); }
-  var DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  var today=iso(new Date()), wk=weekMon(today);
   el("cpWeek").textContent="Week of "+shortDate(wk);
   var sel=el("cpMileDay");
-  if(sel&&sel.getAttribute("data-wk")!==wk){ sel.setAttribute("data-wk",wk);
-    sel.innerHTML=days.map(function(d){var x=parseISO(d);return '<option value="'+d+'"'+(d===(today>days[5]?days[5]:(today<wk?wk:today))?' selected':'')+'>By '+DN[x.getDay()]+" "+x.getDate()+'</option>';}).join(""); }
+  if(sel&&sel.getAttribute("data-day")!==today){ sel.setAttribute("data-day",today); sel.innerHTML=mileOpts(today); }
   var canW=!!(window.eliseAuth&&window.eliseAuth.canWrite());
   el("cpMileAdd").hidden=!canW;
+  var L=mileAll().filter(function(m){ return !m.done||weekMon(m.day)===wk; });
   L.sort(function(a,b){return (a.done?1:0)-(b.done?1:0)||(a.day<b.day?-1:a.day>b.day?1:0);});
   var h=L.map(function(m){
-    var x=parseISO(m.day), late=!m.done&&m.day<today;
+    var late=!m.done&&m.day<today;
     return '<div class="cpmile'+(m.done?" done":"")+'"><input type="checkbox" data-mile="'+esc(m.id)+'"'+(m.done?" checked":"")+(canW?"":" disabled")+' aria-label="Done">'+
       '<span class="t"><span class="mt"'+(canW?' contenteditable="true" data-mile-txt="'+esc(m.id)+'" spellcheck="true"':'')+'>'+esc(m.text)+'</span>'+
         (m.done&&m.by?'<small>Ticked by '+esc(m.by)+'</small>':'')+'</span>'+'<span class="ctl">'+
@@ -6819,30 +6841,27 @@ function renderMiles(){
             MILE_TEAM.concat(m.who&&MILE_TEAM.indexOf(m.who)<0?[m.who]:[]).map(function(n){return '<option'+(n===m.who?' selected':'')+'>'+esc(n)+'</option>';}).join("")+'</select>'
         : (m.who?'<span class="dd">'+esc(m.who)+'</span>':''))+
       (canW&&!m.done
-        ? '<select class="prisel'+(late?" late":"")+'" data-mile-day="'+esc(m.id)+'" aria-label="Due">'+
-            days.map(function(dd){var y=parseISO(dd);return '<option value="'+dd+'"'+(dd===m.day?' selected':'')+'>'+(late&&dd===m.day?"Due ":"By ")+DN[y.getDay()]+" "+y.getDate()+'</option>';}).join("")+
-            (days.indexOf(m.day)<0?'<option value="'+esc(m.day)+'" selected>'+DN[x.getDay()]+" "+x.getDate()+'</option>':'')+
-          '</select>'
-        : '<span class="dd'+(late?" late":"")+'">'+(late?"Due ":"")+DN[x.getDay()]+" "+x.getDate()+'</span>')+
+        ? '<select class="prisel'+(late?" late":"")+'" data-mile-day="'+esc(m.id)+'" aria-label="Due">'+mileOpts(m.day,late?"Due ":"By ")+'</select>'
+        : '<span class="dd'+(late?" late":"")+'">'+(late?"Due ":"")+mileLabel(m.day)+'</span>')+
       (canW?'<button class="mdel" data-mile-del="'+esc(m.id)+'" type="button" aria-label="Delete milestone">Delete</button>':'')+'</span></div>';
   }).join("");
-  box.innerHTML=h||'<p class="empty" style="padding:8px 14px">No milestones yet - type the team\u2019s goals for the week below.</p>';
+  box.innerHTML=h||'<p class="empty" style="padding:8px 14px">No milestones yet - type the team\u2019s goals below.</p>';
 }
 document.addEventListener("change",function(e){
   var wsel=e.target.closest&&e.target.closest("[data-mile-who]");
-  if(wsel){ (MILES.weeks[weekMon()]||[]).forEach(function(m){ if(m.id===wsel.getAttribute("data-mile-who")) m.who=wsel.value; }); renderMiles(); saveMiles(); return; }
+  if(wsel){ var m0=mileFind(wsel.getAttribute("data-mile-who")); if(m0){ m0.who=wsel.value; renderMiles(); saveMiles(); } return; }
   var ds=e.target.closest&&e.target.closest("[data-mile-day]");
-  if(ds){ var wk0=weekMon(); (MILES.weeks[wk0]||[]).forEach(function(m){ if(m.id===ds.getAttribute("data-mile-day")) m.day=ds.value; }); renderMiles(); saveMiles(); return; }
+  if(ds){ var m1=mileFind(ds.getAttribute("data-mile-day")); if(m1){ mileRemove(m1.id); m1.day=ds.value; mileFile(m1); renderMiles(); saveMiles(); } return; }
   var c=e.target.closest&&e.target.closest("[data-mile]"); if(!c) return;
-  var wk=weekMon(), L=MILES.weeks[wk]||[], id=c.getAttribute("data-mile");
-  L.forEach(function(m){ if(m.id===id){ m.done=c.checked; m.by=c.checked?(whoAmI()||""):""; } });
+  var m2=mileFind(c.getAttribute("data-mile")); if(!m2) return;
+  m2.done=c.checked; m2.by=c.checked?(whoAmI()||""):""; m2.doneAt=c.checked?iso(new Date()):"";
   renderMiles(); saveMiles();
 });
 document.addEventListener("click",function(e){
   var d=e.target.closest&&e.target.closest("[data-mile-del]");
   if(d){
     if(!d.dataset.arm){ d.dataset.arm="1"; d.textContent="Sure?"; d.classList.add("arm"); setTimeout(function(){ if(d.isConnected){ delete d.dataset.arm; d.textContent="Delete"; d.classList.remove("arm"); } },2500); return; }
-    var wk=weekMon(); MILES.weeks[wk]=(MILES.weeks[wk]||[]).filter(function(m){return m.id!==d.getAttribute("data-mile-del");}); renderMiles(); saveMiles(); return; }
+    mileRemove(d.getAttribute("data-mile-del")); renderMiles(); saveMiles(); return; }
   if(e.target.closest&&e.target.closest("#cpMileGo")) addMile();
 });
 document.addEventListener("keydown",function(e){
@@ -6852,15 +6871,14 @@ document.addEventListener("keydown",function(e){
 /* a milestone's wording is edited in place - tap it, type, done */
 document.addEventListener("focusout",function(e){
   var t=e.target&&e.target.getAttribute&&e.target.getAttribute("data-mile-txt"); if(!t) return;
-  var v=(e.target.textContent||"").trim(), L=MILES.weeks[weekMon()]||[], hit=null;
-  L.forEach(function(m){ if(m.id===t) hit=m; });
+  var v=(e.target.textContent||"").trim(), hit=mileFind(t);
   if(!hit) return;
   if(!v){ e.target.textContent=hit.text; return; }
   if(v!==hit.text){ hit.text=v; saveMiles(); }
 });
 function addMile(){
   var t=(el("cpMileTxt").value||"").trim(); if(!t) return;
-  var wk=weekMon(); (MILES.weeks[wk]=MILES.weeks[wk]||[]).push({id:"m"+Date.now().toString(36),text:t,who:el("cpMileWho").value||"",day:el("cpMileDay").value||iso(new Date()),done:false});
+  mileFile({id:"m"+Date.now().toString(36),text:t,who:el("cpMileWho").value||"",day:el("cpMileDay").value||iso(new Date()),done:false});
   el("cpMileTxt").value=""; renderMiles(); saveMiles();
 }
 
