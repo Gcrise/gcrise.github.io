@@ -1,0 +1,13 @@
+/* ELISE site sign-in: keep the page on the phone so it opens with no signal.
+   Only this page's own files are cached; sign-ins never go through here. */
+var C="elise-checkin-v1";
+var FILES=["./","index.html","elise-logo.png","favicon.png","icon-180.png","icon-192.png","manifest.webmanifest","../board/config.js"];
+self.addEventListener("install",function(e){e.waitUntil(caches.open(C).then(function(c){return c.addAll(FILES);}).then(function(){return self.skipWaiting();}));});
+self.addEventListener("activate",function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.filter(function(n){return n!==C;}).map(function(n){return caches.delete(n);}));}).then(function(){return self.clients.claim();}));});
+self.addEventListener("fetch",function(e){
+  var u=new URL(e.request.url);
+  if(e.request.method!=="GET"||u.origin!==location.origin)return;
+  /* network first so updates land, the saved copy when there's no signal */
+  e.respondWith(fetch(e.request).then(function(r){var cp=r.clone();caches.open(C).then(function(c){c.put(e.request,cp);});return r;})
+    .catch(function(){return caches.match(e.request,{ignoreSearch:true}).then(function(m){return m||caches.match("index.html");});}));
+});

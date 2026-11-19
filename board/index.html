@@ -446,12 +446,19 @@ window.safetyLog = async function(rows){
 /* exposed so the login strip can drive it */
 window.eliseAuth = {
   signIn:signIn, signOut:signOut, canWrite:canWrite,
-  email:function(){ return (session && session.user && session.user.email) || ""; }
+  email:function(){ return (session && session.user && session.user.email) || ""; },
+  /* direct table calls for tables outside the board store (site sign-in) */
+  rest:async function(path, opts){
+    opts = opts || {};
+    await refreshIfStale();
+    return fetch(REST+path, {method:opts.method||"GET", headers:H(opts.headers), body:opts.body});
+  }
 };
 
 })();
 
 </script>
+<script src="vendor/qrcode.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/pdf.min.js"></script>
 <style>
@@ -1889,6 +1896,14 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 #tsMusterBox{margin:0 14px 12px;border:2px solid var(--alarm);border-radius:4px;padding:10px 12px}
 #tsMusterBox h4{margin:0 0 6px;color:var(--alarm);font-size:15px}
 #tsMusterBox label{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:14px}
+.ts-qr{align-items:center;text-align:center}
+#tsQR{width:180px;max-width:100%;aspect-ratio:1;background:#fff;padding:6px;border-radius:4px}
+#tsQR svg{display:block;width:100%;height:100%}
+.ts-url{font-size:12px;color:var(--ink-3);word-break:break-all}
+.ts-links{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.ts-links a{color:var(--ink)}
+.ts-row-off{padding-left:14px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:0 14px 0 0}
+.ts-ph{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -2452,35 +2467,39 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 
 <section id="v-tester" class="view" hidden>
   <div class="panel">
-    <div class="phead" data-acc="tester"><h2>Tester</h2><span class="meta">Trial features before they go live</span></div>
-    <div class="ts-warn">Site sign-in trial. Everything here saves on <b>this phone only</b>. Nothing is shared or sent, and it clears itself each new day.</div>
+    <div class="phead" data-acc="tester"><h2>Site sign-in</h2><span class="meta" id="tsMeta">Tester - live trial</span></div>
     <div class="ts-grid">
+      <div class="ts-card ts-qr">
+        <h3>QR code for the gate</h3>
+        <div id="tsQR" role="img" aria-label="QR code to the ELISE site sign-in page"></div>
+        <div class="ts-url" id="tsUrl"></div>
+        <div class="ts-links"><a id="tsPoster" target="_blank" rel="noopener">Open the A4 poster to print</a><a id="tsOpen" target="_blank" rel="noopener">Open the sign-in page</a></div>
+      </div>
       <div class="ts-card">
-        <h3>Crew sign-in <span>foreman, at the prestart</span></h3>
+        <h3>Sign a crew in <span>at the prestart</span></h3>
         <label>Company<select id="tsCrewCo"></select></label>
+        <label>Foreman / leading hand<input id="tsCrewName" autocomplete="off"></label>
         <label>How many on today<input id="tsCrewN" type="number" min="1" max="99" inputmode="numeric" placeholder="e.g. 8"></label>
         <label>Names <span class="opt">optional, one per line</span><textarea id="tsCrewNames" rows="3"></textarea></label>
         <button type="button" class="addbtn" id="tsCrewGo">Sign crew in</button>
       </div>
-      <div class="ts-card">
-        <h3>Gate sign-in <span>late starters and visitors</span></h3>
-        <label>Name<input id="tsGateName" autocomplete="off"></label>
-        <label>Company<select id="tsGateCo"></select></label>
-        <label class="ts-chk"><input type="checkbox" id="tsGateInd"> Inducted on ELISE</label>
-        <button type="button" class="addbtn" id="tsGateGo">Sign in</button>
+    </div>
+    <div class="ts-warn" id="tsLock" hidden>Sign in to the board (the padlock, top right) to see who's on site. The list is only shown to the Elise team.</div>
+    <div id="tsLive">
+      <div class="subhead"><span>On site now</span><span id="tsTotal"></span></div>
+      <div id="tsOn"></div>
+      <div class="subhead"><span>Crane lifts today vs signed in</span></div>
+      <div id="tsCheck"></div>
+      <div class="ts-actions">
+        <button type="button" class="ts-btn" id="tsMuster">Start muster</button>
+        <button type="button" class="ts-btn" id="tsOutAll">Sign everyone out</button>
+        <button type="button" class="ts-btn ts-ghost" id="tsRefresh">Refresh</button>
       </div>
+      <div id="tsMusterBox" hidden></div>
+      <div class="subhead"><span>Signed out today</span><span id="tsNOut"></span></div>
+      <div id="tsOff"></div>
     </div>
-    <div class="subhead"><span>On site now</span><span id="tsTotal"></span></div>
-    <div id="tsOn"></div>
-    <div class="subhead"><span>Crane lifts today vs signed in</span></div>
-    <div id="tsCheck"></div>
-    <div class="ts-actions">
-      <button type="button" class="ts-btn" id="tsMuster">Start muster</button>
-      <button type="button" class="ts-btn" id="tsOutAll">Sign everyone out</button>
-      <button type="button" class="ts-btn ts-ghost" id="tsClear">Clear trial data</button>
-    </div>
-    <div id="tsMusterBox" hidden></div>
-    <p class="note">This is a mock-up to try the flow. Before it's used for real, sign-ins will be stored so only the Elise team can see them, and workers only ever see their own sign-in screen.</p>
+    <p class="note" id="tsStamp">Workers scan the QR, sign in on their own phone, and sign out the same way. It works with no signal: the phone holds the sign-in and sends it when it's back on the network. Only signed-in Elise team members can see this list.</p>
   </div>
 </section>
 
@@ -2514,7 +2533,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 08:05</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 09:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9541,76 +9560,107 @@ document.addEventListener("click",function(e){
 });
 el("lpStart").addEventListener("change",function(){var v=this.value;lp.start=v&&v!==lpAutoStart()?v:null;lp.day=null;lpSave();renderLPlan();});
 
-/* ---------- tester: site sign-in trial, this phone only ---------- */
-var TS_KEY="elise_tester_signin";
-function tsLoad(){
-  var d={date:iso(new Date()),list:[]};
-  try{var s=JSON.parse(localStorage.getItem(TS_KEY)||"null");if(s&&s.date===d.date&&Array.isArray(s.list))d=s;}catch(e){}
-  return d;
-}
-function tsSave(d){try{localStorage.setItem(TS_KEY,JSON.stringify(d));}catch(e){toast("Couldn't save on this phone");}}
-function tsNow(){var n=new Date();return n.getHours()*60+n.getMinutes();}
+/* ---------- site sign-in (Tester tab): live from the site_signin table ---------- */
+var TS_URL=new URL("../checkin/",location.href).href,TS_CACHE="elise_ts_cache";
+var ts={rows:null,at:null,err:null,timer:null,muster:null};
+function tsRid(n){var a=new Uint8Array(n),s="";crypto.getRandomValues(a);for(var i=0;i<n;i++)s+=("0"+a[i].toString(16)).slice(-2);return s;}
 function tsCoOpts(){var T=trades();return Object.keys(T).map(function(c){return '<option value="'+c+'">'+esc(T[c][0])+"</option>";}).join("");}
-var tsMuster=null;
+function tsCoName(c){var T=trades();return (T[c]||DEF_TRADES[c]||[c==="DAV"?"Davos Cranes":c==="HAR"?"Harwell":c])[0];}
+function tsClock(t){var d=new Date(t);return fmtClock(d.getHours()*60+d.getMinutes());}
+function tsSigned(){return !!(window.eliseAuth&&eliseAuth.canWrite());}
+async function tsFetch(){
+  if(!tsSigned()){renderTester();return;}
+  try{
+    var r=await eliseAuth.rest("site_signin?day=eq."+iso(new Date())+"&select=id,kind,co,name,phone,n,crew_names,inducted,at,out_at,out_by&order=at.asc");
+    if(!r.ok)throw new Error(r.status+"");
+    ts.rows=await r.json();ts.at=Date.now();ts.err=null;
+    try{localStorage.setItem(TS_CACHE,JSON.stringify({day:iso(new Date()),at:ts.at,rows:ts.rows}));}catch(e){}
+  }catch(e){
+    ts.err=navigator.onLine?"Couldn't load the list":"No signal - showing the last list this device saw";
+    if(!ts.rows){try{var c=JSON.parse(localStorage.getItem(TS_CACHE)||"null");if(c&&c.day===iso(new Date())){ts.rows=c.rows;ts.at=c.at;}}catch(x){}}
+  }
+  renderTester();
+}
+async function tsPatch(ids,body){
+  var r=await eliseAuth.rest("site_signin?id=in.("+ids.join(",")+")",{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify(body)});
+  if(!r.ok){toast(navigator.onLine?"Couldn't save that":"No signal - try again when you're back online");return false;}
+  return true;
+}
 function renderTester(){
-  if(!el("tsCrewCo").options.length){el("tsCrewCo").innerHTML=tsCoOpts();el("tsGateCo").innerHTML=tsCoOpts();}
-  var d=tsLoad(),on=d.list.filter(function(x){return x.out==null;}),T=trades(),by={},tot=0;
+  if(!el("tsCrewCo").options.length)el("tsCrewCo").innerHTML=tsCoOpts();
+  if(!el("tsQR").firstChild&&window.qrcode){var q=qrcode(0,"M");q.addData(TS_URL);q.make();el("tsQR").innerHTML=q.createSvgTag({cellSize:6,margin:2,scalable:true});}
+  el("tsUrl").textContent=TS_URL;el("tsPoster").href=TS_URL+"poster.html";el("tsOpen").href=TS_URL;
+  var signed=tsSigned();
+  el("tsLock").hidden=signed;el("tsLive").hidden=!signed;
+  if(!signed)return;
+  if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester")tsFetch();},30000);}
+  if(ts.rows==null){el("tsOn").innerHTML='<div class="lp-none">Loading&hellip;</div>';if(!ts.loading){ts.loading=1;tsFetch().then(function(){ts.loading=0;});}return;}
+  var rows=ts.rows,on=rows.filter(function(x){return !x.out_at;}),off=rows.filter(function(x){return x.out_at;}),by={},tot=0;
   on.forEach(function(x){(by[x.co]=by[x.co]||[]).push(x);tot+=x.n;});
   el("tsTotal").textContent=tot?tot+" on site":"";
-  var cos=Object.keys(by).sort(function(a,b){return (T[a]||[a])[0]<(T[b]||[b])[0]?-1:1;});
+  el("tsMeta").textContent=(ts.err?ts.err+" - ":"")+(ts.at?"updated "+tsClock(ts.at):"");
+  var cos=Object.keys(by).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;});
+  function who(x){
+    var s=x.kind==="crew"?esc(x.name)+" + crew of "+x.n+(x.crew_names&&x.crew_names.length?' <small>('+esc(x.crew_names.join(", "))+")</small>":""):esc(x.name)+(x.kind==="visitor"?" <small>visitor</small>":"");
+    if(!x.inducted&&x.kind!=="visitor")s+=' <span class="flag">not inducted</span>';
+    if(x.phone)s+=' <small class="ts-ph">'+esc(x.phone)+"</small>";
+    return s;
+  }
   el("tsOn").innerHTML=cos.length?cos.map(function(c){
     var n=by[c].reduce(function(s,x){return s+x.n;},0);
-    return '<div class="ts-co"><div class="ts-co-h">'+lpTag(c)+esc((T[c]||[c])[0])+"<i>"+n+"</i></div>"+by[c].map(function(x){
-      return '<div class="ts-row">'+(x.kind==="crew"?"Crew of "+x.n+(x.names&&x.names.length?": "+esc(x.names.join(", ")):""):esc(x.name)+(x.ind?"":' <span class="flag">not inducted</span>'))+
-        " <small>in "+fmtClock(x.at)+'</small><button type="button" class="ts-out" data-tsout="'+x.id+'">Sign out</button></div>';
+    return '<div class="ts-co"><div class="ts-co-h">'+lpTag(c)+esc(tsCoName(c))+"<i>"+n+"</i></div>"+by[c].map(function(x){
+      return '<div class="ts-row">'+who(x)+" <small>in "+tsClock(x.at)+'</small><button type="button" class="ts-out" data-tsout="'+x.id+'">Sign out</button></div>';
     }).join("")+"</div>";
   }).join(""):'<div class="lp-none">Nobody signed in yet today.</div>';
-  var bk=(state.lifts||[]).filter(function(b){return b.date===iso(new Date())&&b.type==="lift"&&b.co;}),bc={};
+  el("tsNOut").textContent=off.length?off.reduce(function(s,x){return s+x.n;},0)+" people":"";
+  el("tsOff").innerHTML=off.length?off.map(function(x){
+    return '<div class="ts-row ts-row-off">'+lpTag(x.co)+who(x)+" <small>"+tsClock(x.at)+" - "+tsClock(x.out_at)+(x.out_by==="team"?" (signed out by Elise)":"")+"</small></div>";
+  }).join(""):'<div class="lp-none">Nobody yet.</div>';
+  var bk=(state.lifts||[]).filter(function(b){return b.date===iso(new Date())&&b.type==="lift"&&b.co&&b.crane!=="none";}),bc={};
   bk.forEach(function(b){bc[b.co]=(bc[b.co]||0)+1;});
   var ks=Object.keys(bc);
   el("tsCheck").innerHTML=ks.length?ks.map(function(c){
     var n=(by[c]||[]).reduce(function(s,x){return s+x.n;},0);
-    return '<div class="ts-ck">'+lpTag(c)+esc((T[c]||[c])[0])+" - "+bc[c]+" lift"+(bc[c]>1?"s":"")+" booked - "+(n?'<span class="ok">'+n+" signed in</span>":'<span class="bad">nobody signed in</span>')+"</div>";
+    return '<div class="ts-ck">'+lpTag(c)+esc(tsCoName(c))+" - "+bc[c]+" lift"+(bc[c]>1?"s":"")+" booked - "+(n?'<span class="ok">'+n+" signed in</span>":'<span class="bad">nobody signed in</span>')+"</div>";
   }).join(""):'<div class="lp-none">No crane lifts on the board today.</div>';
   var mb=el("tsMusterBox");
-  if(tsMuster){
+  if(ts.muster){
     mb.hidden=false;
-    var left=on.filter(function(x){return !tsMuster[x.id];}).reduce(function(s,x){return s+x.n;},0);
+    var left=on.filter(function(x){return !ts.muster[x.id];}).reduce(function(s,x){return s+x.n;},0);
     mb.innerHTML="<h4>Muster - "+(left?left+" not accounted for":"all accounted for")+"</h4>"+on.map(function(x){
-      return '<label><input type="checkbox" data-tsm="'+x.id+'"'+(tsMuster[x.id]?" checked":"")+"> "+esc((T[x.co]||[x.co])[0])+" - "+(x.kind==="crew"?"crew of "+x.n:esc(x.name))+"</label>";
+      return '<label><input type="checkbox" data-tsm="'+x.id+'"'+(ts.muster[x.id]?" checked":"")+"> "+esc(tsCoName(x.co))+" - "+(x.kind==="crew"?esc(x.name)+" + crew of "+x.n:esc(x.name))+(x.phone?" - "+esc(x.phone):"")+"</label>";
     }).join("")+'<button type="button" class="ts-btn ts-ghost" id="tsMusterEnd" style="margin-top:8px">End muster</button>';
   } else mb.hidden=true;
 }
-function tsAdd(rec){var d=tsLoad();rec.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);rec.at=tsNow();rec.out=null;d.list.push(rec);tsSave(d);renderTester();}
-el("tsCrewGo").addEventListener("click",function(){
-  var n=parseInt(el("tsCrewN").value,10);if(!(n>0)){toast("Enter how many are on today");return;}
+el("tsCrewGo").addEventListener("click",async function(){
+  if(!tsSigned()){toast("Sign in to the board first");return;}
+  var nm=el("tsCrewName").value.trim(),n=parseInt(el("tsCrewN").value,10);
+  if(!nm){toast("Put the foreman's name in");return;}
+  if(!(n>0&&n<100)){toast("Enter how many are on today");return;}
   var names=el("tsCrewNames").value.split(/\n/).map(function(s){return s.trim();}).filter(Boolean);
-  tsAdd({kind:"crew",co:el("tsCrewCo").value,n:n,names:names});
-  el("tsCrewN").value="";el("tsCrewNames").value="";toast("Crew signed in");
+  var row={client_id:tsRid(12),token:tsRid(16),day:iso(new Date()),kind:"crew",co:el("tsCrewCo").value,name:nm,n:n,crew_names:names.length?names:null,inducted:true,at:new Date().toISOString()};
+  var r=await eliseAuth.rest("site_signin",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify(row)});
+  if(!r.ok){toast(navigator.onLine?"Couldn't sign the crew in":"No signal - use the QR page, it saves offline");return;}
+  el("tsCrewName").value="";el("tsCrewN").value="";el("tsCrewNames").value="";toast("Crew signed in");tsFetch();
 });
-el("tsGateGo").addEventListener("click",function(){
-  var nm=el("tsGateName").value.trim();if(!nm){toast("Enter a name");return;}
-  tsAdd({kind:"gate",co:el("tsGateCo").value,n:1,name:nm,ind:el("tsGateInd").checked});
-  el("tsGateName").value="";el("tsGateInd").checked=false;toast("Signed in");
-});
-document.addEventListener("click",function(e){
+document.addEventListener("click",async function(e){
   var o=e.target.closest("[data-tsout]");
-  if(o){var d=tsLoad();d.list.forEach(function(x){if(x.id===o.getAttribute("data-tsout"))x.out=tsNow();});tsSave(d);renderTester();return;}
-  if(e.target.id==="tsMusterEnd"){tsMuster=null;renderTester();return;}
+  if(o){if(await tsPatch([o.getAttribute("data-tsout")],{out_at:new Date().toISOString(),out_by:"team"}))tsFetch();return;}
+  if(e.target.id==="tsMusterEnd"){ts.muster=null;renderTester();return;}
 });
 document.addEventListener("change",function(e){
   var m=e.target.closest&&e.target.closest("[data-tsm]");
-  if(m&&tsMuster){tsMuster[m.getAttribute("data-tsm")]=m.checked;renderTester();}
+  if(m&&ts.muster){ts.muster[m.getAttribute("data-tsm")]=m.checked;renderTester();}
 });
-el("tsMuster").addEventListener("click",function(){tsMuster={};renderTester();el("tsMusterBox").scrollIntoView({block:"nearest"});});
-el("tsOutAll").addEventListener("click",function(){
+el("tsMuster").addEventListener("click",function(){ts.muster={};renderTester();el("tsMusterBox").scrollIntoView({block:"nearest"});});
+el("tsRefresh").addEventListener("click",function(){tsFetch();});
+el("tsOutAll").addEventListener("click",async function(){
   var b=this;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to sign everyone out";setTimeout(function(){b.dataset.arm="";b.textContent="Sign everyone out";},3000);return;}
-  var d=tsLoad(),t=tsNow();d.list.forEach(function(x){if(x.out==null)x.out=t;});tsSave(d);b.dataset.arm="";b.textContent="Sign everyone out";renderTester();
+  b.dataset.arm="";b.textContent="Sign everyone out";
+  var ids=(ts.rows||[]).filter(function(x){return !x.out_at;}).map(function(x){return x.id;});
+  if(ids.length&&await tsPatch(ids,{out_at:new Date().toISOString(),out_by:"team"}))tsFetch();
 });
-el("tsClear").addEventListener("click",function(){
-  var b=this;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to clear";setTimeout(function(){b.dataset.arm="";b.textContent="Clear trial data";},3000);return;}
-  try{localStorage.removeItem(TS_KEY);}catch(e){}tsMuster=null;b.dataset.arm="";b.textContent="Clear trial data";renderTester();
-});
+document.addEventListener("elise-signedout",function(){ts.rows=null;try{localStorage.removeItem(TS_CACHE);}catch(e){}if(state.view==="tester")renderTester();});
 
 /* ---------- boot ---------- */
 state.date=boardDate();
