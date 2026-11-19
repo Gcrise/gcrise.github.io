@@ -628,6 +628,8 @@ button,input,select{font:inherit;color:inherit}
 .tab.tabdd{gap:5px}
 .tab.tabdd .ddcaret{font-size:11px;line-height:1}
 .ddmenu{width:200px}
+.lmile{font-style:normal;font-family:var(--f-cond);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FF6B6B;border:1px solid currentColor;border-radius:3px;padding:0 5px;margin-right:7px;vertical-align:1px}
+:root[data-theme="light"] .lmile{color:#C62828}
 .ddmenu .mm-it.on{background:var(--surface-2)}
 .ddmenu .mm-it i.alert{color:#fff;background:#C62828;border-color:#C62828}
 .tab[aria-current="true"]{opacity:1;border-bottom-color:var(--clock);color:var(--ink)}
@@ -2390,7 +2392,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:15</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5267,6 +5269,12 @@ function logItems(){
     var e={ts:+at||0,date:day||d.date,text:d.text,who:d.who,photo:d.photo,note:d.note};
     all.push(e); byText[k]=e;
   });
+  /* ticked team milestones land here too, on the day they were ticked */
+  (typeof mileAll==="function"?mileAll():[]).forEach(function(m){
+    if(!m||!m.done||!m.text) return;
+    var day=m.doneAt||m.day||iso(new Date());
+    all.push({ts:Date.parse(day)||0,date:day,text:m.text,who:m.who||m.by||"",kind:"mile"});
+  });
   all.sort(function(a,b){
     if(a.date!==b.date)return a.date<b.date?1:-1;
     return (+b.ts||0)-(+a.ts||0);
@@ -5903,7 +5911,7 @@ function renderLog(){
       '<span>'+rows.length+(rows.length===1?" job":" jobs")+'</span></div>'+
       rows.map(function(e){
         return '<div class="logrow"><span class="tick">&#10003;</span>'+
-          '<span class="ltext">'+esc(e.text)+(e.note?'<small class="lnote">'+esc(e.note)+'</small>':'')+'</span>'+
+          '<span class="ltext">'+(e.kind==="mile"?'<em class="lmile">Milestone</em>':'')+esc(e.text)+(e.note?'<small class="lnote">'+esc(e.note)+'</small>':'')+'</span>'+
           (e.photo?'<a href="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" target="_blank" rel="noopener"><img class="lph" src="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" alt="Photo" loading="lazy"></a>':'')+
           (e.who?'<span class="lwho">'+esc(e.who)+'</span>':'')+'</div>';
       }).join("")+'</div>';
@@ -6912,7 +6920,7 @@ var MILE_TEAM=["James","Anthony","Harry","Rick","Kayla"];
 function weekMon(d){ var x=parseISO(d||iso(new Date())); var k=(x.getDay()+6)%7; x.setDate(x.getDate()-k); return iso(x); }
 if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
   if(!db) return; milesRef=db.collection("config").doc("milestones");
-  milesRef.onSnapshot(function(sn){ var d=sn&&sn.data&&sn.data(); if(!d) return; var j=JSON.stringify(d); if(j===milesSeen) return; milesSeen=j; MILES=d; if(!MILES.weeks)MILES.weeks={}; renderMiles(); });
+  milesRef.onSnapshot(function(sn){ var d=sn&&sn.data&&sn.data(); if(!d) return; var j=JSON.stringify(d); if(j===milesSeen) return; milesSeen=j; MILES=d; if(!MILES.weeks)MILES.weeks={}; renderMiles(); renderLog(); });
 }).catch(function(){});
 function saveMiles(){
   if(!milesRef||!(window.eliseAuth&&window.eliseAuth.canWrite())){ toast("Sign in to change the milestones"); return; }
@@ -6975,7 +6983,7 @@ document.addEventListener("change",function(e){
   var c=e.target.closest&&e.target.closest("[data-mile]"); if(!c) return;
   var m2=mileFind(c.getAttribute("data-mile")); if(!m2) return;
   m2.done=c.checked; m2.by=c.checked?(whoAmI()||""):""; m2.doneAt=c.checked?iso(new Date()):"";
-  renderMiles(); saveMiles();
+  renderMiles(); renderLog(); saveMiles();
 });
 document.addEventListener("click",function(e){
   var d=e.target.closest&&e.target.closest("[data-mile-del]");
