@@ -2395,7 +2395,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:20</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:58</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4804,7 +4804,7 @@ function go(v){
   window.scrollTo(0,0);
 }
 /* tabs that sit together under one drop-down in the tab row */
-var TAB_GROUPS={daily:{label:"Daily",items:["prestart","safety"]}};
+var TAB_GROUPS={daily:{label:"Daily",items:["prestart","safety"]},logistics:{label:"Logistics",items:["crane","orders"]}};
 function tabGroupOf(v){for(var g in TAB_GROUPS)if(TAB_GROUPS[g].items.indexOf(v)>=0)return g;return null;}
 function renderTabs(){
   var done={};
