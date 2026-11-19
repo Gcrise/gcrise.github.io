@@ -2384,7 +2384,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 18 Nov 22:20</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 20:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -8681,6 +8681,8 @@ function renderEufy(){
 /* Deck headcount: a scheduled check counts the people in the Tikee deck photo
    through the day; this shows the latest count, the day's peak and each check */
 function deckCount(){
+  /* headcount retired 19 Nov - the banner stays empty; code kept in case it comes back */
+  return;
   var box=el("deckCount"); if(!box||JL_REST.indexOf("http")!==0) return;
   var day=iso(new Date());
   jlGet(JL_REST+"deck_count?select=at,people,photo_time,note&day=eq."+day+"&order=at.asc")
