@@ -628,6 +628,9 @@ button,input,select{font:inherit;color:inherit}
 .tab.tabdd{gap:5px}
 .tab.tabdd .ddcaret{font-size:11px;line-height:1}
 .ddmenu{width:200px}
+.logcat+.logcat{margin-top:10px}
+.loghead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0;padding:12px 14px 8px;font-family:var(--f-cond);font-size:15px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);border-bottom:2px solid var(--clock)}
+.loghead span{font-family:var(--f-num);font-size:12px;font-weight:500;letter-spacing:0;color:var(--ink-3)}
 .lmile{font-style:normal;font-family:var(--f-cond);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FF6B6B;border:1px solid currentColor;border-radius:3px;padding:0 5px;margin-right:7px;vertical-align:1px}
 :root[data-theme="light"] .lmile{color:#C62828}
 .ddmenu .mm-it.on{background:var(--surface-2)}
@@ -2392,7 +2395,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:15</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:20</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5891,30 +5894,38 @@ function renderWeather(){
       : '<p class="empty">'+(WX.state==="loading"?"Reading the forecast\u2026":"No forecast held.")+'</p>';
   }
 }
+function logCat(e){
+  if(e.kind==="mile") return "mile";
+  if(/\|site prestart$/.test(e.key||"")||e.text==="Site prestart completed") return "pre";
+  return "lab";
+}
+var LOG_CATS=[["pre","Prestarts"],["mile","Team milestones"],["lab","Labour & jobs"]];
 function renderLog(){
   var box=el("logList");if(!box)return;
   var all=logItems();
   var meta=el("logMeta");
-  if(meta)meta.textContent=all.length?all.length+(all.length===1?" job":" jobs")+" ticked off since the board went up":"";
+  if(meta)meta.textContent=all.length?all.length+(all.length===1?" item":" items")+" closed out since the board went up":"";
   if(!all.length){
     box.innerHTML='<p class="empty">Nothing ticked off yet. Jobs land here as the crew closes them out.</p>';
     return;
   }
-  var days=[],seen={};
-  all.forEach(function(e){
-    if(!seen[e.date]){seen[e.date]=[];days.push(e.date);}
-    seen[e.date].push(e);
-  });
-  box.innerHTML=days.map(function(d){
-    var rows=seen[d];
-    return '<div class="logday"><div class="subhead" data-acc="log"><span>'+esc(longDate(d))+'</span>'+
-      '<span>'+rows.length+(rows.length===1?" job":" jobs")+'</span></div>'+
-      rows.map(function(e){
-        return '<div class="logrow"><span class="tick">&#10003;</span>'+
-          '<span class="ltext">'+(e.kind==="mile"?'<em class="lmile">Milestone</em>':'')+esc(e.text)+(e.note?'<small class="lnote">'+esc(e.note)+'</small>':'')+'</span>'+
-          (e.photo?'<a href="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" target="_blank" rel="noopener"><img class="lph" src="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" alt="Photo" loading="lazy"></a>':'')+
-          (e.who?'<span class="lwho">'+esc(e.who)+'</span>':'')+'</div>';
-      }).join("")+'</div>';
+  box.innerHTML=LOG_CATS.map(function(c){
+    var rows=all.filter(function(e){return logCat(e)===c[0];});
+    if(!rows.length) return "";
+    var days=[],seen={};
+    rows.forEach(function(e){ if(!seen[e.date]){seen[e.date]=[];days.push(e.date);} seen[e.date].push(e); });
+    return '<section class="logcat"><h3 class="loghead">'+esc(c[1])+'<span>'+rows.length+'</span></h3>'+
+      days.map(function(d){
+        var r=seen[d];
+        return '<div class="logday"><div class="subhead" data-acc="log"><span>'+esc(longDate(d))+'</span>'+
+          '<span>'+r.length+'</span></div>'+
+          r.map(function(e){
+            return '<div class="logrow"><span class="tick">&#10003;</span>'+
+              '<span class="ltext">'+esc(e.text)+(e.note?'<small class="lnote">'+esc(e.note)+'</small>':'')+'</span>'+
+              (e.photo?'<a href="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" target="_blank" rel="noopener"><img class="lph" src="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" alt="Photo" loading="lazy"></a>':'')+
+              (e.who?'<span class="lwho">'+esc(e.who)+'</span>':'')+'</div>';
+          }).join("")+'</div>';
+      }).join("")+'</section>';
   }).join("");
 }
 /* ---------- matching a photo caption to the job it belongs to ----------
