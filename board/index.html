@@ -625,7 +625,8 @@ button,input,select{font:inherit;color:inherit}
 .tab:hover{opacity:.9}
 .tab.tabdd .ddcur{font-size:10.5px;opacity:.75;letter-spacing:.08em}
 .tab.tabdd .ddcur::before{content:"\00B7";margin-right:6px}
-.tab.tabdd .ddcaret{font-size:10px;opacity:.7;margin-left:-1px}
+.tab.tabdd{gap:5px}
+.tab.tabdd .ddcaret{font-size:11px;line-height:1}
 .ddmenu{width:200px}
 .ddmenu .mm-it.on{background:var(--surface-2)}
 .ddmenu .mm-it i.alert{color:#fff;background:#C62828;border-color:#C62828}
@@ -2389,7 +2390,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:05</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4811,8 +4812,7 @@ function renderTabs(){
       G.items.forEach(function(v){var c=tabCount(v);if(c){tot+=c.n;al=al||!!c.alert;}});
       var cur=on?VIEWS.filter(function(y){return y[0]===state.view;})[0][1]:"";
       return '<button class="tab tabdd" type="button" data-dd="'+g+'" aria-haspopup="menu" aria-expanded="false" aria-current="'+on+'">'+
-        esc(G.label)+(cur?'<span class="ddcur">'+esc(cur)+'</span>':'')+
-        (tot?'<b class="'+(al?"alert":"")+'">'+tot+'</b>':'')+'<span class="ddcaret" aria-hidden="true">&#9662;</span></button>';
+        esc(G.label)+'<span class="ddcaret" aria-hidden="true">&#9662;</span></button>';
     }
     var n=tabCount(x[0]);
     return '<button class="tab'+(x[0]==="path"?" tabred":"")+'" data-go="'+x[0]+'" aria-current="'+(state.view===x[0])+'">'+esc(x[1])+
