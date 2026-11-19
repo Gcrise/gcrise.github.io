@@ -1833,6 +1833,62 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 #cbapp .rvghost{position:fixed;z-index:80;pointer-events:none;font-family:var(--f-num);
   font-size:13px;font-weight:700;background:var(--ink);color:var(--paper);border-radius:5px;
   padding:5px 10px;white-space:nowrap}
+/* lifting plan + tester (20 Nov) */
+#v-lplan,#v-tester{--acc:var(--clock);--acc-ink:var(--clock)}
+.lp-bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 14px 4px}
+.lp-seg{display:inline-flex;border:1px solid var(--line-hard);border-radius:4px;overflow:hidden}
+.lp-seg button{font:inherit;font-size:13px;padding:7px 12px;background:transparent;color:var(--ink-2);border:0;cursor:pointer}
+.lp-seg button+button{border-left:1px solid var(--line-hard)}
+.lp-seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:600}
+.lp-start{font-size:12px;color:var(--ink-3);display:flex;gap:6px;align-items:center}
+.lp-start input{font:inherit;font-size:13px;padding:5px 6px;border:1px solid var(--line-hard);border-radius:4px;background:var(--surface);color:var(--ink)}
+.lp-days{display:flex;gap:6px;overflow-x:auto;padding:10px 14px;scrollbar-width:thin}
+.lp-day{flex:0 0 auto;min-width:64px;text-align:left;font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);cursor:pointer;line-height:1.2}
+.lp-day b{display:block;font-size:13px}
+.lp-day span{font-size:11px;color:var(--ink-3)}
+.lp-day.today{border-color:var(--ok);box-shadow:inset 0 -3px 0 var(--ok)}
+.lp-day[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.lp-day[aria-selected="true"] span{color:var(--surface-2)}
+.lp-head{padding:4px 14px 8px}
+.lp-head h3{margin:0;font-size:18px;text-wrap:balance}
+.lp-head p{margin:2px 0 0;font-size:13px;color:var(--ink-3)}
+.lp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:0 18px;align-items:start}
+@media (max-width:860px){.lp-grid{grid-template-columns:minmax(0,1fr)}}
+.lp-col{min-width:0}
+.lp-it{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;padding:8px 14px;border-bottom:1px solid var(--line)}
+.lp-it:last-child{border-bottom:0}
+.lp-tag{grid-row:span 2;align-self:start;min-width:40px;text-align:center;font-size:11px;font-weight:700;padding:3px 5px;border-radius:3px;color:#fff;background:var(--c,#8C8C8C)}
+.lp-tag.dark{color:#1d1d1d}
+.lp-it .w{font-size:14px;color:var(--ink)}
+.lp-it .s{font-size:12px;color:var(--ink-3)}
+.lp-none{padding:8px 14px;font-size:13px;color:var(--ink-3)}
+.lp-fig{margin:10px 14px 14px;min-width:0}
+.lp-fig img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:4px;background:#fff}
+.lp-fig figcaption{font-size:12px;color:var(--ink-3);margin-top:6px}
+.ts-warn{margin:12px 14px 4px;padding:9px 12px;border-left:3px solid var(--warn);background:var(--surface-2);font-size:13px;color:var(--ink)}
+.ts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;padding:10px 14px}
+.ts-card{border:1px solid var(--line);border-radius:4px;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.ts-card h3{margin:0;font-size:15px}
+.ts-card h3 span,.ts-card .opt{font-weight:400;font-size:12px;color:var(--ink-3)}
+.ts-card label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}
+.ts-card input:not([type=checkbox]),.ts-card select,.ts-card textarea{font:inherit;font-size:15px;padding:8px;border:1px solid var(--line-hard);border-radius:4px;background:var(--surface);color:var(--ink);min-width:0}
+.ts-card label.ts-chk{flex-direction:row;align-items:center;gap:8px;font-size:14px;color:var(--ink)}
+.ts-co{padding:8px 14px;border-bottom:1px solid var(--line)}
+.ts-co-h{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.ts-co-h i{font-style:normal;margin-left:auto;font-size:13px;color:var(--ink-2)}
+.ts-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);padding:4px 0 0 48px;flex-wrap:wrap}
+.ts-row small{color:var(--ink-3)}
+.ts-row .flag{color:var(--crit);font-weight:600}
+.ts-out{margin-left:auto;font:inherit;font-size:12px;padding:3px 8px;border:1px solid var(--line-hard);border-radius:3px;background:transparent;color:var(--ink-2);cursor:pointer}
+.ts-ck{display:flex;gap:8px;align-items:center;padding:6px 14px;font-size:13px;border-bottom:1px solid var(--line)}
+.ts-ck .bad{color:var(--crit);font-weight:600}
+.ts-ck .ok{color:var(--ok)}
+.ts-actions{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px}
+.ts-btn{font:inherit;font-size:13px;padding:8px 12px;border-radius:4px;border:1px solid var(--ink);background:var(--ink);color:var(--surface);cursor:pointer}
+.ts-btn.ts-ghost{background:transparent;color:var(--ink-2);border-color:var(--line-hard)}
+#tsMusterBox{margin:0 14px 12px;border:2px solid var(--alarm);border-radius:4px;padding:10px 12px}
+#tsMusterBox h4{margin:0 0 6px;color:var(--alarm);font-size:15px}
+#tsMusterBox label{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:14px}
 </style>
 </head>
 <body>
@@ -2365,6 +2421,69 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
   </div>
 </section>
 
+<section id="v-lplan" class="view" hidden>
+  <div class="panel">
+    <div class="phead" data-acc="lplan"><h2>Lifting plan</h2><span class="meta" id="lpMeta"></span></div>
+    <div class="lp-bar">
+      <div class="lp-seg" role="group" aria-label="Install cycle">
+        <button type="button" data-lpc="s">Single install</button><button type="button" data-lpc="d">Double install</button>
+      </div>
+      <label class="lp-start">Day 0 (pour) <input type="date" id="lpStart"></label>
+    </div>
+    <div class="lp-days" id="lpDays" role="tablist" aria-label="Cycle day"></div>
+    <div class="lp-head" id="lpHead"></div>
+    <div class="lp-grid">
+      <div class="lp-col">
+        <div class="subhead"><span>Crane lifts planned</span><span id="lpNL"></span></div>
+        <div id="lpLifts"></div>
+        <div class="subhead"><span>Other work on the deck</span></div>
+        <div id="lpWork"></div>
+        <div class="subhead"><span>Booked on the crane board</span><span id="lpNB"></span></div>
+        <div id="lpBooked"></div>
+      </div>
+      <figure class="lp-fig">
+        <a id="lpImgA" target="_blank" rel="noopener"><img id="lpImg" alt="Day-by-day markup on the typical level GA" loading="lazy"></a>
+        <figcaption>Harry's day-by-day markup on the typical level GA. Tap to open full size.</figcaption>
+      </figure>
+    </div>
+    <p class="note">The plan is the typical cycle from the day-by-days. Dates count working days (Mon&ndash;Sat) from the Day 0 pour. "Booked" is what's on the crane board for that date; the 6pm lift record in iCloud shows what actually landed.</p>
+  </div>
+</section>
+
+<section id="v-tester" class="view" hidden>
+  <div class="panel">
+    <div class="phead" data-acc="tester"><h2>Tester</h2><span class="meta">Trial features before they go live</span></div>
+    <div class="ts-warn">Site sign-in trial. Everything here saves on <b>this phone only</b>. Nothing is shared or sent, and it clears itself each new day.</div>
+    <div class="ts-grid">
+      <div class="ts-card">
+        <h3>Crew sign-in <span>foreman, at the prestart</span></h3>
+        <label>Company<select id="tsCrewCo"></select></label>
+        <label>How many on today<input id="tsCrewN" type="number" min="1" max="99" inputmode="numeric" placeholder="e.g. 8"></label>
+        <label>Names <span class="opt">optional, one per line</span><textarea id="tsCrewNames" rows="3"></textarea></label>
+        <button type="button" class="addbtn" id="tsCrewGo">Sign crew in</button>
+      </div>
+      <div class="ts-card">
+        <h3>Gate sign-in <span>late starters and visitors</span></h3>
+        <label>Name<input id="tsGateName" autocomplete="off"></label>
+        <label>Company<select id="tsGateCo"></select></label>
+        <label class="ts-chk"><input type="checkbox" id="tsGateInd"> Inducted on ELISE</label>
+        <button type="button" class="addbtn" id="tsGateGo">Sign in</button>
+      </div>
+    </div>
+    <div class="subhead"><span>On site now</span><span id="tsTotal"></span></div>
+    <div id="tsOn"></div>
+    <div class="subhead"><span>Crane lifts today vs signed in</span></div>
+    <div id="tsCheck"></div>
+    <div class="ts-actions">
+      <button type="button" class="ts-btn" id="tsMuster">Start muster</button>
+      <button type="button" class="ts-btn" id="tsOutAll">Sign everyone out</button>
+      <button type="button" class="ts-btn ts-ghost" id="tsClear">Clear trial data</button>
+    </div>
+    <div id="tsMusterBox" hidden></div>
+    <p class="note">This is a mock-up to try the flow. Before it's used for real, sign-ins will be stored so only the Elise team can see them, and workers only ever see their own sign-in screen.</p>
+  </div>
+</section>
+
 <section id="v-path" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="path"><h2>Critical path</h2><span class="meta" id="cpMeta"></span></div>
@@ -2395,7 +2514,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 19 Nov 21:58</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 08:05</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4731,7 +4850,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["orders","Site orders"],["weather","Weather"],["camera","Live view"],["log","Completed works"]];
+var VIEWS=[["today","Today"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["lplan","Lifting plan"],["orders","Site orders"],["weather","Weather"],["camera","Live view"],["log","Completed works"],["tester","Tester"]];
 /* Eufy tab retired 17 Nov at Harry's call - the section, its code and the camera
    settings are all kept; put ["eufy","Eufy"] back after "camera" above to re-add it. */
 var CUT=1260;      /* one cut a day, 9pm */
@@ -4796,7 +4915,9 @@ function go(v){
   state.view=v;
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
-  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders");
+  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders"||v==="lplan"||v==="tester");
+  if(v==="lplan")renderLPlan();
+  if(v==="tester")renderTester();
   if(v==="camera")camOpen();
   if(v==="eufy")renderEufy();
   if(v==="crane"&&window.__cbRail)setTimeout(window.__cbRail,30);
@@ -4804,7 +4925,7 @@ function go(v){
   window.scrollTo(0,0);
 }
 /* tabs that sit together under one drop-down in the tab row */
-var TAB_GROUPS={daily:{label:"Daily",items:["prestart","safety"]},logistics:{label:"Logistics",items:["crane","orders"]}};
+var TAB_GROUPS={daily:{label:"Daily",items:["prestart","safety"]},logistics:{label:"Logistics",items:["crane","lplan","orders"]}};
 function tabGroupOf(v){for(var g in TAB_GROUPS)if(TAB_GROUPS[g].items.indexOf(v)>=0)return g;return null;}
 function renderTabs(){
   var done={};
@@ -4919,7 +5040,7 @@ var syncT=null;
 window.__ELISE_SYNC=function(items,win){
   ingestLifts(items,win);
   if(syncT)return;
-  syncT=setTimeout(function(){syncT=null;renderFront();renderTabs();},120);
+  syncT=setTimeout(function(){syncT=null;renderFront();renderTabs();if(state.view==="lplan")renderLPlan();if(state.view==="tester")renderTester();},120);
 };
 function dayRows(){
   return state.lifts.filter(function(b){return b.date===state.date;})
@@ -9332,6 +9453,164 @@ function setTheme(t){
   }
 })();
 el("themeBtn").addEventListener("click",function(){setTheme(effTheme()==="dark"?"light":"dark");});
+
+/* ---------- lifting plan: Harry's day-by-days, one cycle at a time ---------- */
+/* each item: [trade, what, crane lift?]. Taken off the marked-up GA pages. */
+var LP_DAYS={
+ s:[
+  {t:"Pour day",img:["s01"],it:[["BUT","Pour stair and slab - pour start to finish point",1],["NS","Load scaffold materials - 1 x semi, 2pm",1],["AP","Pre-load precast materials and starter bars",1],["GLF","Begin stripping rebates and edge board for panel install, ahead of sequence - PM",0],["EC","Surveyor setout - PM",0]]},
+  {t:"Precast 10 panels, scaffold starts",img:["s02","s03"],it:[["AP","Precast setout and install 10 x panels",1],["NS","Scaffold start south-east",1],["NS","Scaffold backload - 2pm",1],["EEC","PT initial stress",0],["GLF","Formwork continue edge board and wet area stripping",0],["NS","Install handrail for stair install",0]]},
+  {t:"Scaffold complete, load formwork",img:["s04"],it:[["GLF","Load formwork and setout - PM",1],["NS","Scaffold backload - 2pm",1],["NS","Scaffold complete and consolidate",0],["GLF","Form wet stitches and stair landings",0],["RZE","Tie wet stitches",0]]},
+  {t:"Formwork commence deck, pour wet joints",img:["s05"],it:[["BUT","Pour wet joints and PMT - PM, kibble / chute",1],["GLF","Formwork complete wet joints and stair landings",0],["GLF","Formwork day 1 - commence deck",0],["RZE","Tie stairs / PMT",0],["EEC","PT final stress",0]]},
+  {t:"Continue deck, grout ducts",img:["s06"],it:[["GLF","Continue formwork deck",0],["EEC","Grout ducts - leave pans behind for half-day start on next cycle",0],["OTH","Service trades install stair cast-ins",0],["EC","Surveyor start setout - continued AM next day",0]]},
+  {t:"Load steel A + B layers",img:["s07"],it:[["RZE","Load steel A + B layers",1],["GLF","Consolidate formwork items for backload",1],["OTH","Bin",1],["GLF","Formwork complete edge board in line with steel sequence",0],["EEC","PT anchors",0],["OTH","Survey and cast fire collars",0]]},
+  {t:"Reo A + B, PT north",img:["s08"],it:[["EEC","Coil and ducts",1],["OTH","Bin",1],["RZE","Reo A + B layers - north complete 10:30am, south 2:30pm",0],["EEC","PT north start 10:30am",0],["OTH","Cast-in services",0]]},
+  {t:"Load steel C + D layers",img:["s09"],it:[["RZE","Load steel C + D layers",1],["EEC","Coil",1],["OTH","Bin",1],["RZE","C + D layers - north complete 10am, south 2:30pm",0],["EEC","PT complete",0],["GLF","Begin wet areas, setdowns and height fillets - north to south following steel",0],["OTH","Cast-in services complete",0]]},
+  {t:"Final clean, ready to pour",img:["s10"],it:[["OTH","Bin",1],["RZE","Complete C + D layers",0],["GLF","Continue wet areas, setdowns, height fillets - pour areas first NE-NW-SE-SW",0],["EC","All trades final clean, ready to pour",0]]},
+  {t:"Pour - next cycle Day 0",img:["s11"],it:[["BUT","Pour stair and slab",1],["OTH","Bin",1],["GLF","Complete wet areas, setdowns and height fillets",0]]}
+ ],
+ d:[
+  {t:"Pour day",img:["d01"],it:[["BUT","Pour stair and slab - pour start to finish point",1],["NS","Load scaffold materials - 1 x semi, 2pm",1],["AP","Pre-load precast materials and starter bars",1],["GLF","Begin stripping rebates and edge board for panel install, ahead of sequence - PM",0],["EC","Surveyor setout - PM",0]]},
+  {t:"Precast setout, scaffold starts",img:["d02"],it:[["AP","Precast setout east and pre-load - PM",1],["NS","Scaffold start south - stretcher, then south-east-north",1],["GLF","Move all excess gear at 2:30pm for panel install",1],["NS","Scaffold backload - PM",1],["EEC","PT initial stress",0],["GLF","Continue edge board and wet area stripping - stack in south",0]]},
+  {t:"Precast day 1 - 17 panels",img:["d03"],it:[["AP","Precast install 17 x panels",1],["NS","Backload post panels - south and west",1],["GLF","Load formwork - PM, if crane time permits",1],["GLF","Formwork backload - PM",1],["NS","Scaffold complete south and west",0],["GLF","Continue edge board and wet area stripping - stack in south",0]]},
+  {t:"Precast day 2 - 19 panels",img:["d04"],it:[["AP","Precast install 19 x panels",1],["GLF","Load deck - PM after panels",1],["GLF","Begin wet joints",0],["NS","Scaffold complete, face fix handrail",0],["EEC","PT final stress",0]]},
+  {t:"Formwork commence deck, pour wet joints",img:["d05"],it:[["BUT","Pour wet joints - PM, kibble / chute",1],["GLF","Formwork complete wet joints and stair landings",0],["GLF","Formwork day 1 - commence deck",0],["NS","Scaffold complete, face fix handrail",0]]},
+  {t:"Deck day 2, grout ducts",img:["d06"],it:[["GLF","Strip wet joints and jump trailing deck",1],["GLF","Formwork day 2 - continue deck east to west",0],["EEC","Grout ducts - leave pans behind for half-day start on next cycle",0],["EC","Surveyor start setout - continued AM next day",0]]},
+  {t:"Load steel A + B layers",img:["d07"],it:[["RZE","Load steel A + B layers",1],["GLF","Consolidate formwork items for backload",1],["OTH","Bin",1],["GLF","Formwork day 3 - complete edge board following steel sequence",0],["GLF","Form lift shaft",0],["EEC","PT anchors following steel sequence",0],["OTH","Survey and cast fire collars as per steel sequence",0]]},
+  {t:"Reo A + B, PT north",img:["d08"],it:[["EEC","Coil and ducts",1],["OTH","Bin",1],["RZE","Reo A + B north to south - north by 10:30am, south by 2:30pm",0],["EEC","PT north start 10:30am",0],["OTH","Cast-in services north to south",0]]},
+  {t:"Load steel C + D layers",img:["d09"],it:[["RZE","Load steel C + D layers",1],["EEC","Coil",1],["OTH","Bin",1],["RZE","C + D layers - north complete 10am, south 2:30pm",0],["EEC","PT complete",0],["GLF","Begin wet areas, setdowns and height fillets - north to south following steel",0],["OTH","Cast-in services complete",0]]},
+  {t:"Final clean, ready to pour",img:["d10"],it:[["OTH","Bin",1],["RZE","Complete C + D layers",0],["GLF","Continue wet areas, setdowns, height fillets - pour areas first NE-NW-SE-SW",0],["EC","All trades final clean, ready to pour",0]]},
+  {t:"Pour - next cycle Day 0",img:["d11"],it:[["BUT","Pour stair and slab (next level single height install)",1],["OTH","Bin",1],["GLF","Complete wet areas, setdowns and height fillets",0]]}
+ ]};
+var LP_DEF_START="2026-11-20";
+var lp={c:"s",start:null,day:null,img:0};
+try{var _lp=JSON.parse(localStorage.getItem("elise_lplan")||"{}");if(_lp.c)lp.c=_lp.c;if(_lp.start)lp.start=_lp.start;}catch(e){}
+function lpSave(){try{localStorage.setItem("elise_lplan",JSON.stringify({c:lp.c,start:lp.start}));}catch(e){}}
+/* latest pour booked on the board on or before today, else the default */
+function lpAutoStart(){
+  var t=iso(new Date()),best=null;
+  (state.lifts||[]).forEach(function(b){
+    var s=((b.desc||"")+" "+(b.notes||"")).toUpperCase();
+    if(b.date&&b.date<=t&&s.indexOf("POUR")>=0&&s.indexOf("SLAB")>=0&&(!best||b.date>best))best=b.date;
+  });
+  return best&&best>LP_DEF_START?best:LP_DEF_START;
+}
+/* working days, Mon-Sat */
+function lpDates(start,n){
+  var d=parseISO(start),out=[iso(d)];
+  while(out.length<n){d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);if(d.getDay()!==0)out.push(iso(d));}
+  return out;
+}
+function lpTag(c){
+  var T=trades(),tr=T[c]||DEF_TRADES[c]||["",""],col=tr[1]||"#8C8C8C";
+  var dark=/^#(FF(CB|8A)|9CD3|1BC5|00C8)/i.test(col);
+  return '<span class="lp-tag'+(dark?' dark':'')+'" style="--c:'+col+'" title="'+esc(tr[0]||c)+'">'+esc(c==="OTH"?"—":c)+"</span>";
+}
+function renderLPlan(){
+  var start=lp.start||lpAutoStart(),D=LP_DAYS[lp.c],dates=lpDates(start,D.length),today=iso(new Date());
+  if(lp.day==null){var k=dates.indexOf(today);lp.day=k>=0?k:(today<dates[0]?0:D.length-1);}
+  if(lp.day>=D.length)lp.day=D.length-1;
+  el("lpStart").value=start;
+  document.querySelectorAll("[data-lpc]").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-lpc")===lp.c);});
+  el("lpMeta").textContent=(lp.c==="s"?"Single":"Double")+" install cycle - Day 0 "+shortDate(start);
+  el("lpDays").innerHTML=D.map(function(x,i){
+    var d=parseISO(dates[i]);
+    return '<button type="button" role="tab" class="lp-day'+(dates[i]===today?" today":"")+'" data-lpd="'+i+'" aria-selected="'+(i===lp.day)+'"><b>Day '+i+'</b><span>'+dayName(d).slice(0,3)+" "+d.getDate()+" "+monName(d)+"</span></button>";
+  }).join("");
+  var day=D[lp.day],dt=dates[lp.day];
+  el("lpHead").innerHTML="<h3>Day "+lp.day+" - "+esc(day.t)+"</h3><p>"+esc(longDate(dt))+(dt===today?" - today":"")+"</p>";
+  var lifts=day.it.filter(function(x){return x[2];}),work=day.it.filter(function(x){return !x[2];});
+  function row(x){var T=trades();return '<div class="lp-it">'+lpTag(x[0])+'<span class="w">'+esc(x[1])+'</span><span class="s">'+esc(x[0]==="OTH"?"Various":(T[x[0]]||DEF_TRADES[x[0]]||[x[0]])[0])+"</span></div>";}
+  el("lpNL").textContent=lifts.length?lifts.length+" planned":"";
+  el("lpLifts").innerHTML=lifts.length?lifts.map(row).join(""):'<div class="lp-none">No crane work on the plan for this day.</div>';
+  el("lpWork").innerHTML=work.length?work.map(row).join(""):'<div class="lp-none">Nothing else marked.</div>';
+  var bk=(state.lifts||[]).filter(function(b){return b.date===dt&&b.type==="lift";}).sort(function(a,b){return toMin(a.start)-toMin(b.start);});
+  el("lpNB").textContent=bk.length?bk.length+" booked":"";
+  var KM=kindMap("lift"),TT=trades();
+  el("lpBooked").innerHTML=bk.length?bk.map(function(b){
+    return '<div class="lp-it">'+lpTag(b.co||"OTH")+'<span class="w">'+esc(fmtClock(toMin(b.start)))+" - "+esc(b.desc||KM[b.kind]||b.kind||"Lift")+'</span><span class="s">'+esc((TT[b.co]||[b.co||""])[0])+(KM[b.kind]?" - "+esc(KM[b.kind]):"")+"</span></div>";
+  }).join(""):'<div class="lp-none">'+(dt<today?"Nothing on the board for this date.":"Nothing booked yet for this date.")+"</div>";
+  var im=day.img[Math.min(lp.img,day.img.length-1)],src="dbd/"+(im)+".jpg";
+  el("lpImg").src=src;el("lpImgA").href=src;
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-lpc]");
+  if(b){lp.c=b.getAttribute("data-lpc");lp.day=null;lpSave();renderLPlan();return;}
+  var d=e.target.closest("[data-lpd]");
+  if(d){lp.day=+d.getAttribute("data-lpd");lp.img=0;renderLPlan();return;}
+});
+el("lpStart").addEventListener("change",function(){var v=this.value;lp.start=v&&v!==lpAutoStart()?v:null;lp.day=null;lpSave();renderLPlan();});
+
+/* ---------- tester: site sign-in trial, this phone only ---------- */
+var TS_KEY="elise_tester_signin";
+function tsLoad(){
+  var d={date:iso(new Date()),list:[]};
+  try{var s=JSON.parse(localStorage.getItem(TS_KEY)||"null");if(s&&s.date===d.date&&Array.isArray(s.list))d=s;}catch(e){}
+  return d;
+}
+function tsSave(d){try{localStorage.setItem(TS_KEY,JSON.stringify(d));}catch(e){toast("Couldn't save on this phone");}}
+function tsNow(){var n=new Date();return n.getHours()*60+n.getMinutes();}
+function tsCoOpts(){var T=trades();return Object.keys(T).map(function(c){return '<option value="'+c+'">'+esc(T[c][0])+"</option>";}).join("");}
+var tsMuster=null;
+function renderTester(){
+  if(!el("tsCrewCo").options.length){el("tsCrewCo").innerHTML=tsCoOpts();el("tsGateCo").innerHTML=tsCoOpts();}
+  var d=tsLoad(),on=d.list.filter(function(x){return x.out==null;}),T=trades(),by={},tot=0;
+  on.forEach(function(x){(by[x.co]=by[x.co]||[]).push(x);tot+=x.n;});
+  el("tsTotal").textContent=tot?tot+" on site":"";
+  var cos=Object.keys(by).sort(function(a,b){return (T[a]||[a])[0]<(T[b]||[b])[0]?-1:1;});
+  el("tsOn").innerHTML=cos.length?cos.map(function(c){
+    var n=by[c].reduce(function(s,x){return s+x.n;},0);
+    return '<div class="ts-co"><div class="ts-co-h">'+lpTag(c)+esc((T[c]||[c])[0])+"<i>"+n+"</i></div>"+by[c].map(function(x){
+      return '<div class="ts-row">'+(x.kind==="crew"?"Crew of "+x.n+(x.names&&x.names.length?": "+esc(x.names.join(", ")):""):esc(x.name)+(x.ind?"":' <span class="flag">not inducted</span>'))+
+        " <small>in "+fmtClock(x.at)+'</small><button type="button" class="ts-out" data-tsout="'+x.id+'">Sign out</button></div>';
+    }).join("")+"</div>";
+  }).join(""):'<div class="lp-none">Nobody signed in yet today.</div>';
+  var bk=(state.lifts||[]).filter(function(b){return b.date===iso(new Date())&&b.type==="lift"&&b.co;}),bc={};
+  bk.forEach(function(b){bc[b.co]=(bc[b.co]||0)+1;});
+  var ks=Object.keys(bc);
+  el("tsCheck").innerHTML=ks.length?ks.map(function(c){
+    var n=(by[c]||[]).reduce(function(s,x){return s+x.n;},0);
+    return '<div class="ts-ck">'+lpTag(c)+esc((T[c]||[c])[0])+" - "+bc[c]+" lift"+(bc[c]>1?"s":"")+" booked - "+(n?'<span class="ok">'+n+" signed in</span>":'<span class="bad">nobody signed in</span>')+"</div>";
+  }).join(""):'<div class="lp-none">No crane lifts on the board today.</div>';
+  var mb=el("tsMusterBox");
+  if(tsMuster){
+    mb.hidden=false;
+    var left=on.filter(function(x){return !tsMuster[x.id];}).reduce(function(s,x){return s+x.n;},0);
+    mb.innerHTML="<h4>Muster - "+(left?left+" not accounted for":"all accounted for")+"</h4>"+on.map(function(x){
+      return '<label><input type="checkbox" data-tsm="'+x.id+'"'+(tsMuster[x.id]?" checked":"")+"> "+esc((T[x.co]||[x.co])[0])+" - "+(x.kind==="crew"?"crew of "+x.n:esc(x.name))+"</label>";
+    }).join("")+'<button type="button" class="ts-btn ts-ghost" id="tsMusterEnd" style="margin-top:8px">End muster</button>';
+  } else mb.hidden=true;
+}
+function tsAdd(rec){var d=tsLoad();rec.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);rec.at=tsNow();rec.out=null;d.list.push(rec);tsSave(d);renderTester();}
+el("tsCrewGo").addEventListener("click",function(){
+  var n=parseInt(el("tsCrewN").value,10);if(!(n>0)){toast("Enter how many are on today");return;}
+  var names=el("tsCrewNames").value.split(/\n/).map(function(s){return s.trim();}).filter(Boolean);
+  tsAdd({kind:"crew",co:el("tsCrewCo").value,n:n,names:names});
+  el("tsCrewN").value="";el("tsCrewNames").value="";toast("Crew signed in");
+});
+el("tsGateGo").addEventListener("click",function(){
+  var nm=el("tsGateName").value.trim();if(!nm){toast("Enter a name");return;}
+  tsAdd({kind:"gate",co:el("tsGateCo").value,n:1,name:nm,ind:el("tsGateInd").checked});
+  el("tsGateName").value="";el("tsGateInd").checked=false;toast("Signed in");
+});
+document.addEventListener("click",function(e){
+  var o=e.target.closest("[data-tsout]");
+  if(o){var d=tsLoad();d.list.forEach(function(x){if(x.id===o.getAttribute("data-tsout"))x.out=tsNow();});tsSave(d);renderTester();return;}
+  if(e.target.id==="tsMusterEnd"){tsMuster=null;renderTester();return;}
+});
+document.addEventListener("change",function(e){
+  var m=e.target.closest&&e.target.closest("[data-tsm]");
+  if(m&&tsMuster){tsMuster[m.getAttribute("data-tsm")]=m.checked;renderTester();}
+});
+el("tsMuster").addEventListener("click",function(){tsMuster={};renderTester();el("tsMusterBox").scrollIntoView({block:"nearest"});});
+el("tsOutAll").addEventListener("click",function(){
+  var b=this;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to sign everyone out";setTimeout(function(){b.dataset.arm="";b.textContent="Sign everyone out";},3000);return;}
+  var d=tsLoad(),t=tsNow();d.list.forEach(function(x){if(x.out==null)x.out=t;});tsSave(d);b.dataset.arm="";b.textContent="Sign everyone out";renderTester();
+});
+el("tsClear").addEventListener("click",function(){
+  var b=this;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to clear";setTimeout(function(){b.dataset.arm="";b.textContent="Clear trial data";},3000);return;}
+  try{localStorage.removeItem(TS_KEY);}catch(e){}tsMuster=null;b.dataset.arm="";b.textContent="Clear trial data";renderTester();
+});
 
 /* ---------- boot ---------- */
 state.date=boardDate();
