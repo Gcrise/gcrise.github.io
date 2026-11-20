@@ -43,6 +43,7 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 .pend{margin-top:10px;font-size:14px;color:var(--warn);text-align:center}
 .msg{min-height:20px;margin-top:10px;font-size:14px;color:var(--stop)}
 .rules{font-size:14px;line-height:1.45;color:var(--ink2);margin:0;padding-left:18px}
+.note-out{border-color:var(--warn);color:var(--ink);font-size:15px;line-height:1.4}
 .muted{color:var(--ink3);font-size:13px;line-height:1.45}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
@@ -58,6 +59,7 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
   <div class="pend" id="pend1" hidden></div>
 </div>
 
+<div class="card note-out" id="vNote" hidden></div>
 <!-- signed out / first time -->
 <div class="card" id="vForm" hidden>
   <div class="seg" role="group" aria-label="Signing in">
@@ -85,7 +87,7 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 
 <div class="card">
   <ul class="rules">
-    <li>Sign in every day when you arrive and sign out when you leave.</li>
+    <li>Sign in every day when you arrive and sign out when you leave. Anyone still signed in at 6pm is signed out automatically.</li>
     <li>Not inducted? See the Elise site office before going past the gate.</li>
     <li>Your details stay on this phone for next time, and only the Elise site team can see the sign-in list.</li>
   </ul>
@@ -155,10 +157,28 @@ function setKind(k){
   $("goIn").textContent=k==="crew"?"Sign crew in":"Sign in";
 }
 document.querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(){setKind(b.getAttribute("data-k"));});});
+var K_NOTE="elise_ci_note";
+function autoTime(cur){var d=cur.day.split("-");return new Date(+d[0],+d[1]-1,+d[2],18,0,0).getTime();}
+function endLocal(cur,by,at){ls(K_CUR,null);ls(K_NOTE,{day:cur.day,by:by,at:at});}
+/* ask the server whether this phone's sign-in is still open (6pm auto, or Elise signed them out) */
+async function checkStatus(){
+  var cur=ls(K_CUR);if(!cur||!navigator.onLine)return;
+  if(queue().some(function(j){return j.t==="in"&&j.row.client_id===cur.id;}))return;
+  try{
+    var r=await fetch(URL_+"/rest/v1/rpc/site_status",{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({p_client_id:cur.id,p_token:cur.token})});
+    if(!r.ok)return;var j=await r.json();
+    if(j&&j[0]&&j[0].out_at){endLocal(cur,j[0].out_by||"team",j[0].out_at);render();}
+  }catch(e){}
+}
 function render(){
   netState();
   var cur=ls(K_CUR);
+  if(cur&&Date.now()>=autoTime(cur)){endLocal(cur,"auto",new Date(autoTime(cur)).toISOString());cur=null;}
   if(cur&&cur.day!==today()){ls(K_CUR,null);cur=null;}
+  var note=ls(K_NOTE);
+  if(note&&note.day!==today())note=null;
+  $("vNote").hidden=!(note&&!cur);
+  if(note)$("vNote").textContent=note.by==="auto"?"You were signed out automatically at 6pm. Please sign out yourself when you leave site.":note.by==="team"?"The Elise site team signed you out at "+clock(note.at)+".":"";
   var q=queue(),pend=q.length;
   $("vOn").hidden=!cur;$("vForm").hidden=!!cur;
   if(cur){
@@ -172,7 +192,7 @@ function render(){
 var me=ls(K_ME);
 if(me){$("fName").value=me.name||"";$("fCo").value=me.co||"";$("fPhone").value=me.phone||"";if(me.kind)setKind(me.kind);}
 $("goIn").addEventListener("click",function(){
-  $("msg").textContent="";
+  $("msg").textContent="";ls(K_NOTE,null);
   var name=$("fName").value.trim(),co=$("fCo").value,phone=$("fPhone").value.trim(),ind=$("fInd").checked;
   if(!name){$("msg").textContent="Put your name in.";return;}
   if(!co){$("msg").textContent="Choose your company.";return;}
@@ -192,7 +212,9 @@ $("goOut").addEventListener("click",function(){
   enqueue({t:"out",id:cur.id,token:cur.token,at:new Date().toISOString()});
   ls(K_CUR,null);render();
 });
-render();flush();
+render();flush().then(checkStatus);
+setInterval(checkStatus,60000);
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")checkStatus();});
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 </script>
 </body></html>

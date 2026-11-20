@@ -2533,7 +2533,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 09:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 13:15</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9614,7 +9614,7 @@ function renderTester(){
   }).join(""):'<div class="lp-none">Nobody signed in yet today.</div>';
   el("tsNOut").textContent=off.length?off.reduce(function(s,x){return s+x.n;},0)+" people":"";
   el("tsOff").innerHTML=off.length?off.map(function(x){
-    return '<div class="ts-row ts-row-off">'+lpTag(x.co)+who(x)+" <small>"+tsClock(x.at)+" - "+tsClock(x.out_at)+(x.out_by==="team"?" (signed out by Elise)":"")+"</small></div>";
+    return '<div class="ts-row ts-row-off">'+lpTag(x.co)+who(x)+" <small>"+tsClock(x.at)+" - "+tsClock(x.out_at)+(x.out_by==="team"?" (signed out by Elise)":x.out_by==="auto"?' <span class="flag">auto 6pm - didn\'t sign out</span>':"")+"</small></div>";
   }).join(""):'<div class="lp-none">Nobody yet.</div>';
   var bk=(state.lifts||[]).filter(function(b){return b.date===iso(new Date())&&b.type==="lift"&&b.co&&b.crane!=="none";}),bc={};
   bk.forEach(function(b){bc[b.co]=(bc[b.co]||0)+1;});
