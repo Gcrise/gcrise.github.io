@@ -44,6 +44,14 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 .msg{min-height:20px;margin-top:10px;font-size:14px;color:var(--stop)}
 .rules{font-size:14px;line-height:1.45;color:var(--ink2);margin:0;padding-left:18px}
 .note-out{border-color:var(--warn);color:var(--ink);font-size:15px;line-height:1.4}
+.step-n{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.step-h{font-size:20px;margin:4px 0 6px}
+.step-p{margin:0 0 8px;color:var(--ink2);font-size:15px;line-height:1.4}
+.doc{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;margin-top:8px}
+.doc a{color:var(--ink);font-weight:700;font-size:16px;overflow-wrap:anywhere}
+.doc a::after{content:" - open";font-weight:400;color:var(--ink3);font-size:13px}
+.doc .check{margin-top:8px}
+.doc.opened a::after{content:" - opened";color:var(--go)}
 .muted{color:var(--ink3);font-size:13px;line-height:1.45}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
@@ -52,6 +60,18 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 <div class="site">3 Twenty Fifth Ave, Palm Beach</div>
 <div class="date" id="date"></div>
 
+<!-- induction / SWMS step -->
+<div class="card" id="vStep" hidden>
+  <div class="step-n" id="stN"></div>
+  <h2 class="step-h" id="stH"></h2>
+  <p class="step-p" id="stP"></p>
+  <div id="stDocs"></div>
+  <label for="stSign">Type your full name to sign</label>
+  <input id="stSign" autocomplete="off" maxlength="80">
+  <button class="big in" id="stGo" type="button">Sign and continue</button>
+  <button class="link" id="stBack" type="button">Back</button>
+  <div class="msg" id="stMsg" role="alert"></div>
+</div>
 <!-- signed in -->
 <div class="card" id="vOn" hidden>
   <div class="state on"><b id="onWho"></b><span id="onSince"></span></div>
@@ -122,6 +142,12 @@ async function send(job){
     if(r.status>=400&&r.status<500)return "drop";
     return false;
   }
+  if(job.t==="ind"){
+    var r3=await fetch(URL_+"/rest/v1/site_induction",{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(job.row)});
+    if(r3.ok)return true;var t3=await r3.text();if(/duplicate key/i.test(t3))return true;
+    if(r3.status>=400&&r3.status<500)return "drop";
+    return false;
+  }
   if(job.t==="out"){
     var r2=await fetch(URL_+"/rest/v1/rpc/site_signout",{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({p_client_id:job.id,p_token:job.token,p_at:job.at})});
     if(r2.ok)return true;
@@ -133,15 +159,17 @@ async function send(job){
 async function flush(){
   if(flushing||!navigator.onLine)return;flushing=true;
   try{
-    var q=queue();
-    while(q.length){
-      var ok;try{ok=await send(q[0]);}catch(e){ok=false;}
+    /* re-read the queue every pass: new taps can land while a send is in flight */
+    for(var guard=0;guard<200;guard++){
+      var q=queue();if(!q.length)break;
+      var job=q[0],key=JSON.stringify(job),ok;
+      try{ok=await send(job);}catch(e){ok=false;}
       if(ok===false)break;
-      q.shift();ls(K_Q,q);
+      var q2=queue();if(q2.length&&JSON.stringify(q2[0])===key){q2.shift();ls(K_Q,q2);}
     }
   }finally{flushing=false;render();}
 }
-window.addEventListener("online",function(){netState();flush();});
+window.addEventListener("online",function(){netState();flush();loadDocs();});
 window.addEventListener("offline",netState);
 setInterval(flush,20000);
 document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){render();flush();}});
@@ -155,6 +183,7 @@ function setKind(k){
   $("lName").textContent=k==="crew"?"Your name (foreman / leading hand)":"Your name";
   $("indTxt").textContent=k==="crew"?"Everyone in my crew has done the ELISE site induction":k==="visitor"?"I'll stay with my Elise host while on site":"I've done the ELISE site induction";
   $("goIn").textContent=k==="crew"?"Sign crew in":"Sign in";
+  if(typeof renderInd==="function")renderInd();
 }
 document.querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(){setKind(b.getAttribute("data-k"));});});
 var K_NOTE="elise_ci_note";
@@ -191,6 +220,62 @@ function render(){
 }
 var me=ls(K_ME);
 if(me){$("fName").value=me.name||"";$("fCo").value=me.co||"";$("fPhone").value=me.phone||"";if(me.kind)setKind(me.kind);}
+/* ---------- induction + SWMS documents ---------- */
+var K_DOCS="elise_ci_docs";
+function docs(){return ls(K_DOCS)||[];}
+async function loadDocs(){
+  if(!navigator.onLine)return;
+  try{var r=await fetch(URL_+"/rest/v1/site_docs?select=id,kind,co,title,path,mime&active=eq.true&order=uploaded_at.asc",{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}});
+    if(r.ok){ls(K_DOCS,await r.json());renderInd();}}catch(e){}
+}
+function docUrl(d){return URL_+"/storage/v1/object/public/site-docs/"+d.path.split("/").map(encodeURIComponent).join("/");}
+function signedSet(){var m=ls(K_ME)||{};return {ind:m.ind||[],swms:m.swms||[],seen:m.seen||[]};}
+function needInd(){var S=signedSet();return docs().filter(function(d){return d.kind==="induction"&&S.ind.indexOf(d.id)<0;});}
+/* SWMS: ask when the company has one this phone hasn't been shown yet (new or updated), or nothing's been signed for it */
+function needSwms(co){
+  var S=signedSet(),all=docs().filter(function(d){return d.kind==="swms"&&d.co===co;});
+  if(!all.length)return [];
+  var fresh=all.filter(function(d){return S.seen.indexOf(d.id)<0;});
+  var any=all.some(function(d){return S.swms.indexOf(d.id)>=0;});
+  return fresh.length||!any?all:[];
+}
+function hasInd(){return docs().some(function(d){return d.kind==="induction";});}
+/* once there's an online induction, it replaces the tick box for people signing themselves in */
+function renderInd(){
+  var online=hasInd()&&kind==="gate";
+  $("indBox").hidden=online;
+}
+var steps=[],stepI=0,pending=null;
+function showStep(){
+  var st=steps[stepI];
+  $("vForm").hidden=true;$("vStep").hidden=false;$("stMsg").textContent="";$("stSign").value="";
+  $("stN").textContent="Step "+(stepI+1)+" of "+steps.length;
+  $("stH").textContent=st.kind==="induction"?"ELISE site induction":"Your company's SWMS";
+  $("stP").textContent=st.kind==="induction"?"Open and read each part of the site induction, then sign below. You only do this once.":"Open and read each SWMS you'll be working under today, tick it, then sign below.";
+  $("stDocs").innerHTML=st.docs.map(function(d,i){
+    return '<div class="doc" id="dc'+i+'"><a href="'+docUrl(d)+'" target="_blank" rel="noopener" data-di="'+i+'">'+esc(d.title)+'</a>'+
+      '<label class="check"><input type="checkbox" data-dk="'+i+'"> '+(st.kind==="induction"?"I've read and understood this":"I've read this SWMS and will work to it")+"</label></div>";
+  }).join("");
+  window.scrollTo(0,0);
+}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+$("stDocs").addEventListener("click",function(e){var a=e.target.closest("[data-di]");if(a)$("dc"+a.getAttribute("data-di")).classList.add("opened");});
+$("stBack").addEventListener("click",function(){$("vStep").hidden=true;$("vForm").hidden=false;steps=[];pending=null;});
+$("stGo").addEventListener("click",function(){
+  var st=steps[stepI],ticks=[].slice.call(document.querySelectorAll("[data-dk]"));
+  var chosen=st.docs.filter(function(d,i){return ticks[i].checked;});
+  if(st.kind==="induction"&&chosen.length<st.docs.length){$("stMsg").textContent="Read and tick every part of the induction.";return;}
+  if(st.kind==="swms"&&!chosen.length){$("stMsg").textContent="Tick at least one SWMS you're working under. If none fit, see your supervisor before starting.";return;}
+  var sig=$("stSign").value.trim();if(sig.length<3){$("stMsg").textContent="Type your full name to sign.";return;}
+  enqueue({t:"ind",row:{client_id:rid(12),kind:st.kind,co:pending.co,name:pending.name,phone:pending.phone||null,doc_ids:chosen.map(function(d){return d.id;}),signed_name:sig,at:new Date().toISOString()}});
+  var m=ls(K_ME)||{};m.ind=m.ind||[];m.swms=m.swms||[];m.seen=m.seen||[];
+  chosen.forEach(function(d){var L=st.kind==="induction"?m.ind:m.swms;if(L.indexOf(d.id)<0)L.push(d.id);});
+  if(st.kind==="swms")st.docs.forEach(function(d){if(m.seen.indexOf(d.id)<0)m.seen.push(d.id);});
+  ls(K_ME,m);
+  stepI++;
+  if(stepI<steps.length){showStep();return;}
+  $("vStep").hidden=true;var p=pending;pending=null;steps=[];finishSignIn(p);
+});
 $("goIn").addEventListener("click",function(){
   $("msg").textContent="";ls(K_NOTE,null);
   var name=$("fName").value.trim(),co=$("fCo").value,phone=$("fPhone").value.trim(),ind=$("fInd").checked;
@@ -199,19 +284,33 @@ $("goIn").addEventListener("click",function(){
   var n=1,names=null;
   if(kind==="crew"){n=parseInt($("fN").value,10);if(!(n>=1&&n<=99)){$("msg").textContent="How many in your crew today?";return;}
     names=$("fNames").value.split(/\n/).map(function(s){return s.trim();}).filter(Boolean).slice(0,99);}
-  if(kind!=="visitor"&&!ind){$("msg").textContent="Not inducted yet? See the Elise site office before you go on site.";return;}
+  var online=hasInd()&&kind==="gate";
+  if(kind!=="visitor"&&!online&&!ind){$("msg").textContent="Not inducted yet? See the Elise site office before you go on site.";return;}
+  var m=ls(K_ME)||{};m.name=name;m.co=co;m.phone=phone;m.kind=kind==="crew"?"crew":"gate";ls(K_ME,m);
+  pending={name:name,co:co,phone:phone,n:n,names:names,ind:ind,kind:kind};
+  steps=[];
+  if(kind==="gate"){
+    var ni=needInd();if(ni.length)steps.push({kind:"induction",docs:ni});
+    var ns=needSwms(co);if(ns.length)steps.push({kind:"swms",docs:ns});
+  }
+  if(steps.length){stepI=0;showStep();return;}
+  var p=pending;pending=null;finishSignIn(p);
+});
+function finishSignIn(p){
+  var name=p.name,co=p.co,phone=p.phone,n=p.n,names=p.names,kind=p.kind;
+  var ind=kind==="gate"&&hasInd()?needInd().length===0:p.ind;
   var at=new Date().toISOString(),row={client_id:rid(12),token:rid(16),day:today(),kind:kind,co:co,name:name,phone:phone||null,n:n,crew_names:names,inducted:ind,at:at};
-  ls(K_ME,{name:name,co:co,phone:phone,kind:kind==="crew"?"crew":"gate"});
   ls(K_CUR,{id:row.client_id,token:row.token,day:row.day,kind:kind,name:name,n:n,at:at});
   enqueue({t:"in",row:row});
   $("fInd").checked=false;$("fNames").value="";$("fN").value="";
   render();
-});
+}
 $("goOut").addEventListener("click",function(){
   var cur=ls(K_CUR);if(!cur)return;
   enqueue({t:"out",id:cur.id,token:cur.token,at:new Date().toISOString()});
   ls(K_CUR,null);render();
 });
+renderInd();loadDocs();
 render();flush().then(checkStatus);
 setInterval(checkStatus,60000);
 document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")checkStatus();});

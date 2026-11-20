@@ -452,7 +452,17 @@ window.eliseAuth = {
     opts = opts || {};
     await refreshIfStale();
     return fetch(REST+path, {method:opts.method||"GET", headers:H(opts.headers), body:opts.body});
-  }
+  },
+  /* site-docs bucket: induction files and SWMS */
+  putFile:async function(path, file){
+    await refreshIfStale();
+    return fetch(STORE+"site-docs/"+path, {method:"POST", headers:H({"Content-Type":file.type||"application/octet-stream","x-upsert":"true"}), body:file});
+  },
+  delFile:async function(path){
+    await refreshIfStale();
+    return fetch(STORE+"site-docs/"+path, {method:"DELETE", headers:H()});
+  },
+  fileUrl:function(path){ return SB_URL+"/storage/v1/object/public/site-docs/"+path; }
 };
 
 })();
@@ -1904,6 +1914,13 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .ts-links a{color:var(--ink)}
 .ts-row-off{padding-left:14px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:0 14px 0 0}
 .ts-ph{font-variant-numeric:tabular-nums}
+.ts-drop{border:2px dashed var(--line-hard);border-radius:6px;padding:18px 12px;text-align:center;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;background:var(--surface-2)}
+.ts-drop small{font-weight:400;color:var(--ink-3);font-size:12px}
+.ts-drop.over,.ts-drop:hover{border-color:var(--ink);background:var(--surface)}
+.ts-doc{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px;min-width:0}
+.ts-doc a{color:var(--ink);font-weight:600;overflow-wrap:anywhere;min-width:0}
+.ts-doc small{color:var(--ink-3)}
+.ts-swco{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -2499,6 +2516,25 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <div class="subhead"><span>Signed out today</span><span id="tsNOut"></span></div>
       <div id="tsOff"></div>
     </div>
+    <div class="ts-sec" id="tsDocs">
+      <div class="subhead"><span>Induction &amp; SWMS</span><span id="tsDocN"></span></div>
+      <div class="ts-grid">
+        <div class="ts-card">
+          <h3>Site induction <span>every worker reads and signs once</span></h3>
+          <div class="ts-drop" data-drop="induction" tabindex="0" role="button" aria-label="Add site induction files">Drop the induction here<br><small>or tap to choose - PDF, PowerPoint, Word, images or video</small></div>
+          <div id="tsIndList"></div>
+        </div>
+        <div class="ts-card">
+          <h3>SWMS by company <span>workers sign on to their company's</span></h3>
+          <label>Company<select id="tsSwmsCo"></select></label>
+          <div class="ts-drop" data-drop="swms" tabindex="0" role="button" aria-label="Add SWMS for the chosen company">Drop SWMS here<br><small>or tap to choose - goes to the company above</small></div>
+          <div id="tsSwmsList"></div>
+        </div>
+      </div>
+      <input type="file" id="tsFile" multiple hidden accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.mp4">
+      <div class="subhead"><span>Induction &amp; SWMS register</span><span id="tsRegN"></span></div>
+      <div id="tsReg"></div>
+    </div>
     <p class="note" id="tsStamp">Workers scan the QR, sign in on their own phone, and sign out the same way. It works with no signal: the phone holds the sign-in and sends it when it's back on the network. Only signed-in Elise team members can see this list.</p>
   </div>
 </section>
@@ -2533,7 +2569,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 13:15</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 14:00</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9592,6 +9628,7 @@ function renderTester(){
   el("tsUrl").textContent=TS_URL;el("tsPoster").href=TS_URL+"poster.html";el("tsOpen").href=TS_URL;
   var signed=tsSigned();
   el("tsLock").hidden=signed;el("tsLive").hidden=!signed;
+  renderTsDocs();
   if(!signed)return;
   if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester")tsFetch();},30000);}
   if(ts.rows==null){el("tsOn").innerHTML='<div class="lp-none">Loading&hellip;</div>';if(!ts.loading){ts.loading=1;tsFetch().then(function(){ts.loading=0;});}return;}
@@ -9653,7 +9690,7 @@ document.addEventListener("change",function(e){
   if(m&&ts.muster){ts.muster[m.getAttribute("data-tsm")]=m.checked;renderTester();}
 });
 el("tsMuster").addEventListener("click",function(){ts.muster={};renderTester();el("tsMusterBox").scrollIntoView({block:"nearest"});});
-el("tsRefresh").addEventListener("click",function(){tsFetch();});
+el("tsRefresh").addEventListener("click",function(){tsFetch();tsDocsFetch();});
 el("tsOutAll").addEventListener("click",async function(){
   var b=this;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to sign everyone out";setTimeout(function(){b.dataset.arm="";b.textContent="Sign everyone out";},3000);return;}
   b.dataset.arm="";b.textContent="Sign everyone out";
@@ -9661,6 +9698,70 @@ el("tsOutAll").addEventListener("click",async function(){
   if(ids.length&&await tsPatch(ids,{out_at:new Date().toISOString(),out_by:"team"}))tsFetch();
 });
 document.addEventListener("elise-signedout",function(){ts.rows=null;try{localStorage.removeItem(TS_CACHE);}catch(e){}if(state.view==="tester")renderTester();});
+
+/* ---------- induction + SWMS documents and register (Tester tab) ---------- */
+var tsd={docs:null,reg:null,kind:"induction"};
+function tsSize(n){return n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";}
+function tsDay(t){var d=new Date(t);return d.getDate()+" "+monName(d)+" "+tsClock(t);}
+async function tsDocsFetch(){
+  try{
+    var r=await eliseAuth.rest("site_docs?select=id,kind,co,title,path,mime,size,uploaded_at&active=eq.true&order=uploaded_at.asc");
+    if(r.ok)tsd.docs=await r.json();
+    var g=await eliseAuth.rest("site_induction?select=kind,co,name,phone,doc_ids,signed_name,at&order=at.desc&limit=300");
+    if(g.ok)tsd.reg=await g.json();
+  }catch(e){}
+  renderTsDocs();
+}
+function renderTsDocs(){
+  var signed=tsSigned();el("tsDocs").hidden=!signed;if(!signed)return;
+  if(!el("tsSwmsCo").options.length)el("tsSwmsCo").innerHTML=tsCoOpts();
+  if(tsd.docs==null){if(!tsd.loading){tsd.loading=1;tsDocsFetch().then(function(){tsd.loading=0;});}return;}
+  var D=tsd.docs,ind=D.filter(function(d){return d.kind==="induction";}),sw=D.filter(function(d){return d.kind==="swms";});
+  function item(d){return '<div class="ts-doc"><a href="'+esc(eliseAuth.fileUrl(d.path))+'" target="_blank" rel="noopener">'+esc(d.title)+'</a><small>'+(d.size?tsSize(d.size)+" - ":"")+tsDay(d.uploaded_at)+'</small><button type="button" class="ts-out" data-tsdel="'+d.id+'">Remove</button></div>';}
+  el("tsIndList").innerHTML=ind.length?ind.map(item).join(""):'<div class="lp-none">No induction yet. Until there is one, workers just tick that they\'ve been inducted.</div>';
+  var by={};sw.forEach(function(d){(by[d.co]=by[d.co]||[]).push(d);});
+  el("tsSwmsList").innerHTML=Object.keys(by).length?Object.keys(by).sort().map(function(c){return '<div class="ts-swco">'+lpTag(c)+esc(tsCoName(c))+"</div>"+by[c].map(item).join("");}).join(""):'<div class="lp-none">No SWMS uploaded yet.</div>';
+  el("tsDocN").textContent=ind.length+" induction file"+(ind.length===1?"":"s")+", "+sw.length+" SWMS";
+  var R=tsd.reg||[],title={};D.forEach(function(d){title[d.id]=d.title;});
+  el("tsRegN").textContent=R.length?R.length+" sign-ons":"";
+  el("tsReg").innerHTML=R.length?R.slice(0,80).map(function(x){
+    return '<div class="ts-ck">'+lpTag(x.co)+"<span>"+esc(x.name)+" - "+(x.kind==="induction"?"site induction":"SWMS: "+esc((x.doc_ids||[]).map(function(i){return title[i]||"(removed)";}).join(", ")))+(x.phone?" <small>"+esc(x.phone)+"</small>":"")+" <small>"+tsDay(x.at)+"</small></span></div>";
+  }).join(""):'<div class="lp-none">Nobody yet.</div>';
+}
+async function tsUpload(files){
+  if(!tsSigned()){toast("Sign in to the board first");return;}
+  var kind=tsd.kind,co=kind==="swms"?el("tsSwmsCo").value:null,n=0;
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    if(f.size>50*1048576){toast(f.name+" is over 50 MB");continue;}
+    var safe=f.name.replace(/[^\w.\-]+/g,"_").slice(-80),path=(kind==="swms"?"swms/"+co:"induction")+"/"+Date.now().toString(36)+"_"+safe;
+    toast("Uploading "+f.name+"...");
+    try{
+      var r=await eliseAuth.putFile(path,f);if(!r.ok)throw new Error(r.status);
+      var t=await eliseAuth.rest("site_docs",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({kind:kind,co:co,title:f.name.replace(/\.[^.]+$/,""),path:path,mime:f.type||null,size:f.size,uploaded_by:eliseAuth.email()})});
+      if(!t.ok)throw new Error(t.status);n++;
+    }catch(e){toast(navigator.onLine?"Couldn't upload "+f.name:"No signal - upload when you're back online");}
+  }
+  if(n){toast(n+" file"+(n>1?"s":"")+" added");tsDocsFetch();}
+}
+document.addEventListener("click",function(e){
+  var d=e.target.closest("[data-drop]");
+  if(d){tsd.kind=d.getAttribute("data-drop");el("tsFile").click();return;}
+});
+document.addEventListener("keydown",function(e){var d=e.target.closest&&e.target.closest("[data-drop]");if(d&&(e.key==="Enter"||e.key===" ")){e.preventDefault();tsd.kind=d.getAttribute("data-drop");el("tsFile").click();}});
+el("tsFile").addEventListener("change",function(){var f=[].slice.call(this.files);this.value="";if(f.length)tsUpload(f);});
+["dragenter","dragover"].forEach(function(ev){document.addEventListener(ev,function(e){var d=e.target.closest&&e.target.closest("[data-drop]");if(d){e.preventDefault();d.classList.add("over");}});});
+["dragleave","drop"].forEach(function(ev){document.addEventListener(ev,function(e){var d=e.target.closest&&e.target.closest("[data-drop]");if(d){d.classList.remove("over");}});});
+document.addEventListener("drop",function(e){var d=e.target.closest&&e.target.closest("[data-drop]");if(!d)return;e.preventDefault();tsd.kind=d.getAttribute("data-drop");var f=[].slice.call(e.dataTransfer.files||[]);if(f.length)tsUpload(f);});
+document.addEventListener("click",async function(e){
+  var b=e.target.closest("[data-tsdel]");if(!b)return;
+  if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again";setTimeout(function(){b.dataset.arm="";b.textContent="Remove";},3000);return;}
+  var id=b.getAttribute("data-tsdel"),doc=(tsd.docs||[]).filter(function(x){return x.id===id;})[0];
+  var r=await eliseAuth.rest("site_docs?id=eq."+id,{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({active:false})});
+  if(!r.ok){toast("Couldn't remove it");return;}
+  if(doc)eliseAuth.delFile(doc.path).catch(function(){});
+  tsDocsFetch();
+});
 
 /* ---------- boot ---------- */
 state.date=boardDate();
