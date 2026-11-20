@@ -1921,6 +1921,14 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .ts-doc a{color:var(--ink);font-weight:600;overflow-wrap:anywhere;min-width:0}
 .ts-doc small{color:var(--ink-3)}
 .ts-swco{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;margin-top:10px}
+.ts-big{font-size:20px;font-weight:700;color:var(--ink);margin-right:4px}
+.ts-trades{padding:4px 14px 10px;overflow-x:auto}
+.ts-trades table{width:100%;border-collapse:collapse;font-size:14px}
+.ts-trades th{text-align:left;font-size:11px;letter-spacing:.08em;color:var(--ink-3);font-weight:600;padding:6px 8px 6px 0;border-bottom:1px solid var(--line-hard)}
+.ts-trades td{padding:7px 8px 7px 0;border-bottom:1px solid var(--line);color:var(--ink)}
+.ts-trades td .lp-tag{margin-right:6px}
+.ts-trades th:nth-child(n+2),.ts-trades td:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums;width:90px}
+.ts-trades tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--line-hard)}
 </style>
 </head>
 <body>
@@ -2503,10 +2511,10 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     </div>
     <div class="ts-warn" id="tsLock" hidden>Sign in to the board (the padlock, top right) to see who's on site. The list is only shown to the Elise team.</div>
     <div id="tsLive">
+      <div class="subhead"><span>Trades on site today</span><span id="tsTrN"></span></div>
+      <div class="ts-trades" id="tsTrades"></div>
       <div class="subhead"><span>On site now</span><span id="tsTotal"></span></div>
       <div id="tsOn"></div>
-      <div class="subhead"><span>Crane lifts today vs signed in</span></div>
-      <div id="tsCheck"></div>
       <div class="ts-actions">
         <button type="button" class="ts-btn" id="tsMuster">Start muster</button>
         <button type="button" class="ts-btn" id="tsOutAll">Sign everyone out</button>
@@ -2569,7 +2577,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 14:00</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 20 Nov 22:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9635,8 +9643,10 @@ function renderTester(){
   var rows=ts.rows,on=rows.filter(function(x){return !x.out_at;}),off=rows.filter(function(x){return x.out_at;}),by={},tot=0;
   on.forEach(function(x){(by[x.co]=by[x.co]||[]).push(x);tot+=x.n;});
   el("tsTotal").textContent=tot?tot+" on site":"";
-  el("tsMeta").textContent=(ts.err?ts.err+" - ":"")+(ts.at?"updated "+tsClock(ts.at):"");
+
   var cos=Object.keys(by).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;});
+  var _sn={},_dt=rows.reduce(function(s,x){var k=x.kind==="crew"?null:x.co+"|"+String(x.name||"").trim().toLowerCase();if(k&&_sn[k])return s;if(k)_sn[k]=1;return s+x.n;},0);
+  el("tsMeta").innerHTML='<b class="ts-big">'+_dt+'</b> on site today'+(ts.err?" - "+esc(ts.err):"")+(ts.at?" - updated "+tsClock(ts.at):"");
   function who(x){
     var s=x.kind==="crew"?esc(x.name)+" + crew of "+x.n+(x.crew_names&&x.crew_names.length?' <small>('+esc(x.crew_names.join(", "))+")</small>":""):esc(x.name)+(x.kind==="visitor"?" <small>visitor</small>":"");
     if(!x.inducted&&x.kind!=="visitor")s+=' <span class="flag">not inducted</span>';
@@ -9653,13 +9663,21 @@ function renderTester(){
   el("tsOff").innerHTML=off.length?off.map(function(x){
     return '<div class="ts-row ts-row-off">'+lpTag(x.co)+who(x)+" <small>"+tsClock(x.at)+" - "+tsClock(x.out_at)+(x.out_by==="team"?" (signed out by Elise)":x.out_by==="auto"?' <span class="flag">auto 6pm - didn\'t sign out</span>':"")+"</small></div>";
   }).join(""):'<div class="lp-none">Nobody yet.</div>';
-  var bk=(state.lifts||[]).filter(function(b){return b.date===iso(new Date())&&b.type==="lift"&&b.co&&b.crane!=="none";}),bc={};
-  bk.forEach(function(b){bc[b.co]=(bc[b.co]||0)+1;});
-  var ks=Object.keys(bc);
-  el("tsCheck").innerHTML=ks.length?ks.map(function(c){
-    var n=(by[c]||[]).reduce(function(s,x){return s+x.n;},0);
-    return '<div class="ts-ck">'+lpTag(c)+esc(tsCoName(c))+" - "+bc[c]+" lift"+(bc[c]>1?"s":"")+" booked - "+(n?'<span class="ok">'+n+" signed in</span>":'<span class="bad">nobody signed in</span>')+"</div>";
-  }).join(""):'<div class="lp-none">No crane lifts on the board today.</div>';
+  /* the day's record: every sign-in today, signed out or not */
+  var day={},dayTot=0;
+  /* someone who signs in twice in a day (back from lunch, second trip) counts once */
+  var seen={};
+  rows.forEach(function(x){
+    var d=day[x.co]=day[x.co]||{n:0,now:0},k=x.kind==="crew"?null:x.co+"|"+String(x.name||"").trim().toLowerCase();
+    if(!x.out_at)d.now+=x.n;
+    if(k&&seen[k])return;if(k)seen[k]=1;
+    d.n+=x.n;dayTot+=x.n;
+  });
+  var dk=Object.keys(day).sort(function(a,b){return day[b].n-day[a].n||(tsCoName(a)<tsCoName(b)?-1:1);});
+  el("tsTrN").textContent=dk.length?dk.length+" trade"+(dk.length===1?"":"s"):"";
+  el("tsTrades").innerHTML=dk.length?'<table><thead><tr><th>Trade</th><th>Men today</th><th>On site now</th></tr></thead><tbody>'+dk.map(function(c){
+    return "<tr><td>"+lpTag(c)+" "+esc(tsCoName(c))+"</td><td>"+day[c].n+"</td><td>"+day[c].now+"</td></tr>";
+  }).join("")+'</tbody><tfoot><tr><td>Total</td><td>'+dayTot+"</td><td>"+tot+"</td></tr></tfoot></table>":'<div class="lp-none">No trades signed in yet today.</div>';
   var mb=el("tsMusterBox");
   if(ts.muster){
     mb.hidden=false;
