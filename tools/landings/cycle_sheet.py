@@ -70,5 +70,5 @@ for di,d in enumerate(days,1):
         y+=10.5; c=col(r['trade']); pg.draw_circle((X+5,y-3),3.5,color=c,fill=c)
         gx,gy=pos(r); txt='%s  %s - %s  (%s)'%(r['time'],tname(r['trade']),r['what'],r.get('grid') or bay_of(gx,gy))
         pg.insert_text((X+12,y),txt[:118],fontsize=7)
-pg.insert_text((18,830),'Project ELISE  -  Level 3-10 typical GA (A2.507 rev 05) as base  -  daily sheets carry sizes, booking checks and moves',fontsize=7.5,color=(0.45,0.45,0.45))
+pg.insert_text((18,830),'Project GC RISE  -  Level 3-10 typical GA (A2.507 rev 05) as base  -  daily sheets carry sizes, booking checks and moves',fontsize=7.5,color=(0.45,0.45,0.45))
 out.save(sys.argv[2]); print('wrote',sys.argv[2],tot,'landings')

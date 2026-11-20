@@ -15,7 +15,7 @@ HTML = r"""<!doctype html>
 <meta name="apple-mobile-web-app-title" content="Labour">
 <meta name="theme-color" content="#23271A">
 <meta name="robots" content="noindex,nofollow">
-<title>ELISE Jobs</title>
+<title>GC RISE Jobs</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
 :root{--bg:#23271A;--card:#2D3221;--rule:#3E4431;--ink:#E8E2D8;--ink2:#C6C7B9;
@@ -267,9 +267,9 @@ label.btn{display:inline-flex;align-items:center;justify-content:center}
 :root[data-theme="dark"]{color-scheme:dark}
 
 
-/* the ELISE logo, tinted to the theme's ink so it reads on light and dark */
-.elogo{display:inline-block;width:86px;height:23px;background:var(--ink);
-  -webkit-mask:url(../board/elise-logo.png) no-repeat left center/contain;mask:url(../board/elise-logo.png) no-repeat left center/contain;
+/* the GC RISE logo, tinted to the theme's ink so it reads on light and dark */
+.elogo{display:inline-block;width:118px;height:23px;background:var(--ink);
+  -webkit-mask:url(../board/gcrise-logo.png) no-repeat left center/contain;mask:url(../board/gcrise-logo.png) no-repeat left center/contain;
   color:transparent;overflow:hidden;white-space:nowrap;vertical-align:middle;flex:none}
 
 /* light / dark switch - shares the board's choice (same phone, same setting) */
@@ -313,7 +313,7 @@ html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-r
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><b class="elogo" role="img" aria-label="ELISE">ELISE</b>
+    <div class="brand"><b class="elogo" role="img" aria-label="GC RISE">GC RISE</b>
       <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><button class="thbtn" id="thBtn" type="button" aria-label="Switch light or dark" title="Light / dark"></button><button class="me" id="meBtn">Who am I?</button></span></div>
     <div class="tabs" role="tablist">
       <button class="tab" id="t0" aria-selected="true">Today<b id="d0">&nbsp;</b></button>
@@ -671,7 +671,7 @@ function render(){
 
 /* Who is on the job. Context for the list above it, not something to act on,
    so it sits at the bottom and stays quiet. */
-/* Trade colour for a labour supplier. ELISE is in the board's trade table so
+/* Trade colour for a labour supplier. GC RISE is in the board's trade table so
    it gets the same olive it has everywhere else; the two labour-hire firms
    are not trades and carry their own colours. */
 var SUPPLIER_COLOUR = { WORKCON:"#4FA3D1", HARWELL:"#C96A2E" };

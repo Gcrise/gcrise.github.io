@@ -1,4 +1,4 @@
-"""Shared bits for the ELISE crane-landing sheets.
+"""Shared bits for the GC RISE crane-landing sheets.
 Plan coordinates are in 'GA px': the Level 3-10 typical GA (A2.507) rendered at 60 dpi.
 Photo coordinates are from the Tikee deck view used by the daily run: the deck crop
 (x 0.28-0.82, y 0-0.78 of the 1920x692 photo) shown at 1500x960 and screenshotted at 800x512."""
@@ -8,7 +8,7 @@ GRID_X = {'1':588,'2':748,'3':878,'4':1010,'5':1216}
 GRID_Y = {'A':518,'B':648,'C':778,'D':928}
 SLAB = (515,395,1250,965)
 TRADES = {  # crane board colours
- 'EC':('Elise','A8A05C'),'GLF':('G+L Form','FF8A00'),'ECC':('East Coast Concrete','5A6670'),'EEC':('Encon PT','D92B20'),
+ 'EC':('GC Rise','A8A05C'),'GLF':('G+L Form','FF8A00'),'ECC':('East Coast Concrete','5A6670'),'EEC':('Encon PT','D92B20'),
  'AP':('Advanced Precast','00C875'),'NEU':('Neumann Steel','1E4FA3'),'NS':('Newnhams','FFCB00'),'EVS':('Evolution Shotcrete','7F5347'),
  'MDP':('Matt Dyce Plumbing','0073EA'),'MC':('Multicool','1BC5C5'),'LRC':('LRC','9D4EDD'),'ACF':('Auscoast Fire','E2445C'),
  'RZE':('Rize','FF2D87'),'CC':('Classic Corp','9CD326'),'BAY':('Bayleys','037F4C'),'EMP':('Empire','8C8C8C'),'BUT':('Butlers','784BD1'),

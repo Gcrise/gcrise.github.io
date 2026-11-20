@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Day Board">
 <meta name="theme-color" content="#23271A">
-<title>ELISE Day Board</title>
+<title>GC RISE Day Board</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="fonts.css">
@@ -18,7 +18,7 @@
 <script src="vendor/supabase.js"></script>
 <script>
 /* ============================================================
-   ELISE DAY BOARD - SUPABASE SHIM
+   GC RISE DAY BOARD - SUPABASE SHIM
    ------------------------------------------------------------
    Presents the exact same API the Claude runtime gave the board
    (claude.use("db"|"assets"|"downloads")), backed by Supabase.
@@ -606,11 +606,11 @@ window.eliseAuth = {
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:14px;line-height:1.45;margin:0;padding-top:env(safe-area-inset-top,0px)}
 
-/* the ELISE logo, tinted to the theme's ink so it reads on light and dark */
-.elogo{display:inline-block;width:86px;height:23px;background:var(--ink);
-  -webkit-mask:url(elise-logo.png) no-repeat left center/contain;mask:url(elise-logo.png) no-repeat left center/contain;
+/* the GC RISE logo, tinted to the theme's ink so it reads on light and dark */
+.elogo{display:inline-block;width:114px;height:23px;background:var(--ink);
+  -webkit-mask:url(gcrise-logo.png) no-repeat left center/contain;mask:url(gcrise-logo.png) no-repeat left center/contain;
   color:transparent;overflow:hidden;white-space:nowrap;vertical-align:middle;flex:none}
-.mast .elogo{width:92px;height:24px}
+.mast .elogo{width:120px;height:24px}
 
 /* iPhone zooms the page into any text box set smaller than 16px - keep every
    box at 16px on touch screens so typing never zooms */
@@ -1952,7 +1952,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 
 <header class="mast">
   <div class="mast-in gut">
-    <span class="wordmark elogo" role="img" aria-label="ELISE">ELISE</span>
+    <span class="wordmark elogo" role="img" aria-label="GC RISE">GC RISE</span>
     <span class="mast-sub">Day Board &middot; 3 Twenty Fifth Ave</span>
     <button class="themebtn" id="themeBtn" type="button" title="Switch the board between light and dark"></button>
 <button class="lockbtn fsbtn" id="fsBtn" type="button" title="Full screen (F)" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -2416,14 +2416,14 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <a class="mini" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener">Open in Tikee</a>
       <button class="mini" type="button" id="tkRaw">Whole page</button><button class="mini" type="button" data-camfull="tkBox">Full screen</button></div>
     <div class="tkbox" id="tkBox"><div class="tkcrop" id="tkCrop">
-      <iframe id="tkFrame" title="ELISE deck - Tikee photo browser" allow="fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
+      <iframe id="tkFrame" title="GC RISE deck - Tikee photo browser" allow="fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
     </div>
     <div class="camgrid">
       <div class="camcol camlatest" hidden>
         <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" id="inkHide" hidden>Hide marks</button><button class="mini" type="button" id="inkBtn">Mark up</button><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
-          <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><div class="camzoom" id="camZoom"><div class="camstage" id="camStage"><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"><svg id="camInk" viewBox="0 0 7360 2650" preserveAspectRatio="none" aria-label="Mark-up on the deck photo"></svg></div></div></div>
+          <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><div class="camzoom" id="camZoom"><div class="camstage" id="camStage"><img id="camImg" alt="GC RISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"><svg id="camInk" viewBox="0 0 7360 2650" preserveAspectRatio="none" aria-label="Mark-up on the deck photo"></svg></div></div></div>
           <div class="camtools" id="camTools" hidden>
             <div class="ctg"><button type="button" data-tool="pen" class="on">Pen</button><button type="button" data-tool="arrow">Arrow</button><button type="button" data-tool="box">Box</button><button type="button" data-tool="text">Text</button></div>
             <div class="ctg"><button type="button" data-col="#FF3B30" class="sw on" style="--sw:#FF3B30" aria-label="Red"></button><button type="button" data-col="#FFD60A" class="sw" style="--sw:#FFD60A" aria-label="Yellow"></button><button type="button" data-col="#32D74B" class="sw" style="--sw:#32D74B" aria-label="Green"></button><button type="button" data-col="#0A84FF" class="sw" style="--sw:#0A84FF" aria-label="Blue"></button><button type="button" data-col="#FFFFFF" class="sw" style="--sw:#FFFFFF" aria-label="White"></button></div>
@@ -2437,7 +2437,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <div class="camcol">
         <div class="camhd"><b>Timelapse</b><span>Drag the slide bar</span><button class="mini" type="button" data-camfull="tlBox">Full screen</button></div>
         <div class="cambox" id="tlBox">
-          <iframe id="camFrame" title="ELISE deck timelapse" scrolling="no" allow="fullscreen; autoplay" allowfullscreen referrerpolicy="no-referrer"></iframe>
+          <iframe id="camFrame" title="GC RISE deck timelapse" scrolling="no" allow="fullscreen; autoplay" allowfullscreen referrerpolicy="no-referrer"></iframe>
           <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
         </div>
       </div>
@@ -2502,7 +2502,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <div class="ts-grid">
       <div class="ts-card ts-qr">
         <h3>QR code for the gate</h3>
-        <div id="tsQR" role="img" aria-label="QR code to the ELISE site sign-in page"></div>
+        <div id="tsQR" role="img" aria-label="QR code to the GC RISE site sign-in page"></div>
         <div class="ts-url" id="tsUrl"></div>
         <div class="ts-links"><a id="tsPoster" target="_blank" rel="noopener">Open the A4 poster to print</a><a id="tsOpen" target="_blank" rel="noopener">Open the sign-in page</a></div>
       </div>
@@ -2515,7 +2515,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
         <button type="button" class="addbtn" id="tsCrewGo">Sign crew in</button>
       </div>
     </div>
-    <div class="ts-warn" id="tsLock" hidden>Sign in to the board (the padlock, top right) to see who's on site. The list is only shown to the Elise team.</div>
+    <div class="ts-warn" id="tsLock" hidden>Sign in to the board (the padlock, top right) to see who's on site. The list is only shown to the GC Rise team.</div>
     <div id="tsLive">
       <div class="subhead"><span>Trades on site today</span><span id="tsTrN"></span></div>
       <div class="ts-trades" id="tsTrades"></div>
@@ -2549,7 +2549,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <div class="subhead"><span>Induction &amp; SWMS register</span><span id="tsRegN"></span></div>
       <div id="tsReg"></div>
     </div>
-    <p class="note" id="tsStamp">Workers scan the QR, sign in on their own phone, and sign out the same way. It works with no signal: the phone holds the sign-in and sends it when it's back on the network. Only signed-in Elise team members can see this list.</p>
+    <p class="note" id="tsStamp">Workers scan the QR, sign in on their own phone, and sign out the same way. It works with no signal: the phone holds the sign-in and sends it when it's back on the network. Only signed-in GC Rise team members can see this list.</p>
   </div>
 </section>
 
@@ -2583,7 +2583,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 07:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 08:00</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -2608,7 +2608,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 </main>
 
 <footer class="gut">
-  <span>Elise Constructions Pty Ltd &middot; QBCC 15555981</span>
+  <span>GC Rise &middot; QBCC 15555981</span>
   <span id="feeds" style="display:flex;gap:14px;flex-wrap:wrap"></span>
   <span id="dbState">Checking store…</span>
 </footer>
@@ -2625,12 +2625,12 @@ function autoQty(v){
 (function(){
   "use strict";
   var DEF={
-    name:"ELISE",
+    name:"GC RISE",
     sub:"Crane & delivery board · 3 Twenty Fifth Ave, Palm Beach",
     per:10, per15:["AP"], bundleKg:1000, bundleTrades:["RZE","NEU"], pairTrades:["AP","NEU"], open:360, close:1080, cut1:840, cut2:1200,
     breaks:[[600,30],[780,30]],
     trades:[
-      ["EC","Elise","#3A3835"],["GLF","G+L Form","#FF8A00"],
+      ["EC","GC Rise","#3A3835"],["GLF","G+L Form","#FF8A00"],
       ["ECC","East Coast Concrete","#5A6670"],["EEC","Encon PT","#D92B20"],["AP","Advanced Precast","#00C875"],
       ["NEU","Neumann Steel","#1E4FA3"],
       ["NS","Newnham Scaffolding","#FFCB00"],["EVS","Evolution Shotcrete","#7F5347"],["MDP","Matt Dyce Plumbing","#0073EA"],["MC","Multicool Mechanical","#1BC5C5"],
@@ -4903,7 +4903,7 @@ function autoQty(v){
 "use strict";
 
 var DEF_TRADES={
- EC:["Elise","#3A3835"],GLF:["G+L Form","#FF8A00"],ECC:["East Coast Concrete","#5A6670"],
+ EC:["GC Rise","#3A3835"],GLF:["G+L Form","#FF8A00"],ECC:["East Coast Concrete","#5A6670"],
  EEC:["Encon PT","#D92B20"],AP:["Advanced Precast","#00C875"],NEU:["Neumann Steel","#1E4FA3"],
  NS:["Newnham Scaffolding","#FFCB00"],EVS:["Evolution Shotcrete","#7F5347"],
  MDP:["Matt Dyce Plumbing","#0073EA"],MC:["Multicool Mechanical","#1BC5C5"],
@@ -5790,8 +5790,8 @@ document.addEventListener("click",function(e){
     if(!patch.risk) toast("High risk works is empty - fill it in so the crew see what they're signing for");
     var u=signUrl(state.date), inp=el("preLinkTxt");
     inp.value=u; inp.hidden=false; inp.select();
-    var msg="ELISE high risk prestart "+shortDate(state.date)+" - read it and sign here: ";
-    if(navigator.share){ navigator.share({title:"ELISE high risk prestart",text:msg,url:u}).catch(function(){}); }
+    var msg="GC RISE high risk prestart "+shortDate(state.date)+" - read it and sign here: ";
+    if(navigator.share){ navigator.share({title:"GC RISE high risk prestart",text:msg,url:u}).catch(function(){}); }
     else if(navigator.clipboard){ navigator.clipboard.writeText(msg+u).then(function(){toast("Sign link copied - paste it into the group");},function(){}); }
   }
   if(e.target.closest&&e.target.closest("#preSignHere")) sigPad(state.date);
@@ -7528,7 +7528,7 @@ function prestartText(){
   var d=parseISO(state.date),lab=state.labour.filter(function(r){return r.date===state.date;}),rows=dayRows();
   var heads=lab.reduce(function(a,r){return a+(+r.qty||1);},0);
   var pd=preDoc();
-  var out=["ELISE PRESTART — "+dayName(d)+" "+d.getDate()+" "+monName(d),"On site: "+heads];
+  var out=["GC RISE PRESTART — "+dayName(d)+" "+d.getDate()+" "+monName(d),"On site: "+heads];
   if(pd.weather||wxLine(state.date))out.push("Weather: "+(pd.weather||wxLine(state.date)));
   out.push("","STRUCTURES");
   if(pd.works)pd.works.split(/\n+/).forEach(function(l){out.push("- "+l);});else out.push("-");
@@ -7557,7 +7557,7 @@ function prestartText(){
 /* ---------- a section as plain text, for pasting into a message ---------- */
 function headLine(){
   var d=parseISO(state.date);
-  return "ELISE - "+dayName(d)+" "+d.getDate()+" "+monName(d)+" "+d.getFullYear();
+  return "GC RISE - "+dayName(d)+" "+d.getDate()+" "+monName(d)+" "+d.getFullYear();
 }
 function sectionText(which){
   if(which==="all")return prestartText();
@@ -7625,7 +7625,7 @@ function sectionText(which){
     }
   } else if(which==="log"){
     var lg=logItems();
-    out=["ELISE - COMPLETED WORKS",""];
+    out=["GC RISE - COMPLETED WORKS",""];
     out.push(lg.length?lg.length+" jobs ticked off":"Nothing ticked off yet.");
     var last="";
     lg.forEach(function(e){
@@ -8118,7 +8118,7 @@ async function buildPDF(which){
   for(var pg=1;pg<=pages;pg++){
     doc.setPage(pg);
     doc.setTextColor(147,139,126);doc.setFontSize(7);doc.setFont("helvetica","normal");
-    doc.text("Elise Constructions Pty Ltd  ·  QBCC 15555981  ·  Site Manager: Harry Agnew",M,291);
+    doc.text("GC Rise  ·  QBCC 15555981  ·  Site Manager: Harry Agnew",M,291);
     doc.text("Page "+pg+" of "+pages,W-M,291,{align:"right"});
   }
   return doc;
@@ -8175,7 +8175,7 @@ function buildMilesPDF(){
   var today=iso(new Date()), wk=weekMon(today);
   var L=mileAll().filter(function(m){return !m.done||weekMon(m.day)===wk;});
   doc.setFillColor(35,39,26);doc.rect(0,0,W,24,"F");
-  doc.setTextColor(232,226,216);doc.setFont("helvetica","bold");doc.setFontSize(16);doc.text("ELISE",M,11);
+  doc.setTextColor(232,226,216);doc.setFont("helvetica","bold");doc.setFontSize(16);doc.text("GC RISE",M,11);
   doc.setFontSize(11);doc.text("TEAM MILESTONES",M,18);
   doc.setFont("helvetica","normal");doc.setFontSize(9);
   doc.text("Week of "+mileLabel(wk)+"   |   printed "+mileLabel(today),W-M,18,{align:"right"});
@@ -8209,7 +8209,7 @@ function buildMilesPDF(){
     y+=5;
   });
   doc.setFontSize(7.5);doc.setTextColor(150,150,140);doc.setFont("helvetica","normal");
-  doc.text("ELISE Constructions  |  3 Twenty Fifth Avenue, Palm Beach",M,H-8);
+  doc.text("GC RISE  |  3 Twenty Fifth Avenue, Palm Beach",M,H-8);
   return doc;
 }
 
@@ -8246,14 +8246,14 @@ function buildTeamPDF(){
   function co(c){return rgb((T[c]||T.OTH||["","#938C80"])[1]);}
   // masthead
   doc.setFillColor(237,232,221);doc.rect(0,H-H+0,W,14,"F");
-  txt("ELISE",M,9.6,"bold",15,INK);
+  txt("GC RISE",M,9.6,"bold",15,INK);
   txt("3 TWENTY FIFTH AVE, PALM BEACH",M+30,8,"normal",7,INK3);
   txt("TEAM PRESTART",M+30,11.6,"bold",7.4,GOLD);
   txt(longDate(state.date),W-M,9.6,"bold",15,INK,true);
   txt(nlift+" LIFTS   "+durTxt(hook)+" HOOK"+(pourm?("   "+durTxt(pourm)+" CONCRETE POUR"):"")+
       "   "+dels.length+" DELIVERIES",W-M,13,"normal",6.6,INK3,true);
   doc.setFillColor(13,99,119);doc.rect(0,14,W,0.9,"F");
-  txt("ELISE CONSTRUCTIONS  -  QBCC 15555981  -  SITE MANAGER: HARRY AGNEW",M,H-6,"normal",6,INK3);
+  txt("GC RISE  -  QBCC 15555981  -  SITE MANAGER: HARRY AGNEW",M,H-6,"normal",6,INK3);
   var y0=20;
   var ACC={hook:[13,99,119],del:[24,79,124],pour:[138,60,107],safe:[178,48,31],jobs:[140,106,46]};
   function head(x,y,t,n,k){
@@ -8367,14 +8367,14 @@ function buildLogisticsPDF(){
   }
   function page(){
     doc.setFillColor(237,232,221);doc.rect(0,0,W,16,"F");
-    txt("ELISE",M,9.6,"bold",13,INK);
+    txt("GC RISE",M,9.6,"bold",13,INK);
     txt("3 TWENTY FIFTH AVE, PALM BEACH",M+27,7.8,"normal",7,INK3);
     txt("LOGISTICS PRESTART",M+27,11.6,"bold",7.4,GOLD);
     txt(longDate(state.date),W-M,9.6,"bold",13,INK,true);
     txt(nlift+" LIFTS   "+durTxt(hook)+" HOOK"+(pourm?("   "+durTxt(pourm)+" CONCRETE POUR"):"")+
         "   "+dels.length+" DELIVERIES",W-M,13.4,"normal",6.6,INK3,true);
     doc.setFillColor(TEAL[0],TEAL[1],TEAL[2]);doc.rect(0,16,W,0.9,"F");
-    txt("ELISE CONSTRUCTIONS  -  QBCC 15555981  -  SITE MANAGER: HARRY AGNEW",M,H-7,"normal",6,INK3);
+    txt("GC RISE  -  QBCC 15555981  -  SITE MANAGER: HARRY AGNEW",M,H-7,"normal",6,INK3);
     txt("UNBOOKED TRUCKS GET TURNED AROUND",W-M,H-7,"bold",6,INK3,true);
   }
   /* Measure the day at full width. If it fits down one column, keep it wide
@@ -8471,7 +8471,7 @@ async function savePDF(which,btn,fmt){
             (which==="logistics")?buildLogisticsPDF():await buildPDF(which);
     if(!doc)return;
     var slug=which==="all"?"day_sheet":which;
-    var base="ELISE_"+(which==="miles"?"team_milestones":slug)+"_"+(which==="miles"?iso(new Date()):state.date);
+    var base="GC_RISE_"+(which==="miles"?"team_milestones":slug)+"_"+(which==="miles"?iso(new Date()):state.date);
     var label=SECTIONS[which]||"Sheet";
     if(fmt==="jpg"){
       var imgs;
@@ -9442,10 +9442,10 @@ async function saveFile(name,text,mime){
 async function exportJson(){
   if(!db){toast("Can\u2019t read the board from this screen");return;}
   var all=await gatherAll();
-  var body={project:"ELISE",site:"3 Twenty Fifth Ave, Palm Beach",
+  var body={project:"GC RISE",site:"3 Twenty Fifth Ave, Palm Beach",
             exported:new Date().toISOString(),collections:all};
   var n=0;for(var k in all)n+=all[k].length;
-  if(await saveFile("ELISE_board_export_"+iso(new Date())+".json",
+  if(await saveFile("GC_RISE_board_export_"+iso(new Date())+".json",
       JSON.stringify(body,null,1),"application/json"))
     toast(n+" records saved");
 }
@@ -9454,7 +9454,7 @@ async function exportCsv(){
   var all=await gatherAll(),d=iso(new Date()),saved=0;
   var lifts=(all.lifts||[]).slice().sort(function(a,b){
     return (a.date||"").localeCompare(b.date||"")||(+a.start||0)-(+b.start||0);});
-  if(lifts.length&&await saveFile("ELISE_crane_and_deliveries_"+d+".csv",
+  if(lifts.length&&await saveFile("GC_RISE_crane_and_deliveries_"+d+".csv",
     toCsv(lifts.map(function(r){
       var st=+r.start||0,du=+r.dur||0;
       return {date:r.date,start:fmtClock(st),finish:fmtClock(st+du),minutes:du,
@@ -9473,17 +9473,17 @@ async function exportCsv(){
     return rows;
   }
   var jobs=flat("jobs");
-  if(jobs.length&&await saveFile("ELISE_labour_jobs_"+d+".csv",
+  if(jobs.length&&await saveFile("GC_RISE_labour_jobs_"+d+".csv",
     toCsv(jobs,["date","text","who","priority","done","carried_from"]),"text/csv")) saved++;
   var pour=flat("prepour");
-  if(pour.length&&await saveFile("ELISE_prepour_"+d+".csv",
+  if(pour.length&&await saveFile("GC_RISE_prepour_"+d+".csv",
     toCsv(pour,["date","text","who","priority","done","carried_from"]),"text/csv")) saved++;
   var log=[];
   (all.donelog||[]).forEach(function(doc){
     (doc.items||[]).forEach(function(i){log.push({date:i.date,text:i.text,who:i.who||""});});
   });
   log.sort(function(a,b){return (b.date||"").localeCompare(a.date||"");});
-  if(log.length&&await saveFile("ELISE_done_log_"+d+".csv",
+  if(log.length&&await saveFile("GC_RISE_done_log_"+d+".csv",
     toCsv(log,["date","text","who"]),"text/csv")) saved++;
   if(saved)toast(saved+(saved===1?" file saved":" files saved"));
 }
@@ -9667,7 +9667,7 @@ function renderTester(){
   }).join(""):'<div class="lp-none">Nobody signed in yet today.</div>';
   el("tsNOut").textContent=off.length?off.reduce(function(s,x){return s+x.n;},0)+" people":"";
   el("tsOff").innerHTML=off.length?off.map(function(x){
-    return '<div class="ts-row ts-row-off">'+lpTag(x.co)+who(x)+" <small>"+tsClock(x.at)+" - "+tsClock(x.out_at)+(x.out_by==="team"?" (signed out by Elise)":x.out_by==="auto"?' <span class="flag">auto 6pm - didn\'t sign out</span>':"")+"</small></div>";
+    return '<div class="ts-row ts-row-off">'+lpTag(x.co)+who(x)+" <small>"+tsClock(x.at)+" - "+tsClock(x.out_at)+(x.out_by==="team"?" (signed out by GC Rise)":x.out_by==="auto"?' <span class="flag">auto 6pm - didn\'t sign out</span>':"")+"</small></div>";
   }).join(""):'<div class="lp-none">Nobody yet.</div>';
   /* the day's record: every sign-in today, signed out or not */
   var day={},dayTot=0;
@@ -9820,7 +9820,7 @@ var loadTimer=setTimeout(function(){if(!state.ready)el("dbState").textContent="S
     liftKey=w[0];
     unsubLifts=db.collection("lifts").where("date",">=",w[0]).where("date","<=",w[1]).onSnapshot(function(snap){
       state.ready=true;clearTimeout(loadTimer);
-      el("dbState").textContent="Live — ELISE board, open to anyone with the link.";
+      el("dbState").textContent="Live — GC RISE board, open to anyone with the link.";
       ingestLifts(snap.docs.map(function(d){return normLift(d.id,d.data()||{});}),w);
       renderFront();renderTabs();
     },fail);
