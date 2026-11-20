@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="favicon.png">
-<title>GC RISE Site Sign-in</title>
+<title>ELISE Site Sign-in</title>
 <style>
 :root{--bg:#23271A;--card:#2D3221;--rule:#3E4431;--ink:#E8E2D8;--ink2:#C6C7B9;--ink3:#9EA090;--accent:#DCCAA2;--stop:#FF6B6B;--go:#2FD44A;--warn:#DDB45F;color-scheme:dark}
 @media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#E8E2D8;--card:#F5F1EA;--rule:#D2CBBC;--ink:#2D3221;--ink2:#4E5340;--ink3:#717462;--accent:#2D3221;--stop:#B3261E;--go:#2E7D32;--warn:#9C7220;color-scheme:light}}
@@ -15,7 +15,7 @@
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 .wrap{max-width:520px;margin:0 auto;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{width:124px;height:22px;background:var(--ink);-webkit-mask:url(gcrise-logo.png) left center/contain no-repeat;mask:url(gcrise-logo.png) left center/contain no-repeat}
+.logo{width:96px;height:22px;background:var(--ink);-webkit-mask:url(elise-logo.png) left center/contain no-repeat;mask:url(elise-logo.png) left center/contain no-repeat}
 .net{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:6px}
 .net i{width:8px;height:8px;border-radius:50%;background:var(--go)}
 .net.off i{background:var(--warn)}
@@ -55,7 +55,7 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 .muted{color:var(--ink3);font-size:13px;line-height:1.45}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
-<div class="top"><div class="logo" role="img" aria-label="GC RISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
+<div class="top"><div class="logo" role="img" aria-label="ELISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
 <h1>Site sign-in</h1>
 <div class="site">3 Twenty Fifth Ave, Palm Beach</div>
 <div class="date" id="date"></div>
@@ -99,7 +99,7 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
     <label for="fNames">Their names <span class="opt">- one per line, optional</span></label>
     <textarea id="fNames" rows="4"></textarea>
   </div>
-  <label class="check" id="indBox"><input type="checkbox" id="fInd"> <span id="indTxt">I've done the GC RISE site induction</span></label>
+  <label class="check" id="indBox"><input type="checkbox" id="fInd"> <span id="indTxt">I've done the ELISE site induction</span></label>
   <button class="big in" id="goIn" type="button">Sign in</button>
   <div class="msg" id="msg" role="alert"></div>
   <div class="pend" id="pend2" hidden></div>
@@ -108,8 +108,8 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 <div class="card">
   <ul class="rules">
     <li>Sign in every day when you arrive and sign out when you leave. Anyone still signed in at 6pm is signed out automatically.</li>
-    <li>Not inducted? See the GC Rise site office before going past the gate.</li>
-    <li>Your details stay on this phone for next time, and only the GC Rise site team can see the sign-in list.</li>
+    <li>Not inducted? See the Elise site office before going past the gate.</li>
+    <li>Your details stay on this phone for next time, and only the Elise site team can see the sign-in list.</li>
   </ul>
 </div>
 <p class="muted">No signal? It still works. Your sign-in is saved on this phone and sends itself as soon as you're back on the network. Open this page once with signal and it will load offline after that.</p>
@@ -118,7 +118,7 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 <script>
 "use strict";
 var CFG=window.ELISE_CONFIG||{},URL_=(CFG.url||"").replace(/\/+$/,""),KEY=CFG.key||"";
-var TRADES=[["EC","GC Rise"],["GLF","G+L Form"],["ECC","East Coast Concrete"],["BUT","Butlers"],["EEC","Encon PT"],["AP","Advanced Precast"],["NEU","Neumann Steel"],["RZE","Rize Reinforcements"],["NS","Newnham Scaffolding"],["EVS","Evolution Shotcrete"],["MDP","Matt Dyce Plumbing"],["MC","Multicool Mechanical"],["LRC","LRC Electrical"],["ACF","Auscoast Fire"],["CC","Classic Corp"],["BAY","Bayleys"],["EMP","Empire"],["S4U","Skips 4 U"],["DAV","Davos Cranes"],["HAR","Harwell"],["OTH","Other / visitor"]];
+var TRADES=[["EC","Elise"],["GLF","G+L Form"],["ECC","East Coast Concrete"],["BUT","Butlers"],["EEC","Encon PT"],["AP","Advanced Precast"],["NEU","Neumann Steel"],["RZE","Rize Reinforcements"],["NS","Newnham Scaffolding"],["EVS","Evolution Shotcrete"],["MDP","Matt Dyce Plumbing"],["MC","Multicool Mechanical"],["LRC","LRC Electrical"],["ACF","Auscoast Fire"],["CC","Classic Corp"],["BAY","Bayleys"],["EMP","Empire"],["S4U","Skips 4 U"],["DAV","Davos Cranes"],["HAR","Harwell"],["OTH","Other / visitor"]];
 var K_ME="elise_ci_me",K_CUR="elise_ci_cur",K_Q="elise_ci_queue";
 function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"null");if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
 function $(id){return document.getElementById(id);}
@@ -181,7 +181,7 @@ function setKind(k){
   document.querySelectorAll("[data-k]").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-k")===k);});
   $("crewBox").hidden=k!=="crew";
   $("lName").textContent=k==="crew"?"Your name (foreman / leading hand)":"Your name";
-  $("indTxt").textContent=k==="crew"?"Everyone in my crew has done the GC RISE site induction":k==="visitor"?"I'll stay with my GC Rise host while on site":"I've done the GC RISE site induction";
+  $("indTxt").textContent=k==="crew"?"Everyone in my crew has done the ELISE site induction":k==="visitor"?"I'll stay with my Elise host while on site":"I've done the ELISE site induction";
   $("goIn").textContent=k==="crew"?"Sign crew in":"Sign in";
   if(typeof renderInd==="function")renderInd();
 }
@@ -189,7 +189,7 @@ document.querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("cl
 var K_NOTE="elise_ci_note";
 function autoTime(cur){var d=cur.day.split("-");return new Date(+d[0],+d[1]-1,+d[2],18,0,0).getTime();}
 function endLocal(cur,by,at){ls(K_CUR,null);ls(K_NOTE,{day:cur.day,by:by,at:at});}
-/* ask the server whether this phone's sign-in is still open (6pm auto, or GC Rise signed them out) */
+/* ask the server whether this phone's sign-in is still open (6pm auto, or Elise signed them out) */
 async function checkStatus(){
   var cur=ls(K_CUR);if(!cur||!navigator.onLine)return;
   if(queue().some(function(j){return j.t==="in"&&j.row.client_id===cur.id;}))return;
@@ -207,7 +207,7 @@ function render(){
   var note=ls(K_NOTE);
   if(note&&note.day!==today())note=null;
   $("vNote").hidden=!(note&&!cur);
-  if(note)$("vNote").textContent=note.by==="auto"?"You were signed out automatically at 6pm. Please sign out yourself when you leave site.":note.by==="team"?"The GC Rise site team signed you out at "+clock(note.at)+".":"";
+  if(note)$("vNote").textContent=note.by==="auto"?"You were signed out automatically at 6pm. Please sign out yourself when you leave site.":note.by==="team"?"The Elise site team signed you out at "+clock(note.at)+".":"";
   var q=queue(),pend=q.length;
   $("vOn").hidden=!cur;$("vForm").hidden=!!cur;
   if(cur){
@@ -250,7 +250,7 @@ function showStep(){
   var st=steps[stepI];
   $("vForm").hidden=true;$("vStep").hidden=false;$("stMsg").textContent="";$("stSign").value="";
   $("stN").textContent="Step "+(stepI+1)+" of "+steps.length;
-  $("stH").textContent=st.kind==="induction"?"GC RISE site induction":"Your company's SWMS";
+  $("stH").textContent=st.kind==="induction"?"ELISE site induction":"Your company's SWMS";
   $("stP").textContent=st.kind==="induction"?"Open and read each part of the site induction, then sign below. You only do this once.":"Open and read each SWMS you'll be working under today, tick it, then sign below.";
   $("stDocs").innerHTML=st.docs.map(function(d,i){
     return '<div class="doc" id="dc'+i+'"><a href="'+docUrl(d)+'" target="_blank" rel="noopener" data-di="'+i+'">'+esc(d.title)+'</a>'+
@@ -285,7 +285,7 @@ $("goIn").addEventListener("click",function(){
   if(kind==="crew"){n=parseInt($("fN").value,10);if(!(n>=1&&n<=99)){$("msg").textContent="How many in your crew today?";return;}
     names=$("fNames").value.split(/\n/).map(function(s){return s.trim();}).filter(Boolean).slice(0,99);}
   var online=hasInd()&&kind==="gate";
-  if(kind!=="visitor"&&!online&&!ind){$("msg").textContent="Not inducted yet? See the GC Rise site office before you go on site.";return;}
+  if(kind!=="visitor"&&!online&&!ind){$("msg").textContent="Not inducted yet? See the Elise site office before you go on site.";return;}
   var m=ls(K_ME)||{};m.name=name;m.co=co;m.phone=phone;m.kind=kind==="crew"?"crew":"gate";ls(K_ME,m);
   pending={name:name,co:co,phone:phone,n:n,names:names,ind:ind,kind:kind};
   steps=[];

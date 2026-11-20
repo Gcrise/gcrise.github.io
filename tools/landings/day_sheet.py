@@ -63,5 +63,5 @@ for r in rows:
     if r['trade'] in seen: continue
     seen.append(r['trade']); c=col(r['trade']); pg.draw_circle((lx+6,ly-3),5,color=c,fill=c); pg.insert_text((lx+15,ly),tname(r['trade']),fontsize=9); lx+=15+len(tname(r['trade']))*5.2+18
 pg.insert_text((18,ly+16),'Colours match the crane board trades  |  Shaded box = footprint to scale  |  Dashed line = moved across the deck  |  X = lifted off',fontsize=8.5,color=(0.3,0.3,0.3))
-pg.insert_text((18,830),'Project GC RISE  -  Level 3-10 typical GA (A2.507 rev 05) as base  -  N up, Gold Coast Hwy west, Twenty Fifth Ave south',fontsize=7.5,color=(0.45,0.45,0.45))
+pg.insert_text((18,830),'Project ELISE  -  Level 3-10 typical GA (A2.507 rev 05) as base  -  N up, Gold Coast Hwy west, Twenty Fifth Ave south',fontsize=7.5,color=(0.45,0.45,0.45))
 out.save(sys.argv[3]); print('wrote',sys.argv[3],len(rows),'rows')
