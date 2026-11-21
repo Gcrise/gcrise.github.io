@@ -1879,9 +1879,9 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .lp-it .w{font-size:14px;color:var(--ink)}
 .lp-it .s{font-size:12px;color:var(--ink-3)}
 .lp-none{padding:8px 14px;font-size:13px;color:var(--ink-3)}
-.lp-fig{margin:10px 14px 14px;min-width:0}
+.lp-fig{margin:12px 14px 16px;min-width:0;border:2px solid var(--line-hard);border-radius:6px;padding:10px;background:var(--surface-2)}
 .lp-fig img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:4px;background:#fff}
-.lp-fig figcaption{font-size:12px;color:var(--ink-3);margin-top:6px}
+.lp-fig figcaption{font-size:12px;color:var(--ink-3);margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
 .ts-warn{margin:12px 14px 4px;padding:9px 12px;border-left:3px solid var(--warn);background:var(--surface-2);font-size:13px;color:var(--ink)}
 .ts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;padding:10px 14px}
 .ts-card{border:1px solid var(--line);border-radius:4px;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
@@ -2583,7 +2583,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 08:25</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 14:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5989,9 +5989,12 @@ function renderPrestart(){
   var ptype=d.type==="hr"?"hr":"daily";
   Array.prototype.forEach.call(document.querySelectorAll("#preType [data-ptype]"),function(b){
     b.setAttribute("aria-pressed",String(b.getAttribute("data-ptype")===ptype));
-    b.disabled=signed;
-    b.onclick=function(){ if(!signed&&ptype!==b.getAttribute("data-ptype")) savePre({type:b.getAttribute("data-ptype")}); };
+    /* stays open after the prestart is completed: a high risk job can come up
+       later in the day and still needs its briefing and signatures */
+    b.disabled=false;
+    b.onclick=function(){ if(ptype!==b.getAttribute("data-ptype")) savePre({type:b.getAttribute("data-ptype")}); };
   });
+  var rk=el("preRisk"); if(rk&&ptype==="hr") rk.disabled=false;
   var hd=document.querySelector("#v-prestart .phead h2"); if(hd) hd.textContent=ptype==="hr"?"High risk prestart":"Daily prestart";
   var sb=el("preSignBox"); if(sb){ sb.hidden=ptype!=="hr"; if(ptype==="hr") loadSigns(state.date); }
   if(btn){ btn.hidden=signed; btn.textContent="Complete prestart"; btn.onclick=completePre; }
