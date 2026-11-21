@@ -1944,6 +1944,27 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .lpv-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y pinch-zoom;padding:0 8px calc(env(safe-area-inset-bottom,0px) + 8px)}
 .lpv-scroll img{display:block;width:100%;height:auto;margin:0 auto;background:#fff}
 .lpv.zoom .lpv-scroll img{width:260%;max-width:none}
+/* Tikee lift record (day-by-day evaluation) */
+.lp-rec{border-top:2px solid var(--line-hard);margin-top:6px}
+.lp-rec-sum{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:8px 14px 2px;font-size:13px;color:var(--ink-2)}
+.lp-rec-sum b{color:var(--ink);font-size:15px}
+.lp-rec-sum .lp-tag{grid-row:auto}
+.lp-map{position:relative;margin:10px 14px;border:2px solid var(--line-hard);border-radius:6px;overflow:hidden;background:#fff;max-width:900px}
+.lp-map img{display:block;width:100%;height:auto}
+.lp-box{position:absolute;transform:translate(-50%,-50%);border:2px solid var(--c);background:color-mix(in srgb,var(--c) 38%,transparent);border-radius:2px;min-width:8px;min-height:8px}
+.lp-box.rm{background:transparent;border-style:dashed}
+.lp-box i{position:absolute;left:-9px;top:-9px;min-width:17px;height:17px;border-radius:9px;background:#111;color:#fff;font:700 10px/17px system-ui,sans-serif;font-style:normal;text-align:center;padding:0 3px}
+.lp-box.rm::after{content:"\2715";position:absolute;inset:0;display:grid;place-items:center;color:var(--c);font:700 12px system-ui,sans-serif}
+.lp-recrow{display:grid;grid-template-columns:28px auto minmax(0,1fr);gap:2px 10px;padding:8px 14px;border-bottom:1px solid var(--line);align-items:start}
+.lp-recrow .nn{font-weight:700;font-size:14px;color:var(--ink)}
+.lp-recrow .w{font-size:14px;color:var(--ink)}
+.lp-recrow .s{grid-column:3;font-size:12px;color:var(--ink-3)}
+.lp-recrow .bk{grid-column:3;font-size:12px;color:var(--ink-2)}
+.lp-recrow .bk.no{color:var(--crit);font-weight:600}
+.lp-recrow .lp-tag{grid-row:span 1}
+.lp-reclist{margin:4px 14px 10px;padding-left:18px;font-size:13px;line-height:1.45;color:var(--ink-2)}
+.lp-reclist li{margin:2px 0}
+.lp-rech{padding:10px 14px 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 </style>
 </head>
 <body>
@@ -2501,6 +2522,10 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
         <figcaption>Harry's day-by-day markup on the typical level GA. Tap the drawing to open it full size.</figcaption>
       </figure>
     </div>
+    <div class="lp-rec" id="lpRec">
+      <div class="subhead"><span>What actually landed - Tikee lift record</span><span id="lpRecN"></span></div>
+      <div id="lpRecBody"></div>
+    </div>
     <p class="note">The plan is the typical cycle from the day-by-days. Dates count working days (Mon&ndash;Sat) from the Day 0 pour. "Booked" is what's on the crane board for that date; the 6pm lift record in iCloud shows what actually landed.</p>
   </div>
 </section>
@@ -2592,7 +2617,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 14:35</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 18:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9613,6 +9638,7 @@ function renderLPlan(){
   }).join(""):'<div class="lp-none">'+(dt<today?"Nothing on the board for this date.":"Nothing booked yet for this date.")+"</div>";
   var im=day.img[Math.min(lp.img,day.img.length-1)],src="dbd/"+(im)+".jpg";
   el("lpImg").src=src;el("lpImgA").href=src;
+  renderLPRec(dt);
 }
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-lpc]");
@@ -9620,6 +9646,51 @@ document.addEventListener("click",function(e){
   var d=e.target.closest("[data-lpd]");
   if(d){lp.day=+d.getAttribute("data-lpd");lp.img=0;renderLPlan();return;}
 });
+/* ---- Tikee lift record for the chosen day (written each evening by the 6pm run) ---- */
+var lpRec={};
+function lpPhotoToGA(px,py){
+  var x=515+(px-140)/560*735, y=py<=100?395+(py-5)/95*245:640+(py-100)/295*325;
+  return [Math.max(515,Math.min(1250,x)),Math.max(395,Math.min(965,y))];
+}
+function lpBay(x,y){
+  function span(v,arr){for(var i=1;i<arr.length;i++){if(v<=arr[i][0]){var a=arr[i-1][1],b=arr[i][1];return a===b?a:a+"-"+b;}}return arr[arr.length-1][1];}
+  return span(y,[[395,"A"],[518,"A"],[648,"B"],[778,"C"],[928,"D"],[965,"D"]])+" / "+span(x,[[515,"1"],[588,"1"],[748,"2"],[878,"3"],[1010,"4"],[1216,"5"],[1250,"5"]]);
+}
+function lpRecFetch(dt){
+  if(lpRec[dt]&&lpRec[dt].loading)return;
+  lpRec[dt]={loading:1};
+  eliseAuth.rest("lift_record?date=eq."+dt+"&select=*").then(function(r){return r.ok?r.json():null;}).then(function(j){
+    lpRec[dt]={rec:j&&j[0]||null,at:Date.now()};if(state.view==="lplan")renderLPRec(dt);
+  }).catch(function(){lpRec[dt]={rec:null,err:1};if(state.view==="lplan")renderLPRec(dt);});
+}
+function renderLPRec(dt){
+  var box=el("lpRecBody");if(!box)return;
+  var c=lpRec[dt];
+  if(!c||(!c.rec&&!c.err&&Date.now()-(c.at||0)>120000)){lpRecFetch(dt);}
+  if(!c||c.loading){el("lpRecN").textContent="";box.innerHTML='<div class="lp-none">Loading&hellip;</div>';return;}
+  var R=c.rec,today=iso(new Date());
+  if(!R){el("lpRecN").textContent="";box.innerHTML='<div class="lp-none">'+(c.err?"Couldn't load the lift record.":dt>today?"Not recorded yet - each working day is recorded off the Tikee camera at 6pm.":dt===today?"Today's record comes through after 6pm.":"No lift record for this day.")+"</div>";return;}
+  var rows=R.rows||[],T=trades(),by={};
+  rows.forEach(function(r){if(!r.removed)by[r.trade]=(by[r.trade]||0)+1;});
+  var landed=rows.filter(function(r){return !r.removed;}).length,off=rows.length-landed;
+  el("lpRecN").textContent=landed+" landed"+(off?", "+off+" off":"");
+  var GX0=330,GY0=280,GW=970,GH=780,M=28.3465/1.2;
+  function pos(r){return r.photo?lpPhotoToGA(r.photo[0],r.photo[1]):(r.ga||[0,0]);}
+  var map='<div class="lp-map"><img src="dbd/ga.jpg" alt="Typical level GA with the day\'s landings marked">'+rows.map(function(r){
+    var p=pos(r),col=(T[r.trade]||DEF_TRADES[r.trade]||["","#6E6A62"])[1]||"#6E6A62";
+    var w=Math.max(.6,+r.w||1)*M/GW*100,h=Math.max(.6,+r.h||1)*M/GH*100;
+    return '<div class="lp-box'+(r.removed?" rm":"")+'" style="--c:'+col+';left:'+((p[0]-GX0)/GW*100).toFixed(2)+'%;top:'+((p[1]-GY0)/GH*100).toFixed(2)+'%;width:'+w.toFixed(2)+'%;height:'+h.toFixed(2)+'%" title="'+esc(r.n+" "+r.what)+'"><i>'+esc(r.n)+"</i></div>";
+  }).join("")+"</div>";
+  var sum='<div class="lp-rec-sum"><b>'+esc(R.level||"")+'</b><span>'+esc(R.day_label||"")+"</span></div>"+
+    '<div class="lp-rec-sum">'+Object.keys(by).sort(function(a,b){return by[b]-by[a];}).map(function(k){return lpTag(k)+" "+by[k];}).join(" ")+(off?' <span>&middot; '+off+" lifted off</span>":"")+"</div>";
+  var list=rows.map(function(r){
+    var p=pos(r),bk=String(r.booked||""),no=/^(no|not)\b/i.test(bk);
+    return '<div class="lp-recrow"><span class="nn">'+esc(r.n)+"</span>"+lpTag(r.trade||"OTH")+'<span class="w">'+(r.removed?"<b>Off:</b> ":"")+esc(r.what)+(r.size?" &middot; "+esc(r.size):"")+'</span><span class="s">'+esc(r.time||"")+" &middot; grid "+esc(lpBay(p[0],p[1]))+'</span><span class="bk'+(no?" no":"")+'">'+(bk?"Booked: "+esc(bk):"")+"</span></div>";
+  }).join("");
+  var ns=(R.not_seen||[]).length?'<div class="lp-rech">Booked but not seen on the deck</div><ul class="lp-reclist">'+R.not_seen.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>":"";
+  var nt=(R.notes||[]).length?'<div class="lp-rech">Notes vs the day-by-day</div><ul class="lp-reclist">'+R.notes.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>":"";
+  box.innerHTML=sum+map+(list||'<div class="lp-none">No lifts seen on the deck.</div>')+ns+nt;
+}
 /* plan viewer: tap the drawing to open it full screen in the page, with a
    Close button - opening the image itself left the home-screen app stuck */
 function lpView(src){
