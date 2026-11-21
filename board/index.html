@@ -1935,6 +1935,15 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 #v-tester .subhead span+span{font-size:12px}
 #v-tester .ts-card h3{font-size:17px;text-transform:uppercase;letter-spacing:.06em;line-height:1.3}
 #v-tester .ts-card h3 span{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+/* full-size plan viewer with a close button (home-screen app has no browser back) */
+.lpv{position:fixed;inset:0;z-index:9000;background:#12140E;display:flex;flex-direction:column}
+.lpv-bar{display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 10px) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px))}
+.lpv-bar span{margin-right:auto;color:#E8E2D8;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.lpv-bar button{font:inherit;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:10px 16px;border-radius:6px;border:1px solid #E8E2D8;background:transparent;color:#E8E2D8;cursor:pointer;min-height:44px}
+.lpv-bar .lpv-x{background:#E8E2D8;color:#1d1f16}
+.lpv-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y pinch-zoom;padding:0 8px calc(env(safe-area-inset-bottom,0px) + 8px)}
+.lpv-scroll img{display:block;width:100%;height:auto;margin:0 auto;background:#fff}
+.lpv.zoom .lpv-scroll img{width:260%;max-width:none}
 </style>
 </head>
 <body>
@@ -2489,7 +2498,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       </div>
       <figure class="lp-fig">
         <a id="lpImgA" target="_blank" rel="noopener"><img id="lpImg" alt="Day-by-day markup on the typical level GA" loading="lazy"></a>
-        <figcaption>Harry's day-by-day markup on the typical level GA. Tap to open full size.</figcaption>
+        <figcaption>Harry's day-by-day markup on the typical level GA. Tap the drawing to open it full size.</figcaption>
       </figure>
     </div>
     <p class="note">The plan is the typical cycle from the day-by-days. Dates count working days (Mon&ndash;Sat) from the Day 0 pour. "Booked" is what's on the crane board for that date; the 6pm lift record in iCloud shows what actually landed.</p>
@@ -2583,7 +2592,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 14:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 14:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9611,6 +9620,19 @@ document.addEventListener("click",function(e){
   var d=e.target.closest("[data-lpd]");
   if(d){lp.day=+d.getAttribute("data-lpd");lp.img=0;renderLPlan();return;}
 });
+/* plan viewer: tap the drawing to open it full screen in the page, with a
+   Close button - opening the image itself left the home-screen app stuck */
+function lpView(src){
+  var o=document.createElement("div");o.className="lpv";o.setAttribute("role","dialog");o.setAttribute("aria-label","Day-by-day plan, full size");
+  o.innerHTML='<div class="lpv-bar"><span>Day-by-day plan</span><button type="button" class="lpv-z">Zoom in</button><button type="button" class="lpv-x">Close &#x2715;</button></div><div class="lpv-scroll"><img alt="Day-by-day markup on the typical level GA" src="'+src+'"></div>';
+  function close(){document.removeEventListener("keydown",key);o.remove();}
+  function key(e){if(e.key==="Escape")close();}
+  o.querySelector(".lpv-x").onclick=close;
+  o.querySelector(".lpv-z").onclick=function(){var z=o.classList.toggle("zoom");this.textContent=z?"Fit to screen":"Zoom in";};
+  document.addEventListener("keydown",key);
+  document.body.appendChild(o);o.querySelector(".lpv-x").focus();
+}
+el("lpImgA").addEventListener("click",function(e){e.preventDefault();lpView(this.getAttribute("href"));});
 el("lpStart").addEventListener("change",function(){var v=this.value;lp.start=v&&v!==lpAutoStart()?v:null;lp.day=null;lpSave();renderLPlan();});
 
 /* ---------- site sign-in (Tester tab): live from the site_signin table ---------- */
