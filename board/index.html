@@ -1965,6 +1965,9 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .lp-reclist{margin:4px 14px 10px;padding-left:18px;font-size:13px;line-height:1.45;color:var(--ink-2)}
 .lp-reclist li{margin:2px 0}
 .lp-rech{padding:10px 14px 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.lp-recl{padding:6px 14px 2px}
+#v-lrec{--acc:var(--clock);--acc-ink:var(--clock)}
+#v-lrec .lp-rec{border-top:0}
 </style>
 </head>
 <body>
@@ -2522,11 +2525,21 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
         <figcaption>Harry's day-by-day markup on the typical level GA. Tap the drawing to open it full size.</figcaption>
       </figure>
     </div>
+    <div class="lp-recl"><button type="button" class="ts-btn ts-ghost" id="lpGoRec">See what actually landed this day &rarr; Lift records</button></div>
+    <p class="note">The plan is the typical cycle from the day-by-days. Dates count working days (Mon&ndash;Sat) from the Day 0 pour. "Booked" is what's on the crane board for that date; the 6pm lift record in iCloud shows what actually landed.</p>
+  </div>
+</section>
+
+<section id="v-lrec" class="view" hidden>
+  <div class="panel">
+    <div class="phead" data-acc="lrec"><h2>Lift records</h2><span class="meta" id="lrMeta">Read off the Tikee deck camera each evening</span></div>
+    <div class="lp-days" id="lrDays" role="tablist" aria-label="Recorded day"></div>
+    <div id="lrCycle"></div>
     <div class="lp-rec" id="lpRec">
-      <div class="subhead"><span>What actually landed - Tikee lift record</span><span id="lpRecN"></span></div>
+      <div class="subhead"><span>What actually landed</span><span id="lpRecN"></span></div>
       <div id="lpRecBody"></div>
     </div>
-    <p class="note">The plan is the typical cycle from the day-by-days. Dates count working days (Mon&ndash;Sat) from the Day 0 pour. "Booked" is what's on the crane board for that date; the 6pm lift record in iCloud shows what actually landed.</p>
+    <p class="note">Each working day is recorded off the Tikee camera at 6pm and compared with the crane board. Sizes are estimated off the photos; positions are approximate. The A3 day sheets and cycle summary are in iCloud &gt; Claude &gt; ELISE &gt; Lift Records.</p>
   </div>
 </section>
 
@@ -2617,7 +2630,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 18:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 23:25</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -4953,7 +4966,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["lplan","Lifting plan"],["orders","Site orders"],["weather","Weather"],["camera","Live view"],["log","Completed works"],["tester","Tester"]];
+var VIEWS=[["today","Today"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["lplan","Lifting plan"],["lrec","Lift records"],["orders","Site orders"],["weather","Weather"],["camera","Live view"],["log","Completed works"],["tester","Tester"]];
 /* Eufy tab retired 17 Nov at Harry's call - the section, its code and the camera
    settings are all kept; put ["eufy","Eufy"] back after "camera" above to re-add it. */
 var CUT=1260;      /* one cut a day, 9pm */
@@ -5018,8 +5031,9 @@ function go(v){
   state.view=v;
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
-  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders"||v==="lplan"||v==="tester");
+  el("daystrip").hidden=(v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders"||v==="lplan"||v==="lrec"||v==="tester");
   if(v==="lplan")renderLPlan();
+  if(v==="lrec")renderLRec();
   if(v==="tester")renderTester();
   if(v==="camera")camOpen();
   if(v==="eufy")renderEufy();
@@ -5028,7 +5042,7 @@ function go(v){
   window.scrollTo(0,0);
 }
 /* tabs that sit together under one drop-down in the tab row */
-var TAB_GROUPS={daily:{label:"Daily",items:["prestart","safety"]},logistics:{label:"Logistics",items:["crane","lplan","orders"]}};
+var TAB_GROUPS={daily:{label:"Daily",items:["prestart","safety"]},logistics:{label:"Logistics",items:["crane","lplan","lrec","orders"]}};
 function tabGroupOf(v){for(var g in TAB_GROUPS)if(TAB_GROUPS[g].items.indexOf(v)>=0)return g;return null;}
 function renderTabs(){
   var done={};
@@ -9638,7 +9652,7 @@ function renderLPlan(){
   }).join(""):'<div class="lp-none">'+(dt<today?"Nothing on the board for this date.":"Nothing booked yet for this date.")+"</div>";
   var im=day.img[Math.min(lp.img,day.img.length-1)],src="dbd/"+(im)+".jpg";
   el("lpImg").src=src;el("lpImgA").href=src;
-  renderLPRec(dt);
+  lp.dt=dt;
 }
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-lpc]");
@@ -9660,8 +9674,8 @@ function lpRecFetch(dt){
   if(lpRec[dt]&&lpRec[dt].loading)return;
   lpRec[dt]={loading:1};
   eliseAuth.rest("lift_record?date=eq."+dt+"&select=*").then(function(r){return r.ok?r.json():null;}).then(function(j){
-    lpRec[dt]={rec:j&&j[0]||null,at:Date.now()};if(state.view==="lplan")renderLPRec(dt);
-  }).catch(function(){lpRec[dt]={rec:null,err:1};if(state.view==="lplan")renderLPRec(dt);});
+    lpRec[dt]={rec:j&&j[0]||null,at:Date.now()};if(state.view==="lrec")renderLRec();
+  }).catch(function(){lpRec[dt]={rec:null,err:1};if(state.view==="lrec")renderLRec();});
 }
 function renderLPRec(dt){
   var box=el("lpRecBody");if(!box)return;
@@ -9691,6 +9705,37 @@ function renderLPRec(dt){
   var nt=(R.notes||[]).length?'<div class="lp-rech">Notes vs the day-by-day</div><ul class="lp-reclist">'+R.notes.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>":"";
   box.innerHTML=sum+map+(list||'<div class="lp-none">No lifts seen on the deck.</div>')+ns+nt;
 }
+/* ---- Lift records tab: every recorded day, newest first ---- */
+var lr={list:null,sel:null,loading:0};
+function lrLoad(){
+  if(lr.loading)return;lr.loading=1;
+  eliseAuth.rest("lift_record?select=date,cycle_start,level,day_label,rows&order=date.desc&limit=60").then(function(r){return r.ok?r.json():[];}).then(function(j){
+    lr.list=j||[];lr.loading=0;(j||[]).forEach(function(R){lpRec[R.date]=lpRec[R.date]&&lpRec[R.date].rec&&lpRec[R.date].rec.not_seen?lpRec[R.date]:null;});
+    if(state.view==="lrec")renderLRec();
+  }).catch(function(){lr.list=[];lr.loading=0;if(state.view==="lrec")renderLRec();});
+}
+function renderLRec(){
+  if(lr.list==null){el("lrDays").innerHTML='<div class="lp-none">Loading&hellip;</div>';lrLoad();return;}
+  var L=lr.list;
+  if(!L.length){el("lrDays").innerHTML="";el("lrCycle").innerHTML="";el("lpRecN").textContent="";el("lpRecBody").innerHTML='<div class="lp-none">No days recorded yet. Each working day is recorded at 6pm.</div>';return;}
+  if(!lr.sel||!L.some(function(x){return x.date===lr.sel;}))lr.sel=L[0].date;
+  var today=iso(new Date());
+  el("lrDays").innerHTML=L.map(function(R){
+    var d=parseISO(R.date),n=(R.rows||[]).filter(function(r){return !r.removed;}).length,m=/Day\s*(\d+)/i.exec(R.day_label||"");
+    return '<button type="button" role="tab" class="lp-day'+(R.date===today?" today":"")+'" data-lrd="'+R.date+'" aria-selected="'+(R.date===lr.sel)+'"><b>'+(m?"Day "+m[1]:esc(R.level||""))+'</b><span>'+dayName(d).slice(0,3)+" "+d.getDate()+" "+monName(d)+" &middot; "+n+"</span></button>";
+  }).join("");
+  /* cycle so far: landings by trade over the selected day's cycle */
+  var sel=L.filter(function(x){return x.date===lr.sel;})[0],cyc=L.filter(function(x){return x.cycle_start&&x.cycle_start===sel.cycle_start;}),by={},tot=0;
+  cyc.forEach(function(R){(R.rows||[]).forEach(function(r){if(!r.removed){by[r.trade]=(by[r.trade]||0)+1;tot++;}});});
+  el("lrCycle").innerHTML=sel.cycle_start?'<div class="lp-rec-sum"><span>Cycle from '+esc(shortDate(sel.cycle_start))+": <b>"+tot+"</b> landings over "+cyc.length+" day"+(cyc.length===1?"":"s")+"</span></div>"+
+    '<div class="lp-rec-sum">'+Object.keys(by).sort(function(a,b){return by[b]-by[a];}).map(function(k){return lpTag(k)+" "+by[k];}).join(" ")+"</div>":"";
+  el("lrMeta").textContent=L.length+" day"+(L.length===1?"":"s")+" recorded";
+  renderLPRec(lr.sel);
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-lrd]");if(b){lr.sel=b.getAttribute("data-lrd");renderLRec();return;}
+  if(e.target.id==="lpGoRec"){lr.sel=lp.dt;location.hash="lrec";}
+});
 /* plan viewer: tap the drawing to open it full screen in the page, with a
    Close button - opening the image itself left the home-screen app stuck */
 function lpView(src){
