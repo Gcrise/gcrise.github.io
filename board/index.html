@@ -1968,6 +1968,23 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .lp-recl{padding:6px 14px 2px}
 #v-lrec{--acc:var(--clock);--acc-ink:var(--clock)}
 #v-lrec .lp-rec{border-top:0}
+/* Lift records - simplified */
+.lr-day{font:inherit;font-size:14px;font-weight:600;padding:7px 14px;border:1px solid var(--line-hard);border-radius:16px;background:transparent;color:var(--ink-2);cursor:pointer;flex:0 0 auto}
+.lr-day[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+#lrDays{gap:8px;padding:12px 14px 4px}
+.lr-head{padding:8px 14px 4px}
+.lr-head h3{margin:0;font-size:19px;line-height:1.25}
+.lr-head h3 span{font-size:13px;font-weight:600;color:var(--ink-3);margin-left:6px}
+.lr-head p{margin:3px 0 0;font-size:13px;color:var(--ink-3)}
+.lr-counts{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;font-size:14px;color:var(--ink-2)}
+.lr-counts b{color:var(--ink)}
+.lr-tr{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center;margin-left:auto}
+.lr-tr .lp-tag{min-width:34px;font-size:10px;padding:2px 4px}
+.lr-tr i{font-style:normal;font-size:13px;color:var(--ink-2);margin:0 4px 0 2px}
+.lr-more{margin:0 14px;border-top:1px solid var(--line)}
+.lr-more summary{cursor:pointer;padding:10px 0;font-size:13px;font-weight:600;color:var(--ink-2)}
+.lr-cycle{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:8px 14px 0;padding:10px 0;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.lr-cycle b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -2532,13 +2549,13 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 
 <section id="v-lrec" class="view" hidden>
   <div class="panel">
-    <div class="phead" data-acc="lrec"><h2>Lift records</h2><span class="meta" id="lrMeta">Read off the Tikee deck camera each evening</span></div>
+    <div class="phead" data-acc="lrec"><h2>Lift records</h2><span class="meta" id="lrMeta"></span></div>
     <div class="lp-days" id="lrDays" role="tablist" aria-label="Recorded day"></div>
-    <div id="lrCycle"></div>
     <div class="lp-rec" id="lpRec">
-      <div class="subhead"><span>What actually landed</span><span id="lpRecN"></span></div>
+      <span id="lpRecN" hidden></span>
       <div id="lpRecBody"></div>
     </div>
+    <div id="lrCycle"></div>
     <p class="note">Each working day is recorded off the Tikee camera at 6pm and compared with the crane board. Sizes are estimated off the photos; positions are approximate. The A3 day sheets and cycle summary are in iCloud &gt; Claude &gt; ELISE &gt; Lift Records.</p>
   </div>
 </section>
@@ -2630,7 +2647,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 14:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 15:05</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9695,14 +9712,16 @@ function renderLPRec(dt){
     var w=Math.max(.6,+r.w||1)*M/GW*100,h=Math.max(.6,+r.h||1)*M/GH*100;
     return '<div class="lp-box'+(r.removed?" rm":"")+'" style="--c:'+col+';left:'+((p[0]-GX0)/GW*100).toFixed(2)+'%;top:'+((p[1]-GY0)/GH*100).toFixed(2)+'%;width:'+w.toFixed(2)+'%;height:'+h.toFixed(2)+'%" title="'+esc(r.n+" "+r.what)+'"><i>'+esc(r.n)+"</i></div>";
   }).join("")+"</div>";
-  var sum='<div class="lp-rec-sum"><b>'+esc(R.level||"")+'</b><span>'+esc(R.day_label||"")+"</span></div>"+
-    '<div class="lp-rec-sum">'+Object.keys(by).sort(function(a,b){return by[b]-by[a];}).map(function(k){return lpTag(k)+" "+by[k];}).join(" ")+(off?' <span>&middot; '+off+" lifted off</span>":"")+"</div>";
+  /* one compact header: day, level, counts */
+  var dd=parseISO(R.date||dt),dm=/Day\s*(\d+)/i.exec(R.day_label||""),lbl=String(R.day_label||"").replace(/^Day\s*\d+\s*-\s*/i,"").replace(/\s*\([^)]*\)\s*/g,"").trim();
+  var sum='<div class="lr-head"><h3>'+(dm?"Day "+dm[1]+" &middot; ":"")+dayName(dd).slice(0,3)+" "+dd.getDate()+" "+monName(dd)+(R.level?' <span>'+esc(R.level)+"</span>":"")+"</h3>"+(lbl?"<p>"+esc(lbl)+"</p>":"")+
+    '<div class="lr-counts"><b>'+landed+"</b> landed"+(off?" &middot; <b>"+off+"</b> off":"")+'<span class="lr-tr">'+Object.keys(by).sort(function(a,b){return by[b]-by[a];}).map(function(k){return lpTag(k)+"<i>"+by[k]+"</i>";}).join("")+"</span></div></div>";
   var list=rows.map(function(r){
     var p=pos(r),bk=String(r.booked||""),no=/^(no|not)\b/i.test(bk);
     return '<div class="lp-recrow"><span class="nn">'+esc(r.n)+"</span>"+lpTag(r.trade||"OTH")+'<span class="w">'+(r.removed?"<b>Off:</b> ":"")+esc(r.what)+(r.size?" &middot; "+esc(r.size):"")+'</span><span class="s">'+esc(r.time||"")+" &middot; grid "+esc(lpBay(p[0],p[1]))+'</span><span class="bk'+(no?" no":"")+'">'+(bk?"Booked: "+esc(bk):"")+"</span></div>";
   }).join("");
-  var ns=(R.not_seen||[]).length?'<div class="lp-rech">Booked but not seen on the deck</div><ul class="lp-reclist">'+R.not_seen.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>":"";
-  var nt=(R.notes||[]).length?'<div class="lp-rech">Notes vs the day-by-day</div><ul class="lp-reclist">'+R.notes.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>":"";
+  var ns=(R.not_seen||[]).length?'<details class="lr-more"><summary>Booked but not seen ('+R.not_seen.length+')</summary><ul class="lp-reclist">'+R.not_seen.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul></details>":"";
+  var nt=(R.notes||[]).length?'<details class="lr-more"><summary>Notes ('+R.notes.length+')</summary><ul class="lp-reclist">'+R.notes.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul></details>":"";
   box.innerHTML=sum+map+(list||'<div class="lp-none">No lifts seen on the deck.</div>')+ns+nt;
 }
 /* ---- Lift records tab: every recorded day, in cycle order (Day 0 first), opens on the latest ---- */
@@ -9722,14 +9741,13 @@ function renderLRec(){
   var today=iso(new Date());
   el("lrDays").innerHTML=L.map(function(R){
     var d=parseISO(R.date),n=(R.rows||[]).filter(function(r){return !r.removed;}).length,m=/Day\s*(\d+)/i.exec(R.day_label||"");
-    return '<button type="button" role="tab" class="lp-day'+(R.date===today?" today":"")+'" data-lrd="'+R.date+'" aria-selected="'+(R.date===lr.sel)+'"><b>'+(m?"Day "+m[1]:esc(R.level||""))+'</b><span>'+dayName(d).slice(0,3)+" "+d.getDate()+" "+monName(d)+" &middot; "+n+"</span></button>";
+    return '<button type="button" role="tab" class="lr-day" data-lrd="'+R.date+'" aria-selected="'+(R.date===lr.sel)+'" title="'+dayName(d)+" "+d.getDate()+" "+monName(d)+'">'+(m?"Day "+m[1]:d.getDate()+" "+monName(d))+"</button>";
   }).join("");
   /* cycle so far: landings by trade over the selected day's cycle */
   var sel=L.filter(function(x){return x.date===lr.sel;})[0],cyc=L.filter(function(x){return x.cycle_start&&x.cycle_start===sel.cycle_start;}),by={},tot=0;
   cyc.forEach(function(R){(R.rows||[]).forEach(function(r){if(!r.removed){by[r.trade]=(by[r.trade]||0)+1;tot++;}});});
-  el("lrCycle").innerHTML=sel.cycle_start?'<div class="lp-rec-sum"><span>Cycle from '+esc(shortDate(sel.cycle_start))+": <b>"+tot+"</b> landings over "+cyc.length+" day"+(cyc.length===1?"":"s")+"</span></div>"+
-    '<div class="lp-rec-sum">'+Object.keys(by).sort(function(a,b){return by[b]-by[a];}).map(function(k){return lpTag(k)+" "+by[k];}).join(" ")+"</div>":"";
-  el("lrMeta").textContent=L.length+" day"+(L.length===1?"":"s")+" recorded";
+  el("lrCycle").innerHTML=sel.cycle_start?'<div class="lr-cycle">Cycle from '+esc(shortDate(sel.cycle_start))+": <b>"+tot+"</b> landings over "+cyc.length+" day"+(cyc.length===1?"":"s")+'<span class="lr-tr">'+Object.keys(by).sort(function(a,b){return by[b]-by[a];}).map(function(k){return lpTag(k)+"<i>"+by[k]+"</i>";}).join("")+"</span></div>":"";
+  el("lrMeta").textContent="";
   renderLPRec(lr.sel);
 }
 document.addEventListener("click",function(e){
