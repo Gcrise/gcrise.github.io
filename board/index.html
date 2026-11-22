@@ -1921,6 +1921,64 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .ts-doc a{color:var(--ink);font-weight:600;overflow-wrap:anywhere;min-width:0}
 .ts-doc small{color:var(--ink-3)}
 .ts-swco{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;margin-top:10px}
+/* Tester home - tile panel like 1Breadcrumb's host panel, only what we use */
+.ts-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:14px}
+.ts-tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:138px;padding:16px 10px;border:1px solid var(--line-hard);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;text-align:center}
+.ts-tile:hover{border-color:var(--ink)}
+.ts-tile:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ts-tile svg{width:44px;height:44px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ts-tile b{font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+.ts-tile span{font-size:12px;color:var(--ink-3);min-height:15px}
+.ts-badge{position:absolute;top:8px;right:8px;min-width:24px;height:24px;border-radius:12px;background:var(--alarm);color:#fff;font:700 13px/24px var(--f-ui);font-style:normal;padding:0 7px}
+.ts-bar{padding:10px 14px 0}
+.ts-backbtn{font:inherit;font-size:14px;font-weight:600;padding:8px 12px;border:1px solid var(--line-hard);border-radius:4px;background:transparent;color:var(--ink);cursor:pointer;min-height:40px}
+.ts-filt{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:12px 14px 4px}
+.ts-filt input{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line-hard);border-radius:4px;background:var(--surface);color:var(--ink);flex:1 1 200px;min-width:0}
+.ts-seg{display:flex;border:1px solid var(--line-hard);border-radius:4px;overflow:hidden}
+.ts-seg button{font:inherit;font-size:13px;padding:7px 12px;border:0;background:transparent;color:var(--ink-2);cursor:pointer}
+.ts-seg button+button{border-left:1px solid var(--line-hard)}
+.ts-seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:600}
+.ts-li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;align-items:center;width:100%;padding:10px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.ts-li:hover{background:var(--surface-2)}
+.ts-li .lp-tag{grid-row:span 2}
+.ts-li b{font-size:15px;overflow-wrap:anywhere}
+.ts-li small{grid-column:2;font-size:12px;color:var(--ink-3);overflow-wrap:anywhere}
+.ts-li .st{grid-row:span 2;grid-column:3}
+.ts-st{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:10px;padding:3px 8px;white-space:nowrap}
+.ts-st.pending{background:var(--warn-bg);color:var(--warn)}
+.ts-st.approved{background:var(--ok-bg);color:var(--ok)}
+.ts-st.rejected,.ts-st.expired,.ts-st.none{background:var(--crit-bg);color:var(--crit)}
+.ts-st.closed,.ts-st.removed{background:var(--surface-2);color:var(--ink-2)}
+.ts-p{margin:0;font-size:14px;line-height:1.45;color:var(--ink-2)}
+.ts-x{position:fixed;inset:0;z-index:8000;background:rgba(15,17,10,.55);display:flex;justify-content:center;align-items:flex-start;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 16px) max(12px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(12px,env(safe-area-inset-left,0px))}
+.ts-xp{background:var(--paper);color:var(--ink);border-radius:8px;width:100%;max-width:720px;border:1px solid var(--line-hard)}
+.ts-xh{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--paper);border-bottom:1px solid var(--line-hard);border-radius:8px 8px 0 0;z-index:1}
+.ts-xh h3{margin:0;font-size:18px;flex:1;min-width:0;overflow-wrap:anywhere}
+.ts-xh button{font:inherit;font-size:14px;font-weight:700;padding:8px 14px;border:1px solid var(--ink);border-radius:4px;background:var(--ink);color:var(--surface);cursor:pointer;min-height:40px}
+.ts-xb{padding:6px 14px 16px}
+.ts-xs{margin-top:14px}
+.ts-xs h4{margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.ts-kv{display:grid;grid-template-columns:minmax(110px,38%) minmax(0,1fr);gap:4px 12px;font-size:14px}
+.ts-kv dt{color:var(--ink-3)}
+.ts-kv dd{margin:0;overflow-wrap:anywhere}
+.ts-kv .yes{color:var(--crit);font-weight:700}
+.ts-imgs{display:flex;flex-wrap:wrap;gap:10px}
+.ts-imgs figure{margin:0;width:150px;max-width:100%}
+.ts-imgs img{display:block;width:100%;height:110px;object-fit:cover;border:1px solid var(--line-hard);border-radius:4px;background:#fff;cursor:zoom-in}
+.ts-imgs figcaption{font-size:12px;color:var(--ink-2);margin-top:3px}
+.ts-imgs .pdf{display:grid;place-items:center;height:110px;border:1px solid var(--line-hard);border-radius:4px;font-weight:700;color:var(--ink);background:var(--surface);cursor:pointer;width:100%;font:inherit}
+.ts-sig{background:#fff;border:1px solid var(--line-hard);border-radius:4px;max-width:320px;width:100%;display:block}
+.ts-acklist{margin:0;padding-left:20px;font-size:13px;line-height:1.45;color:var(--ink-2)}
+.ts-review{margin-top:16px;padding-top:12px;border-top:2px solid var(--line-hard);display:flex;flex-direction:column;gap:8px}
+.ts-review textarea{font:inherit;font-size:15px;padding:8px;border:1px solid var(--line-hard);border-radius:4px;background:var(--surface);color:var(--ink)}
+.ts-review .row{display:flex;flex-wrap:wrap;gap:8px}
+.ts-review .row button{flex:1 1 140px;font:inherit;font-size:15px;font-weight:700;padding:12px;border-radius:4px;cursor:pointer;min-height:46px}
+.ts-ok{background:var(--ok);border:1px solid var(--ok);color:#fff}
+.ts-no{background:transparent;border:1px solid var(--crit);color:var(--crit)}
+.ts-mid{background:transparent;border:1px solid var(--line-hard);color:var(--ink)}
+.ts-exp{color:var(--crit);font-weight:600}
+.ts-x dd,.ts-x .ts-p,.ts-x .ts-acklist,.ts-x figcaption,.ts-x textarea,.ts-li b,.ts-li small,#v-tester .ts-p,#v-tester .note{text-transform:none;letter-spacing:normal}
+.ts-sig{max-height:200px;object-fit:contain}
 .ts-big{font-size:20px;font-weight:700;color:var(--ink);margin-right:4px}
 .ts-trades{padding:4px 14px 10px;overflow-x:auto}
 .ts-trades table{width:100%;border-collapse:collapse;font-size:14px}
@@ -2562,58 +2620,104 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 
 <section id="v-tester" class="view" hidden>
   <div class="panel">
-    <div class="phead" data-acc="tester"><h2>Site sign-in</h2><span class="meta" id="tsMeta">Tester - live trial</span></div>
-    <div class="ts-grid">
-      <div class="ts-card ts-qr">
-        <h3>QR code for the gate</h3>
-        <div id="tsQR" role="img" aria-label="QR code to the ELISE site sign-in page"></div>
-        <div class="ts-url" id="tsUrl"></div>
-        <div class="ts-links"><a id="tsPoster" target="_blank" rel="noopener">Open the A4 poster to print</a><a id="tsOpen" target="_blank" rel="noopener">Open the sign-in page</a></div>
-      </div>
-      <div class="ts-card">
-        <h3>Sign a crew in <span>at the prestart</span></h3>
-        <label>Company<select id="tsCrewCo"></select></label>
-        <label>Foreman / leading hand<input id="tsCrewName" autocomplete="off"></label>
-        <label>How many on today<input id="tsCrewN" type="number" min="1" max="99" inputmode="numeric" placeholder="e.g. 8"></label>
-        <label>Names <span class="opt">optional, one per line</span><textarea id="tsCrewNames" rows="3"></textarea></label>
-        <button type="button" class="addbtn" id="tsCrewGo">Sign crew in</button>
+    <div class="phead" data-acc="tester"><h2 id="tsTitle">Site sign-in</h2><span class="meta" id="tsMeta">Tester - live trial</span></div>
+    <div class="ts-bar" id="tsBar" hidden><button type="button" class="ts-backbtn" id="tsBack">&larr; Site sign-in</button></div>
+    <div class="ts-warn" id="tsLock" hidden>Sign in to the board (the padlock, top right) to see this. Inductions, permits and the sign-in list are only shown to the Elise team.</div>
+
+    <div class="ts-tiles" id="tsHomeV">
+      <button type="button" class="ts-tile" data-tsv="att"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="m15.5 11.5 2 2 4-4"/></svg><b>Attendance</b><span id="tbAtt"></span></button>
+      <button type="button" class="ts-tile" data-tsv="appr"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 9h6M9 13h3"/><circle cx="16.5" cy="16.5" r="3"/><path d="m15.2 16.5 1 1 1.8-1.8"/></svg><b>Approvals</b><span id="tbAppr"></span><i class="ts-badge" id="tbApprN" hidden></i></button>
+      <button type="button" class="ts-tile" data-tsv="ind"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="11" r="2.3"/><path d="M5.8 16.5c.6-1.8 1.8-2.6 3.2-2.6s2.6.8 3.2 2.6M14 10h4M14 13.5h3"/></svg><b>Inductions</b><span id="tbInd"></span></button>
+      <button type="button" class="ts-tile" data-tsv="permit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v2.5"/></svg><b>Permits</b><span id="tbPm"></span></button>
+      <button type="button" class="ts-tile" data-tsv="plant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h13v-5H9l-2-4H3z"/><path d="M16 14h3l2 3h-5"/><circle cx="7" cy="18.5" r="1.8"/><circle cx="17" cy="18.5" r="1.8"/><path d="M9 8l6-4 2 4"/></svg><b>Plant</b><span id="tbPl"></span></button>
+      <button type="button" class="ts-tile" data-tsv="gate"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3M14 20h2"/></svg><b>Gate QR code</b><span>Print the poster</span></button>
+      <button type="button" class="ts-tile" data-tsv="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6l2 2h10V19H3z"/><path d="M8 13h8M8 16h5"/></svg><b>SWMS &amp; docs</b><span id="tbDocs"></span></button>
+    </div>
+
+    <div data-tsp="att" hidden>
+      <div id="tsLive">
+        <div class="subhead"><span>Trades on site today</span><span id="tsTrN"></span></div>
+        <div class="ts-trades" id="tsTrades"></div>
+        <div class="subhead"><span>On site now</span><span id="tsTotal"></span></div>
+        <div id="tsOn"></div>
+        <div class="ts-actions">
+          <button type="button" class="ts-btn" id="tsMuster">Start muster</button>
+          <button type="button" class="ts-btn" id="tsOutAll">Sign everyone out</button>
+          <button type="button" class="ts-btn ts-ghost" id="tsRefresh">Refresh</button>
+        </div>
+        <div id="tsMusterBox" hidden></div>
+        <div class="subhead"><span>Signed out today</span><span id="tsNOut"></span></div>
+        <div id="tsOff"></div>
+        <div class="ts-grid">
+          <div class="ts-card">
+            <h3>Sign a crew in <span>at the prestart</span></h3>
+            <label>Company<select id="tsCrewCo"></select></label>
+            <label>Foreman / leading hand<input id="tsCrewName" autocomplete="off"></label>
+            <label>How many on today<input id="tsCrewN" type="number" min="1" max="99" inputmode="numeric" placeholder="e.g. 8"></label>
+            <label>Names <span class="opt">optional, one per line</span><textarea id="tsCrewNames" rows="3"></textarea></label>
+            <button type="button" class="addbtn" id="tsCrewGo">Sign crew in</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="ts-warn" id="tsLock" hidden>Sign in to the board (the padlock, top right) to see who's on site. The list is only shown to the Elise team.</div>
-    <div id="tsLive">
-      <div class="subhead"><span>Trades on site today</span><span id="tsTrN"></span></div>
-      <div class="ts-trades" id="tsTrades"></div>
-      <div class="subhead"><span>On site now</span><span id="tsTotal"></span></div>
-      <div id="tsOn"></div>
-      <div class="ts-actions">
-        <button type="button" class="ts-btn" id="tsMuster">Start muster</button>
-        <button type="button" class="ts-btn" id="tsOutAll">Sign everyone out</button>
-        <button type="button" class="ts-btn ts-ghost" id="tsRefresh">Refresh</button>
-      </div>
-      <div id="tsMusterBox" hidden></div>
-      <div class="subhead"><span>Signed out today</span><span id="tsNOut"></span></div>
-      <div id="tsOff"></div>
+
+    <div data-tsp="appr" hidden><div id="tsAppr"></div></div>
+
+    <div data-tsp="ind" hidden>
+      <div class="ts-filt"><div class="ts-seg" id="tsWkF"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="pending" aria-pressed="false">Waiting</button><button type="button" data-f="approved" aria-pressed="false">Approved</button><button type="button" data-f="rejected" aria-pressed="false">Not approved</button></div><input type="search" id="tsWkQ" placeholder="Search name, company, phone" aria-label="Search inductions"></div>
+      <div id="tsWk"></div>
     </div>
-    <div class="ts-sec" id="tsDocs">
-      <div class="subhead"><span>Induction &amp; SWMS</span><span id="tsDocN"></span></div>
+
+    <div data-tsp="permit" hidden>
+      <div class="ts-filt"><div class="ts-seg" id="tsPmF"><button type="button" data-f="open" aria-pressed="true">Open</button><button type="button" data-f="pending" aria-pressed="false">Waiting</button><button type="button" data-f="closed" aria-pressed="false">Closed</button><button type="button" data-f="all" aria-pressed="false">All</button></div></div>
+      <div id="tsPm"></div>
+      <p class="note">Workers request permits from the sign-in page (the gate QR). You approve here, and they see it on their phone before starting. They close it when the job and fire watch are done, or you can close it here.</p>
+    </div>
+
+    <div data-tsp="plant" hidden>
+      <div class="ts-filt"><div class="ts-seg" id="tsPlF"><button type="button" data-f="on" aria-pressed="true">On site</button><button type="button" data-f="pending" aria-pressed="false">Waiting</button><button type="button" data-f="all" aria-pressed="false">All</button></div></div>
+      <div id="tsPl"></div>
+    </div>
+
+    <div data-tsp="gate" hidden>
       <div class="ts-grid">
-        <div class="ts-card">
-          <h3>Site induction <span>every worker reads and signs once</span></h3>
-          <div class="ts-drop" data-drop="induction" tabindex="0" role="button" aria-label="Add site induction files">Drop the induction here<br><small>or tap to choose - PDF, PowerPoint, Word, images or video</small></div>
-          <div id="tsIndList"></div>
+        <div class="ts-card ts-qr">
+          <h3>QR code for the gate</h3>
+          <div id="tsQR" role="img" aria-label="QR code to the ELISE site sign-in page"></div>
+          <div class="ts-url" id="tsUrl"></div>
+          <div class="ts-links"><a id="tsPoster" target="_blank" rel="noopener">Open the A4 poster to print</a><a id="tsOpen" target="_blank" rel="noopener">Open the sign-in page</a></div>
         </div>
         <div class="ts-card">
-          <h3>SWMS by company <span>workers sign on to their company's</span></h3>
-          <label>Company<select id="tsSwmsCo"></select></label>
-          <div class="ts-drop" data-drop="swms" tabindex="0" role="button" aria-label="Add SWMS for the chosen company">Drop SWMS here<br><small>or tap to choose - goes to the company above</small></div>
-          <div id="tsSwmsList"></div>
+          <h3>What happens at the gate</h3>
+          <p class="ts-p">First visit: the worker does the ELISE Constructions site induction on their phone, about 10 minutes. It covers their details, emergency contact, health, white card and tickets, the 32 acknowledgement items and a signature. It comes to Approvals for you. They only do it once, and it's good for 12 months.</p>
+          <p class="ts-p">Every day: scan, sign in, read and sign their company's SWMS when there's a new one, and sign out. Anyone left signed in at 6pm is signed out automatically.</p>
+          <p class="ts-p">From the same page they can request a permit or register plant. Both come to you for approval.</p>
         </div>
       </div>
-      <input type="file" id="tsFile" multiple hidden accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.mp4">
-      <div class="subhead"><span>Induction &amp; SWMS register</span><span id="tsRegN"></span></div>
-      <div id="tsReg"></div>
     </div>
-    <p class="note" id="tsStamp">Workers scan the QR, sign in on their own phone, and sign out the same way. It works with no signal: the phone holds the sign-in and sends it when it's back on the network. Only signed-in Elise team members can see this list.</p>
+
+    <div data-tsp="docs" hidden>
+      <div class="ts-sec" id="tsDocs">
+        <div class="subhead"><span>SWMS &amp; induction pack</span><span id="tsDocN"></span></div>
+        <div class="ts-grid">
+          <div class="ts-card">
+            <h3>SWMS by company <span>workers sign on to their company's</span></h3>
+            <label>Company<select id="tsSwmsCo"></select></label>
+            <div class="ts-drop" data-drop="swms" tabindex="0" role="button" aria-label="Add SWMS for the chosen company">Drop SWMS here<br><small>or tap to choose - goes to the company above</small></div>
+            <div id="tsSwmsList"></div>
+          </div>
+          <div class="ts-card">
+            <h3>Induction pack <span>optional - site rules, CHSP, H&amp;S policy</span></h3>
+            <div class="ts-drop" data-drop="induction" tabindex="0" role="button" aria-label="Add files to the induction pack">Drop files here<br><small>workers must open each one before the acknowledgement</small></div>
+            <div id="tsIndList"></div>
+          </div>
+        </div>
+        <input type="file" id="tsFile" multiple hidden accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.mp4">
+        <div class="subhead"><span>SWMS sign-on register</span><span id="tsRegN"></span></div>
+        <div id="tsReg"></div>
+      </div>
+    </div>
+    <p class="note" id="tsStamp">Workers scan the QR and do everything on their own phone, even with no signal: the phone holds it and sends it when it's back on the network. Only signed-in Elise team members can see inductions, permits, plant and the sign-in list.</p>
   </div>
 </section>
 
@@ -2647,7 +2751,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 15:05</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9780,7 +9884,7 @@ function tsSigned(){return !!(window.eliseAuth&&eliseAuth.canWrite());}
 async function tsFetch(){
   if(!tsSigned()){renderTester();return;}
   try{
-    var r=await eliseAuth.rest("site_signin?day=eq."+iso(new Date())+"&select=id,kind,co,name,phone,n,crew_names,inducted,at,out_at,out_by&order=at.asc");
+    var r=await eliseAuth.rest("site_signin?day=eq."+iso(new Date())+"&select=id,kind,co,name,phone,n,crew_names,inducted,worker_status,at,out_at,out_by&order=at.asc");
     if(!r.ok)throw new Error(r.status+"");
     ts.rows=await r.json();ts.at=Date.now();ts.err=null;
     try{localStorage.setItem(TS_CACHE,JSON.stringify({day:iso(new Date()),at:ts.at,rows:ts.rows}));}catch(e){}
@@ -9799,22 +9903,28 @@ function renderTester(){
   if(!el("tsCrewCo").options.length)el("tsCrewCo").innerHTML=tsCoOpts();
   if(!el("tsQR").firstChild&&window.qrcode){var q=qrcode(0,"M");q.addData(TS_URL);q.make();el("tsQR").innerHTML=q.createSvgTag({cellSize:6,margin:2,scalable:true});}
   el("tsUrl").textContent=TS_URL;el("tsPoster").href=TS_URL+"poster.html";el("tsOpen").href=TS_URL;
-  var signed=tsSigned();
-  el("tsLock").hidden=signed;el("tsLive").hidden=!signed;
+  var signed=tsSigned(),needAuth=tsv!=="home"&&tsv!=="gate";
+  el("tsHomeV").hidden=tsv!=="home";el("tsBar").hidden=tsv==="home";
+  el("tsTitle").textContent=tsv==="home"?"Site sign-in":TSV_T[tsv];
+  document.querySelectorAll("[data-tsp]").forEach(function(p){p.hidden=p.getAttribute("data-tsp")!==tsv||(needAuth&&!signed);});
+  el("tsLock").hidden=signed||!needAuth;
+  if(!signed){el("tsMeta").textContent="Sign in to the board to see who's on site";["tbAtt","tbAppr","tbInd","tbPm","tbPl","tbDocs"].forEach(function(i){el(i).textContent="";});el("tbApprN").hidden=true;}
   renderTsDocs();
   if(!signed)return;
-  if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester")tsFetch();},30000);}
+  renderTsAdmin();
+  if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester"){tsFetch();tsaFetch();}},30000);}
   if(ts.rows==null){el("tsOn").innerHTML='<div class="lp-none">Loading&hellip;</div>';if(!ts.loading){ts.loading=1;tsFetch().then(function(){ts.loading=0;});}return;}
   var rows=ts.rows,on=rows.filter(function(x){return !x.out_at;}),off=rows.filter(function(x){return x.out_at;}),by={},tot=0;
   on.forEach(function(x){(by[x.co]=by[x.co]||[]).push(x);tot+=x.n;});
-  el("tsTotal").textContent=tot?tot+" on site":"";
+  el("tsTotal").textContent=tot?tot+" on site":"";el("tbAtt").textContent=tot+" on site now";
 
   var cos=Object.keys(by).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;});
   var _sn={},_dt=rows.reduce(function(s,x){var k=x.kind==="crew"?null:x.co+"|"+String(x.name||"").trim().toLowerCase();if(k&&_sn[k])return s;if(k)_sn[k]=1;return s+x.n;},0);
   el("tsMeta").innerHTML='<b class="ts-big">'+_dt+'</b> on site today'+(ts.err?" - "+esc(ts.err):"")+(ts.at?" - updated "+tsClock(ts.at):"");
   function who(x){
     var s=x.kind==="crew"?esc(x.name)+" + crew of "+x.n+(x.crew_names&&x.crew_names.length?' <small>('+esc(x.crew_names.join(", "))+")</small>":""):esc(x.name)+(x.kind==="visitor"?" <small>visitor</small>":"");
-    if(!x.inducted&&x.kind!=="visitor")s+=' <span class="flag">not inducted</span>';
+    var ws=x.worker_status||(x.inducted?"approved":"none");
+    if(x.kind!=="visitor"&&ws!=="approved")s+=' <span class="flag">'+(ws==="pending"?"induction waiting for approval":ws==="rejected"?"induction not approved":"no ELISE induction")+"</span>";
     if(x.phone)s+=' <small class="ts-ph">'+esc(x.phone)+"</small>";
     return s;
   }
@@ -9873,7 +9983,7 @@ document.addEventListener("change",function(e){
   if(m&&ts.muster){ts.muster[m.getAttribute("data-tsm")]=m.checked;renderTester();}
 });
 el("tsMuster").addEventListener("click",function(){ts.muster={};renderTester();el("tsMusterBox").scrollIntoView({block:"nearest"});});
-el("tsRefresh").addEventListener("click",function(){tsFetch();tsDocsFetch();});
+el("tsRefresh").addEventListener("click",function(){tsFetch();tsDocsFetch();tsaFetch();});
 el("tsOutAll").addEventListener("click",async function(){
   var b=this;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to sign everyone out";setTimeout(function(){b.dataset.arm="";b.textContent="Sign everyone out";},3000);return;}
   b.dataset.arm="";b.textContent="Sign everyone out";
@@ -9881,6 +9991,186 @@ el("tsOutAll").addEventListener("click",async function(){
   if(ids.length&&await tsPatch(ids,{out_at:new Date().toISOString(),out_by:"team"}))tsFetch();
 });
 document.addEventListener("elise-signedout",function(){ts.rows=null;try{localStorage.removeItem(TS_CACHE);}catch(e){}if(state.view==="tester")renderTester();});
+
+/* ---------- inductions, permits, plant: approvals by Elise (Tester tab) ---------- */
+var TSV_T={att:"Attendance",appr:"Approvals",ind:"Inductions",permit:"Permits",plant:"Plant",gate:"Gate QR code",docs:"SWMS & docs"};
+var tsv=(function(){try{var v=localStorage.getItem("elise_tsv");return TSV_T[v]?v:"home";}catch(e){return "home";}})();
+var tsa={wk:null,pm:null,pl:null,at:null,f:{ind:"all",permit:"open",plant:"on"},q:""};
+var PERMIT_N={hot:"Hot works",height:"Work at height / EWP",pen:"Penetration / core drilling",dig:"Excavation",iso:"Electrical isolation",conf:"Confined space",ooh:"Out of hours work",crane:"Crane lift outside plan",other:"Other permit"};
+var TK_N={whitecard:"White card",hrwl:"High risk work licence",plant:"Plant licence / VOC",trade:"Trade licence",activity:"Activity-based competency",firstaid:"First aid",other:"Other licence"};
+function tsGo(v){tsv=v;try{localStorage.setItem("elise_tsv",v);}catch(e){}renderTester();var t=el("v-tester");if(t&&t.getBoundingClientRect().top<0)t.scrollIntoView({block:"start"});}
+document.addEventListener("click",function(e){var t=e.target.closest("[data-tsv]");if(t){tsGo(t.getAttribute("data-tsv"));}});
+el("tsBack").addEventListener("click",function(){tsGo("home");});
+function tsToday(){return iso(new Date());}
+function tsD(s){if(!s)return "";var d=new Date(s.length===10?s+"T12:00:00":s);return d.getDate()+" "+monName(d)+" "+d.getFullYear();}
+function tsDT(s){if(!s)return "";var d=new Date(s);return d.getDate()+" "+monName(d)+" "+tsClock(s);}
+function tsSt(s,label){return '<span class="ts-st '+s+'">'+(label||{pending:"Waiting",approved:"Approved",rejected:"Not approved",closed:"Closed",removed:"Removed",expired:"Expired",none:"No induction"}[s]||s)+"</span>";}
+function wkState(w){return w.status==="approved"&&w.expires<tsToday()?"expired":w.status;}
+function pmOpen(p){return p.status==="approved"&&new Date(p.ends).getTime()>Date.now()-12*3600000;}
+function plOn(p){return p.status==="approved"&&(!p.expires||p.expires>=tsToday());}
+async function tsaFetch(){
+  if(!tsSigned())return;
+  try{
+    var R=await Promise.all([
+      eliseAuth.rest("site_worker?select=id,client_id,name,phone,co,occupation,emp_type,status,submitted_at,expires,reviewed_at,reviewed_by,review_note,white_card,comps,medical,injury,meds&order=submitted_at.desc&limit=1000"),
+      eliseAuth.rest("site_permit?select=id,client_id,kind,co,name,phone,location,starts,ends,description,status,review_note,reviewed_by,closed_at,submitted_at&order=submitted_at.desc&limit=300"),
+      eliseAuth.rest("site_plant?select=id,client_id,co,name,plant_type,make_model,serial,operator,status,next_service,expires,submitted_at,review_note&order=submitted_at.desc&limit=300")]);
+    if(R.every(function(r){return r.ok;})){tsa.wk=await R[0].json();tsa.pm=await R[1].json();tsa.pl=await R[2].json();tsa.at=Date.now();}
+  }catch(e){}
+  if(state.view==="tester")renderTsAdmin();
+}
+function wkLi(w){
+  var tk=(w.comps||[]).filter(function(c){return c.expiry&&c.expiry<tsToday();}).length;
+  return '<button type="button" class="ts-li" data-tsopen="worker:'+w.id+'">'+lpTag(w.co)+"<b>"+esc(w.name)+"</b>"+
+    '<span class="st">'+tsSt(wkState(w))+"</span><small>"+esc(tsCoName(w.co))+(w.occupation?" - "+esc(w.occupation):"")+" - "+esc(w.phone)+" - sent "+tsD(w.submitted_at)+
+    (w.status==="approved"?" - until "+tsD(w.expires):"")+(tk?' - <span class="ts-exp">'+tk+" ticket"+(tk>1?"s":"")+" expired</span>":"")+(w.medical||w.injury||w.meds?" - health note":"")+"</small></button>";
+}
+function pmLi(p){
+  return '<button type="button" class="ts-li" data-tsopen="permit:'+p.id+'">'+lpTag(p.co)+"<b>"+esc(PERMIT_N[p.kind]||p.kind)+" - "+esc(p.location||"")+"</b>"+
+    '<span class="st">'+tsSt(p.status)+"</span><small>"+esc(p.name)+", "+esc(tsCoName(p.co))+" - "+tsDT(p.starts)+" to "+tsClock(p.ends)+"</small></button>";
+}
+function plLi(p){
+  var st=p.status==="approved"&&p.expires&&p.expires<tsToday()?"expired":p.status;
+  return '<button type="button" class="ts-li" data-tsopen="plant:'+p.id+'">'+lpTag(p.co)+"<b>"+esc(p.plant_type)+" - "+esc(p.make_model||"")+"</b>"+
+    '<span class="st">'+tsSt(st)+"</span><small>"+esc(p.serial||"")+" - operator "+esc(p.operator||"")+" - "+esc(tsCoName(p.co))+(p.expires?" - good until "+tsD(p.expires):"")+"</small></button>";
+}
+function tsNone(t){return '<div class="lp-none">'+t+"</div>";}
+function renderTsAdmin(){
+  var W=tsa.wk,P=tsa.pm,L=tsa.pl;
+  if(W==null){if(tsSigned()&&!tsa.loading){tsa.loading=1;tsaFetch().then(function(){tsa.loading=0;});}return;}
+  var pw=W.filter(function(w){return w.status==="pending";}),pp=P.filter(function(p){return p.status==="pending";}),pl=L.filter(function(p){return p.status==="pending";});
+  var n=pw.length+pp.length+pl.length;
+  el("tbApprN").hidden=!n;el("tbApprN").textContent=n;
+  el("tbAppr").textContent=n?n+" waiting for you":"Nothing waiting";
+  el("tbInd").textContent=W.filter(function(w){return wkState(w)==="approved";}).length+" approved";
+  var po=P.filter(pmOpen).length;el("tbPm").textContent=po?po+" open":"None open";
+  el("tbPl").textContent=L.filter(plOn).length+" on site";
+  if(tsv==="appr"){
+    el("tsAppr").innerHTML=!n?tsNone("Nothing waiting for approval."):
+      (pw.length?'<div class="subhead"><span>Inductions</span><span>'+pw.length+"</span></div>"+pw.map(wkLi).join(""):"")+
+      (pp.length?'<div class="subhead"><span>Permits</span><span>'+pp.length+"</span></div>"+pp.map(pmLi).join(""):"")+
+      (pl.length?'<div class="subhead"><span>Plant</span><span>'+pl.length+"</span></div>"+pl.map(plLi).join(""):"");
+  }
+  if(tsv==="ind"){
+    var f=tsa.f.ind,q=tsa.q.toLowerCase().trim(),qd=q.replace(/\D/g,"");
+    var list=W.filter(function(w){var s=wkState(w);return f==="all"||s===f||(f==="rejected"&&s==="expired");})
+      .filter(function(w){return !q||(w.name+" "+tsCoName(w.co)+" "+(w.occupation||"")).toLowerCase().indexOf(q)>=0||(qd.length>=3&&String(w.phone).replace(/\D/g,"").indexOf(qd)>=0);});
+    el("tsWk").innerHTML=list.length?list.map(wkLi).join(""):tsNone(W.length?"No one matches.":"No inductions yet. Workers do theirs on their phone the first time they sign in at the gate.");
+  }
+  if(tsv==="permit"){
+    var pf=tsa.f.permit,pl2=P.filter(function(p){return pf==="all"||(pf==="open"?pmOpen(p):p.status===pf);});
+    el("tsPm").innerHTML=pl2.length?pl2.map(pmLi).join(""):tsNone(pf==="open"?"No permits open right now.":"None.");
+  }
+  if(tsv==="plant"){
+    var lf=tsa.f.plant,ll=L.filter(function(p){return lf==="all"||(lf==="on"?plOn(p):p.status===lf);});
+    el("tsPl").innerHTML=ll.length?ll.map(plLi).join(""):tsNone(lf==="on"?"No plant approved for site yet.":"None.");
+  }
+}
+[["tsWkF","ind"],["tsPmF","permit"],["tsPlF","plant"]].forEach(function(x){
+  el(x[0]).addEventListener("click",function(e){var b=e.target.closest("[data-f]");if(!b)return;tsa.f[x[1]]=b.getAttribute("data-f");[].forEach.call(this.children,function(c){c.setAttribute("aria-pressed",c===b);});renderTsAdmin();});
+});
+el("tsWkQ").addEventListener("input",function(){tsa.q=this.value;renderTsAdmin();});
+
+/* detail view */
+var tsx=null;
+function tsKV(rows){return '<dl class="ts-kv">'+rows.filter(function(r){return r[1]!=null&&r[1]!=="";}).map(function(r){return "<dt>"+r[0]+"</dt><dd"+(r[2]?' class="'+r[2]+'"':"")+">"+r[1]+"</dd>";}).join("")+"</dl>";}
+function tsYN(b,note){return b==null?"":b?"Yes"+(note?" - "+esc(note):""):"No";}
+function tsUp(u){
+  if(!u)return "";
+  return "<figure>"+(u.mime==="application/pdf"?'<button type="button" class="pdf" data-tspdf="'+u.id+'">Open PDF</button>':'<img alt="'+esc(u.label||"")+'" src="'+u.data+'" data-tsimg="'+u.id+'">')+"<figcaption>"+esc(u.label||"")+"</figcaption></figure>";
+}
+async function tsOpen(kind,id){
+  var tbl={worker:"site_worker",permit:"site_permit",plant:"site_plant"}[kind];
+  var o=document.createElement("div");o.className="ts-x";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");
+  o.innerHTML='<div class="ts-xp"><div class="ts-xh"><h3>Loading&hellip;</h3><button type="button" data-tsxclose>Close &#x2715;</button></div><div class="ts-xb"></div></div>';
+  document.body.appendChild(o);document.body.style.overflow="hidden";o.querySelector("[data-tsxclose]").focus();
+  tsx={el:o,kind:kind,id:id,ups:[]};
+  try{
+    var r=await eliseAuth.rest(tbl+"?id=eq."+id+"&select=*");if(!r.ok)throw 0;var row=(await r.json())[0];if(!row)throw 0;
+    var u=await eliseAuth.rest("site_upload?ref_type=eq."+kind+"&ref_id=eq."+encodeURIComponent(row.client_id)+"&select=id,client_id,label,mime,data&order=at.asc");
+    tsx.row=row;tsx.ups=u.ok?await u.json():[];
+    drawTsx();
+  }catch(e){o.querySelector("h3").textContent="Couldn't load that";o.querySelector(".ts-xb").innerHTML=tsNone(navigator.onLine?"Try again.":"No signal.");}
+}
+function tsClose(){if(!tsx)return;tsx.ups.forEach(function(u){if(u.blob)URL.revokeObjectURL(u.blob);});tsx.el.remove();tsx=null;document.body.style.overflow="";}
+function drawTsx(){
+  var w=tsx.row,k=tsx.kind,U=tsx.ups,byId={},h="",title;
+  U.forEach(function(x){byId[x.client_id]=x;});
+  var who=esc(w.name)+(w.phone?' - <a href="tel:'+esc(String(w.phone).replace(/[^\d+]/g,""))+'">'+esc(w.phone)+"</a>":"");
+  if(k==="worker"){
+    var st=wkState(w);title=w.name;
+    var used={};
+    h+='<p>'+lpTag(w.co)+" "+esc(tsCoName(w.co))+" "+tsSt(st)+(w.status==="approved"?" until "+tsD(w.expires):"")+"</p>";
+    var photo=U.filter(function(x){return x.label==="Photo of worker";})[0];
+    if(photo){used[photo.client_id]=1;h+='<div class="ts-imgs">'+tsUp(photo)+"</div>";}
+    h+='<div class="ts-xs"><h4>General information</h4>'+tsKV([["Mobile",w.phone?'<a href="tel:'+esc(String(w.phone).replace(/[^\d+]/g,""))+'">'+esc(w.phone)+"</a>":""],["Date of birth",tsD(w.dob)],["Address",esc(w.address)],["Employer",esc(w.employer)],["Occupation",esc(w.occupation)],["Employment type",esc(w.emp_type)],["Driving to site",tsYN(w.driving)+(w.rego?" - rego "+esc(w.rego):"")]])+"</div>";
+    h+='<div class="ts-xs"><h4>Emergency contact</h4>'+tsKV([["Name",esc(w.em_name)],["Mobile",w.em_phone?'<a href="tel:'+esc(String(w.em_phone).replace(/[^\d+]/g,""))+'">'+esc(w.em_phone)+"</a>":""],["Relationship",esc(w.em_rel)]])+"</div>";
+    h+='<div class="ts-xs"><h4>Health &amp; fitness for work</h4>'+tsKV([["Medical conditions / allergies",tsYN(w.medical,w.medical_note),w.medical?"yes":""],["Pre-existing injuries",tsYN(w.injury,w.injury_note),w.injury?"yes":""],["Prescribed medications",tsYN(w.meds,w.meds_note),w.meds?"yes":""]])+"</div>";
+    var C=w.comps||[];
+    h+='<div class="ts-xs"><h4>Tickets &amp; licences</h4>'+tsKV(C.map(function(c){var ex=c.expiry&&c.expiry<tsToday();return [esc(TK_N[c.cat]||c.cat),esc(c.name)+(c.number?" - "+esc(c.number):"")+(c.expiry?' - <span class="'+(ex?"ts-exp":"")+'">'+(ex?"expired ":"exp ")+tsD(c.expiry)+"</span>":"")];}))+
+      '<div class="ts-imgs" style="margin-top:8px">'+C.map(function(c){var x=byId[c.upload];if(x)used[x.client_id]=1;return x?tsUp(x):"";}).join("")+U.filter(function(x){return !used[x.client_id];}).map(tsUp).join("")+"</div></div>";
+    var A=w.ack||[],no=[];A.forEach(function(v,i){if(v!==true)no.push(i+1);});
+    h+='<div class="ts-xs"><h4>Acknowledgement of site induction</h4><p class="ts-p">'+(A.length&&!no.length?"All "+A.length+" items answered Yes.":"Not Yes: item "+no.join(", "))+(w.docs_read&&w.docs_read.length?" Opened "+w.docs_read.length+" induction pack file"+(w.docs_read.length>1?"s":"")+".":"")+"</p></div>";
+    h+='<div class="ts-xs"><h4>Statement of acknowledgement - signed by inductee</h4><p class="ts-p">'+esc(w.signed_name)+" - "+tsDT(w.submitted_at)+'</p><img class="ts-sig" alt="Signature of '+esc(w.name)+'" src="'+w.signature+'"></div>';
+  }else if(k==="permit"){
+    title=(PERMIT_N[w.kind]||w.kind)+" permit";
+    h+="<p>"+lpTag(w.co)+" "+esc(tsCoName(w.co))+" "+tsSt(w.status)+"</p>";
+    h+='<div class="ts-xs">'+tsKV([["Requested by",who],["Where",esc(w.location)],["When",tsDT(w.starts)+" to "+tsClock(w.ends)],["Work",esc(w.description)],["Equipment",esc(w.equipment)],["Fire watch",esc(w.fire_watch)],["Sent",tsDT(w.submitted_at)]])+"</div>";
+    h+='<div class="ts-xs"><h4>Checks ticked by the worker</h4><ul class="ts-acklist">'+Object.keys(w.checks||{}).map(function(c){return "<li>"+esc(c)+"</li>";}).join("")+"</ul></div>";
+    h+='<div class="ts-xs"><h4>Signed</h4><p class="ts-p">'+esc(w.signed_name)+"</p>"+(w.signature?'<img class="ts-sig" alt="Signature" src="'+w.signature+'">':"")+"</div>";
+    if(w.closed_at)h+='<div class="ts-xs"><h4>Closed</h4><p class="ts-p">'+tsDT(w.closed_at)+" by "+(w.closed_by==="worker"?"the worker":esc(w.closed_by||"Elise"))+(w.closed_note?" - "+esc(w.closed_note):"")+"</p></div>";
+  }else{
+    title=w.plant_type+" - "+(w.make_model||"");
+    var pst=w.status==="approved"&&w.expires&&w.expires<tsToday()?"expired":w.status;
+    h+="<p>"+lpTag(w.co)+" "+esc(tsCoName(w.co))+" "+tsSt(pst)+(w.expires&&w.status==="approved"?" until "+tsD(w.expires):"")+"</p>";
+    h+='<div class="ts-xs">'+tsKV([["Registered by",who],["Serial / rego",esc(w.serial)],["Owner / hire co",esc(w.owner)],["Operator",esc(w.operator)],["Licence / VOC",esc(w.operator_licence)],["Last service",tsD(w.last_service)],["Next service",tsD(w.next_service)],["Notes",esc(w.notes)],["Sent",tsDT(w.submitted_at)]])+"</div>";
+    h+='<div class="ts-xs"><h4>Checks ticked</h4><ul class="ts-acklist">'+Object.keys(w.checks||{}).map(function(c){return "<li>"+esc(c)+"</li>";}).join("")+'</ul></div><div class="ts-xs"><h4>Photos &amp; documents</h4><div class="ts-imgs">'+U.map(tsUp).join("")+"</div></div>";
+    h+='<div class="ts-xs"><h4>Signed</h4><p class="ts-p">'+esc(w.signed_name)+"</p>"+(w.signature?'<img class="ts-sig" alt="Signature" src="'+w.signature+'">':"")+"</div>";
+  }
+  /* review */
+  var rv='<div class="ts-review">';
+  if(w.reviewed_at)rv+='<p class="ts-p">'+(w.status==="rejected"?"Not approved":"Approved")+" by "+esc(w.reviewed_by||"Elise")+" - "+tsDT(w.reviewed_at)+(w.review_note?"<br>Note: "+esc(w.review_note):"")+"</p>";
+  var acts=[];
+  if(w.status==="pending")acts=[["approve","Approve","ts-ok"],["reject","Not approved","ts-no"]];
+  else if(k==="worker")acts=w.status==="approved"?[["reject","Revoke induction","ts-no"]]:[["approve","Approve after all","ts-mid"]];
+  else if(k==="permit"&&w.status==="approved")acts=[["close","Close permit","ts-mid"],["reject","Cancel permit","ts-no"]];
+  else if(k==="plant"&&w.status==="approved")acts=[["remove","Plant has left site","ts-mid"]];
+  if(acts.length){
+    rv+='<label class="ts-p" for="tsxNote">Note to the worker <span class="opt">- needed if not approved</span></label><textarea id="tsxNote" rows="2" maxlength="300"></textarea>';
+    if(k==="plant"&&w.status==="pending")rv+='<label class="ts-p" for="tsxExp">Approved until</label><input type="date" id="tsxExp" value="'+(w.next_service&&w.next_service>tsToday()?w.next_service:iso(new Date(Date.now()+365*864e5)))+'" style="font:inherit;font-size:15px;padding:8px;border:1px solid var(--line-hard);border-radius:4px;background:var(--surface);color:var(--ink)">';
+    rv+='<div class="row">'+acts.map(function(a){return '<button type="button" class="'+a[2]+'" data-tsact="'+a[0]+'">'+a[1]+"</button>";}).join("")+"</div>";
+  }
+  rv+="</div>";
+  tsx.el.querySelector("h3").textContent=title;
+  tsx.el.querySelector(".ts-xb").innerHTML=h+rv;
+}
+async function tsAct(a){
+  var w=tsx.row,k=tsx.kind,note=(el("tsxNote")||{}).value||"",now=new Date().toISOString(),body,by=eliseAuth.email&&eliseAuth.email()||"Elise";
+  note=note.trim();
+  if((a==="reject")&&!note){toast("Add a note so they know why");el("tsxNote").focus();return;}
+  if(a==="approve")body={status:"approved",reviewed_at:now,reviewed_by:by,review_note:note||null};
+  if(a==="reject")body={status:"rejected",reviewed_at:now,reviewed_by:by,review_note:note};
+  if(a==="close")body={status:"closed",closed_at:now,closed_by:by,closed_note:note||null};
+  if(a==="remove")body={status:"removed",review_note:note||"Left site"};
+  if(a==="approve"&&k==="plant"){var ex=el("tsxExp");body.expires=ex&&ex.value?ex.value:null;}
+  if(a==="approve"&&k==="worker"&&w.expires<tsToday())body.expires=iso(new Date(Date.now()+365*864e5));
+  var tbl={worker:"site_worker",permit:"site_permit",plant:"site_plant"}[k];
+  var r=await eliseAuth.rest(tbl+"?id=eq."+w.id,{method:"PATCH",headers:{"Prefer":"return=representation"},body:JSON.stringify(body)});
+  if(!r.ok){toast(navigator.onLine?"Couldn't save that":"No signal - try again");return;}
+  var nr=(await r.json())[0];if(nr)tsx.row=nr;
+  toast({approve:"Approved",reject:k==="permit"&&w.status==="approved"?"Permit cancelled":"Marked not approved",close:"Permit closed",remove:"Plant marked off site"}[a]);
+  drawTsx();tsaFetch();if(k==="worker")tsFetch();
+}
+document.addEventListener("click",function(e){
+  var o=e.target.closest("[data-tsopen]");if(o){var p=o.getAttribute("data-tsopen").split(":");tsOpen(p[0],p[1]);return;}
+  if(!tsx)return;
+  if(e.target.closest("[data-tsxclose]")||e.target===tsx.el){tsClose();return;}
+  var a=e.target.closest("[data-tsact]");if(a){tsAct(a.getAttribute("data-tsact"));return;}
+  var im=e.target.closest("[data-tsimg]");if(im){lpView(im.getAttribute("src"));var v=document.querySelector(".lpv-bar span");if(v)v.textContent=im.getAttribute("alt")||"Photo";return;}
+  var pd=e.target.closest("[data-tspdf]");if(pd){var u=tsx.ups.filter(function(x){return x.id===pd.getAttribute("data-tspdf");})[0];if(u){if(!u.blob){var b=atob(u.data.split(",")[1]),a8=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a8[i]=b.charCodeAt(i);u.blob=URL.createObjectURL(new Blob([a8],{type:"application/pdf"}));}window.open(u.blob,"_blank");}}
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&tsx&&!document.querySelector(".lpv"))tsClose();});
+document.addEventListener("elise-signedout",function(){tsa.wk=tsa.pm=tsa.pl=null;tsClose();});
 
 /* ---------- induction + SWMS documents and register (Tester tab) ---------- */
 var tsd={docs:null,reg:null,kind:"induction"};
@@ -9901,10 +10191,10 @@ function renderTsDocs(){
   if(tsd.docs==null){if(!tsd.loading){tsd.loading=1;tsDocsFetch().then(function(){tsd.loading=0;});}return;}
   var D=tsd.docs,ind=D.filter(function(d){return d.kind==="induction";}),sw=D.filter(function(d){return d.kind==="swms";});
   function item(d){return '<div class="ts-doc"><a href="'+esc(eliseAuth.fileUrl(d.path))+'" target="_blank" rel="noopener">'+esc(d.title)+'</a><small>'+(d.size?tsSize(d.size)+" - ":"")+tsDay(d.uploaded_at)+'</small><button type="button" class="ts-out" data-tsdel="'+d.id+'">Remove</button></div>';}
-  el("tsIndList").innerHTML=ind.length?ind.map(item).join(""):'<div class="lp-none">No induction yet. Until there is one, workers just tick that they\'ve been inducted.</div>';
+  el("tsIndList").innerHTML=ind.length?ind.map(item).join(""):'<div class="lp-none">Nothing in the pack. The induction form works without it.</div>';
   var by={};sw.forEach(function(d){(by[d.co]=by[d.co]||[]).push(d);});
   el("tsSwmsList").innerHTML=Object.keys(by).length?Object.keys(by).sort().map(function(c){return '<div class="ts-swco">'+lpTag(c)+esc(tsCoName(c))+"</div>"+by[c].map(item).join("");}).join(""):'<div class="lp-none">No SWMS uploaded yet.</div>';
-  el("tsDocN").textContent=ind.length+" induction file"+(ind.length===1?"":"s")+", "+sw.length+" SWMS";
+  el("tsDocN").textContent=sw.length+" SWMS"+(ind.length?", "+ind.length+" in the induction pack":"");el("tbDocs").textContent=sw.length+" SWMS";
   var R=tsd.reg||[],title={};D.forEach(function(d){title[d.id]=d.title;});
   el("tsRegN").textContent=R.length?R.length+" sign-ons":"";
   el("tsReg").innerHTML=R.length?R.slice(0,80).map(function(x){

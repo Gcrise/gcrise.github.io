@@ -26,15 +26,17 @@ h1{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acce
 label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:12px 0 5px}
 label .opt{text-transform:none;letter-spacing:0}
 input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border-radius:6px;border:1px solid var(--rule);background:var(--bg);color:var(--ink)}
+input[type=date],input[type=time]{min-height:48px}
 .check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px;line-height:1.35;text-transform:none;letter-spacing:0;color:var(--ink)}
 .check input{width:24px;height:24px;flex:0 0 auto;margin:0}
 .seg{display:flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-top:4px}
-.seg button{flex:1;font:inherit;font-size:14px;padding:10px 6px;border:0;background:transparent;color:var(--ink2);cursor:pointer}
+.seg button{flex:1;font:inherit;font-size:14px;padding:10px 6px;border:0;background:transparent;color:var(--ink2);cursor:pointer;min-height:44px}
 .seg button+button{border-left:1px solid var(--rule)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg);font-weight:700}
 .big{display:block;width:100%;margin-top:16px;font:inherit;font-weight:800;font-size:18px;letter-spacing:.06em;text-transform:uppercase;border-radius:8px;padding:18px;cursor:pointer;border:0}
 .big.in{background:var(--go);color:#0d1a0f}
 .big.out{background:var(--stop);color:#1a0d0d}
+.big.alt{background:transparent;border:1px solid var(--rule);color:var(--ink);font-size:15px;padding:14px}
 .link{background:none;border:0;color:var(--ink2);font:inherit;font-size:14px;text-decoration:underline;padding:8px 0;cursor:pointer}
 .state{text-align:center;padding:8px 0 2px}
 .state b{display:block;font-size:24px;margin-bottom:4px}
@@ -53,6 +55,49 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 .doc .check{margin-top:8px}
 .doc.opened a::after{content:" - opened";color:var(--go)}
 .muted{color:var(--ink3);font-size:13px;line-height:1.45}
+/* induction wizard */
+.prog{display:flex;gap:4px;margin:2px 0 10px}
+.prog i{flex:1;height:4px;border-radius:2px;background:var(--rule)}
+.prog i.on{background:var(--accent)}
+.q{margin-top:14px}
+.q>p{margin:0 0 6px;font-size:15px;line-height:1.35}
+.yn{display:flex;gap:8px}
+.yn button{flex:1;font:inherit;font-size:15px;font-weight:700;padding:10px;border-radius:6px;border:1px solid var(--rule);background:transparent;color:var(--ink2);cursor:pointer;min-height:44px}
+.yn button[aria-pressed="true"][data-v="1"]{background:var(--go);border-color:var(--go);color:#0d1a0f}
+.yn button[aria-pressed="true"][data-v="0"]{background:var(--warn);border-color:var(--warn);color:#1a140d}
+.ack{border-top:1px solid var(--rule);padding:12px 0}
+.ack p{margin:0 0 8px;font-size:15px;line-height:1.35}
+.ack .no{font-size:13px;color:var(--warn);margin-top:6px}
+.files{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+.filebtn{position:relative;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink);border:1px dashed var(--ink3);border-radius:6px;padding:12px 14px;margin:0;cursor:pointer;min-height:48px}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.thumb{width:64px;height:48px;border-radius:4px;border:1px solid var(--rule);object-fit:cover;background:var(--bg);display:grid;place-items:center;font-size:11px;color:var(--ink3)}
+.tk{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;margin-top:10px}
+.tk-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tk-h b{font-size:15px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.row2>div{min-width:0}
+.stmt{font-size:15px;line-height:1.45;margin:0}
+.stmt ul{padding-left:20px;margin:8px 0}
+.padbox{margin-top:6px;border:1px solid var(--rule);border-radius:6px;background:#fff;position:relative;touch-action:none}
+.padbox canvas{display:block;width:100%;height:180px;touch-action:none}
+.padbox .hint{position:absolute;left:12px;bottom:10px;font-size:13px;color:#888;pointer-events:none}
+.padbox.inked .hint{display:none}
+.navrow{display:flex;gap:10px;margin-top:16px}
+.navrow .big{margin-top:0}
+.navrow .big.alt{flex:0 0 32%}
+/* my stuff */
+.mine{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.it{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;font-size:14px;line-height:1.4}
+.it b{font-size:15px}
+.chip{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:10px;padding:2px 8px;margin-left:6px;vertical-align:1px}
+.chip.pending{background:var(--warn);color:#1a140d}
+.chip.approved{background:var(--go);color:#0d1a0f}
+.chip.rejected,.chip.error{background:var(--stop);color:#1a0d0d}
+.chip.closed,.chip.sending{background:var(--rule);color:var(--ink)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.acts .big{margin-top:0;font-size:14px;padding:14px 8px}
+.ind-line{font-size:14px;margin-top:10px;text-align:center;color:var(--ink2)}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <div class="top"><div class="logo" role="img" aria-label="ELISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
@@ -60,7 +105,17 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
 <div class="site">3 Twenty Fifth Ave, Palm Beach</div>
 <div class="date" id="date"></div>
 
-<!-- induction / SWMS step -->
+<!-- ELISE Constructions site induction (once only) -->
+<div class="card" id="vInd" hidden>
+  <div class="step-n" id="inN"></div>
+  <div class="prog" id="inProg"></div>
+  <h2 class="step-h" id="inH"></h2>
+  <div id="inBody"></div>
+  <div class="msg" id="inMsg" role="alert"></div>
+  <div class="navrow"><button class="big alt" id="inBack" type="button">Back</button><button class="big in" id="inNext" type="button">Next</button></div>
+</div>
+
+<!-- SWMS step -->
 <div class="card" id="vStep" hidden>
   <div class="step-n" id="stN"></div>
   <h2 class="step-h" id="stH"></h2>
@@ -72,10 +127,22 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
   <button class="link" id="stBack" type="button">Back</button>
   <div class="msg" id="stMsg" role="alert"></div>
 </div>
+
+<!-- permit / plant forms -->
+<div class="card" id="vForm2" hidden>
+  <div class="step-n" id="f2N"></div>
+  <h2 class="step-h" id="f2H"></h2>
+  <div id="f2Body"></div>
+  <div class="msg" id="f2Msg" role="alert"></div>
+  <div class="navrow"><button class="big alt" id="f2Back" type="button">Cancel</button><button class="big in" id="f2Go" type="button">Send to Elise</button></div>
+</div>
+
+<div id="vMain">
 <!-- signed in -->
 <div class="card" id="vOn" hidden>
   <div class="state on"><b id="onWho"></b><span id="onSince"></span></div>
   <button class="big out" id="goOut" type="button">Sign out</button>
+  <div class="ind-line" id="onInd"></div>
   <div class="pend" id="pend1" hidden></div>
 </div>
 
@@ -91,7 +158,7 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
   <input id="fName" autocomplete="name" maxlength="80">
   <label for="fCo">Company</label>
   <select id="fCo"></select>
-  <label for="fPhone">Mobile <span class="opt">- for emergencies on site</span></label>
+  <label for="fPhone">Mobile <span class="opt" id="phOpt">- links you to your induction</span></label>
   <input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20">
   <div id="crewBox" hidden>
     <label for="fN">How many in your crew today, including you</label>
@@ -99,62 +166,73 @@ input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border
     <label for="fNames">Their names <span class="opt">- one per line, optional</span></label>
     <textarea id="fNames" rows="4"></textarea>
   </div>
-  <label class="check" id="indBox"><input type="checkbox" id="fInd"> <span id="indTxt">I've done the ELISE site induction</span></label>
+  <label class="check" id="indBox" hidden><input type="checkbox" id="fInd"> <span id="indTxt"></span></label>
   <button class="big in" id="goIn" type="button">Sign in</button>
+  <div class="ind-line" id="formInd"></div>
   <div class="msg" id="msg" role="alert"></div>
   <div class="pend" id="pend2" hidden></div>
+</div>
+
+<div class="card" id="vMine">
+  <div class="step-n">Permits &amp; plant</div>
+  <div class="acts"><button class="big alt" type="button" id="goPermit">Request a permit</button><button class="big alt" type="button" id="goPlant">Register plant</button></div>
+  <div class="mine" id="mine"></div>
 </div>
 
 <div class="card">
   <ul class="rules">
     <li>Sign in every day when you arrive and sign out when you leave. Anyone still signed in at 6pm is signed out automatically.</li>
-    <li>Not inducted? See the Elise site office before going past the gate.</li>
-    <li>Your details stay on this phone for next time, and only the Elise site team can see the sign-in list.</li>
+    <li>First time on site? You'll do the ELISE Constructions site induction on this page before you sign in. It takes about 10 minutes, you only do it once, and the Elise site manager approves it.</li>
+    <li>Your details stay on this phone for next time. Only the Elise site team can see your induction and the sign-in list.</li>
   </ul>
 </div>
-<p class="muted">No signal? It still works. Your sign-in is saved on this phone and sends itself as soon as you're back on the network. Open this page once with signal and it will load offline after that.</p>
+<p class="muted">No signal? It still works. Everything is saved on this phone and sends itself as soon as you're back on the network. Open this page once with signal and it will load offline after that.</p>
+</div>
 </div>
 <script src="../board/config.js"></script>
 <script>
 "use strict";
 var CFG=window.ELISE_CONFIG||{},URL_=(CFG.url||"").replace(/\/+$/,""),KEY=CFG.key||"";
 var TRADES=[["EC","Elise"],["GLF","G+L Form"],["ECC","East Coast Concrete"],["BUT","Butlers"],["EEC","Encon PT"],["AP","Advanced Precast"],["NEU","Neumann Steel"],["RZE","Rize Reinforcements"],["NS","Newnham Scaffolding"],["EVS","Evolution Shotcrete"],["MDP","Matt Dyce Plumbing"],["MC","Multicool Mechanical"],["LRC","LRC Electrical"],["ACF","Auscoast Fire"],["CC","Classic Corp"],["BAY","Bayleys"],["EMP","Empire"],["S4U","Skips 4 U"],["DAV","Davos Cranes"],["LIN","Lindores (crane crew)"],["SHORE","Shore Plumbing"],["HAR","Harwell"],["OTH","Other / visitor"]];
-var K_ME="elise_ci_me",K_CUR="elise_ci_cur",K_Q="elise_ci_queue";
-function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"null");if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
+var K_ME="elise_ci_me",K_CUR="elise_ci_cur",K_Q="elise_ci_queue",K_MY="elise_ci_my";
+var lsFull=false;
+function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"null");if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){if(v!==undefined)lsFull=true;return v===undefined?null:false;}}
 function $(id){return document.getElementById(id);}
 function pad(n){return (n<10?"0":"")+n;}
 function today(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
 function clock(t){var d=new Date(t),h=d.getHours(),ap=h<12?"am":"pm";h=h%12||12;return h+":"+pad(d.getMinutes())+ap;}
+function dmy(s){if(!s)return "";var d=new Date(s.length===10?s+"T12:00:00":s);return d.toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"});}
 function rid(n){var a=new Uint8Array(n),s="";(window.crypto||window.msCrypto).getRandomValues(a);for(var i=0;i<n;i++)s+=("0"+a[i].toString(16)).slice(-2);return s;}
+function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function coName(c){for(var i=0;i<TRADES.length;i++)if(TRADES[i][0]===c)return TRADES[i][1];return c||"";}
+function phoneOk(p){var d=String(p||"").replace(/\D/g,"");if(/^61/.test(d)&&d.length===11)d="0"+d.slice(2);return d.length>=8&&d.length<=12;}
 var kind="gate";
 $("date").textContent=new Date().toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long"});
-$("fCo").innerHTML='<option value="">Choose your company</option>'+TRADES.map(function(t){return '<option value="'+t[0]+'">'+t[1]+"</option>";}).join("");
+var CO_OPTS='<option value="">Choose your company</option>'+TRADES.map(function(t){return '<option value="'+t[0]+'">'+t[1]+"</option>";}).join("");
+$("fCo").innerHTML=CO_OPTS;
+function H(path,body){return {method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(body)};}
 
 /* ---------- the send queue: everything goes through here, online or not ---------- */
 function queue(){return ls(K_Q)||[];}
-function enqueue(job){var q=queue();q.push(job);ls(K_Q,q);flush();}
+function enqueue(job){var q=queue();q.push(job);var ok=ls(K_Q,q);flush();return ok;}
 var flushing=false;
 async function send(job){
-  if(job.t==="in"){
-    var r=await fetch(URL_+"/rest/v1/site_signin",{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(job.row)});
-    if(r.ok||r.status===409)return true;
-    var tx=await r.text();if(/duplicate key/i.test(tx))return true;
-    if(r.status>=400&&r.status<500)return "drop";
-    return false;
-  }
-  if(job.t==="ind"){
-    var r3=await fetch(URL_+"/rest/v1/site_induction",{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(job.row)});
-    if(r3.ok)return true;var t3=await r3.text();if(/duplicate key/i.test(t3))return true;
-    if(r3.status>=400&&r3.status<500)return "drop";
-    return false;
-  }
-  if(job.t==="out"){
-    var r2=await fetch(URL_+"/rest/v1/rpc/site_signout",{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({p_client_id:job.id,p_token:job.token,p_at:job.at})});
-    if(r2.ok)return true;
-    if(r2.status>=400&&r2.status<500)return "drop";
-    return false;
-  }
-  return "drop";
+  var r;
+  if(job.t==="in")r=await fetch(URL_+"/rest/v1/site_signin",H(0,job.row));
+  else if(job.t==="ind")r=await fetch(URL_+"/rest/v1/site_induction",H(0,job.row));
+  else if(job.t==="post")r=await fetch(URL_+"/rest/v1/"+job.table,H(0,job.row));
+  else if(job.t==="out")r=await fetch(URL_+"/rest/v1/rpc/site_signout",H(0,{p_client_id:job.id,p_token:job.token,p_at:job.at}));
+  else if(job.t==="rpc")r=await fetch(URL_+"/rest/v1/rpc/"+job.fn,H(0,job.body));
+  else return "drop";
+  if(r.ok||r.status===409)return true;
+  var tx=await r.text();if(/duplicate key/i.test(tx))return true;
+  if(r.status>=400&&r.status<500){if(job.t==="post")markDropped(job);return "drop";}
+  return false;
+}
+/* the server refused a form (bad data): show it as failed so they can redo it */
+function markDropped(job){
+  if(job.table==="site_worker"){var m=ls(K_ME)||{};if(m.worker&&m.worker.id===job.row.client_id){m.worker.status="error";ls(K_ME,m);}}
+  if(job.table==="site_permit"||job.table==="site_plant"){var y=my(),L=job.table==="site_permit"?y.permits:y.plant;L.forEach(function(x){if(x.id===job.row.client_id)x.status="error";});ls(K_MY,y);}
 }
 async function flush(){
   if(flushing||!navigator.onLine)return;flushing=true;
@@ -162,43 +240,110 @@ async function flush(){
     /* re-read the queue every pass: new taps can land while a send is in flight */
     for(var guard=0;guard<200;guard++){
       var q=queue();if(!q.length)break;
-      var job=q[0],key=JSON.stringify(job),ok;
+      var job=q[0],key=JSON.stringify(job).slice(0,400),ok;
       try{ok=await send(job);}catch(e){ok=false;}
       if(ok===false)break;
-      var q2=queue();if(q2.length&&JSON.stringify(q2[0])===key){q2.shift();ls(K_Q,q2);}
+      var q2=queue();if(q2.length&&JSON.stringify(q2[0]).slice(0,400)===key){q2.shift();ls(K_Q,q2);}
     }
   }finally{flushing=false;render();}
 }
-window.addEventListener("online",function(){netState();flush();loadDocs();});
+window.addEventListener("online",function(){netState();flush().then(refreshStatus);loadDocs();});
 window.addEventListener("offline",netState);
 setInterval(flush,20000);
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){render();flush();}});
 function netState(){var on=navigator.onLine;$("net").classList.toggle("off",!on);$("net").querySelector("span").textContent=on?"Online":"No signal - saving on phone";}
 
+/* ---------- photos and PDFs: shrink photos so they fit on the phone until there's signal ---------- */
+function readURL(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=rej;r.readAsDataURL(f);});}
+async function shrink(f){
+  if(f.type==="application/pdf"){if(f.size>2.5*1048576)throw new Error("That PDF is too big - take a photo of it instead.");return {mime:"application/pdf",data:await readURL(f),name:f.name};}
+  if(!/^image\//.test(f.type))throw new Error("Use a photo or a PDF.");
+  var url=URL.createObjectURL(f);
+  try{
+    var img=await new Promise(function(res,rej){var i=new Image();i.onload=function(){res(i);};i.onerror=function(){rej(new Error("Couldn't read that photo - try another."));};i.src=url;});
+    var s=Math.min(1,1400/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");
+    c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    return {mime:"image/jpeg",data:c.toDataURL("image/jpeg",0.72),name:f.name};
+  }finally{URL.revokeObjectURL(url);}
+}
+var FILES={};/* key -> {mime,data,name} */
+function fileField(key,label,req){
+  var f=FILES[key];
+  return '<div class="files"><label class="filebtn">'+(f?"Change":"Take photo / choose")+'<input type="file" accept="image/*,application/pdf" data-file="'+key+'" aria-label="'+esc(label)+'"></label>'+
+    (f?(f.mime==="application/pdf"?'<span class="thumb">PDF</span>':'<img class="thumb" alt="" src="'+f.data+'">')+'<span class="muted">'+(f.mime==="application/pdf"?"PDF added":"Photo added")+"</span>":'<span class="muted">'+(req?"Required":"Optional")+"</span>")+"</div>";
+}
+document.addEventListener("change",async function(e){
+  var inp=e.target.closest&&e.target.closest("[data-file]");if(!inp||!inp.files[0])return;
+  var key=inp.getAttribute("data-file");
+  try{FILES[key]=await shrink(inp.files[0]);}catch(err){alertMsg(err.message);return;}
+  var box=inp.closest(".files");if(box)box.outerHTML=fileField(key,"",true);
+});
+function alertMsg(t){var m=!$("vInd").hidden?"inMsg":!$("vForm2").hidden?"f2Msg":"msg";$(m).textContent=t;}
+
+/* ---------- signature pad ---------- */
+function Pad(box){
+  var cv=box.querySelector("canvas"),ctx=cv.getContext("2d"),down=false,ink=0,last=null;
+  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;if(!r.width)return;var img=ink?cv.toDataURL():null;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);ctx.lineWidth=2.4;ctx.lineCap=ctx.lineJoin="round";ctx.strokeStyle="#111";if(img){var i=new Image();i.onload=function(){ctx.drawImage(i,0,0,r.width,r.height);};i.src=img;}}
+  function pt(e){var r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+  cv.addEventListener("pointerdown",function(e){e.preventDefault();cv.setPointerCapture(e.pointerId);down=true;last=pt(e);ctx.beginPath();ctx.arc(last[0],last[1],1.1,0,7);ctx.fillStyle="#111";ctx.fill();});
+  cv.addEventListener("pointermove",function(e){if(!down)return;e.preventDefault();var p=pt(e);ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(p[0],p[1]);ctx.stroke();ink+=Math.abs(p[0]-last[0])+Math.abs(p[1]-last[1]);last=p;if(ink>40)box.classList.add("inked");});
+  ["pointerup","pointercancel","pointerleave"].forEach(function(ev){cv.addEventListener(ev,function(){down=false;});});
+  size();
+  return {
+    clear:function(){ctx.clearRect(0,0,cv.width,cv.height);ink=0;box.classList.remove("inked");},
+    empty:function(){return ink<40;},
+    data:function(){var o=document.createElement("canvas"),r=cv.getBoundingClientRect();o.width=600;o.height=Math.round(600*r.height/r.width);var x=o.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,o.width,o.height);x.drawImage(cv,0,0,o.width,o.height);return o.toDataURL("image/png");}
+  };
+}
+function padHtml(id){return '<div class="padbox" id="'+id+'"><canvas></canvas><span class="hint">Sign here with your finger</span></div><button class="link" type="button" data-padclear="'+id+'">Clear signature</button>';}
+var pads={};
+document.addEventListener("click",function(e){var c=e.target.closest("[data-padclear]");if(c&&pads[c.getAttribute("data-padclear")])pads[c.getAttribute("data-padclear")].clear();});
+function ynHtml(key,val){return '<div class="yn" data-yn="'+key+'"><button type="button" data-v="1" aria-pressed="'+(val===true)+'">Yes</button><button type="button" data-v="0" aria-pressed="'+(val===false)+'">No</button></div>';}
+
 /* ---------- screens ---------- */
+function show(which){
+  ["vInd","vStep","vForm2"].forEach(function(v){$(v).hidden=v!==which;});
+  $("vMain").hidden=!!which;window.scrollTo(0,0);
+  if(!which)render();
+}
 function setKind(k){
   kind=k;
   document.querySelectorAll("[data-k]").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-k")===k);});
   $("crewBox").hidden=k!=="crew";
   $("lName").textContent=k==="crew"?"Your name (foreman / leading hand)":"Your name";
-  $("indTxt").textContent=k==="crew"?"Everyone in my crew has done the ELISE site induction":k==="visitor"?"I'll stay with my Elise host while on site":"I've done the ELISE site induction";
+  $("indBox").hidden=k==="gate";
+  $("indTxt").textContent=k==="crew"?"Everyone in my crew has done the ELISE site induction":"I'll stay with my Elise host while on site";
+  $("phOpt").textContent=k==="visitor"?"- for emergencies on site":"- links you to your induction";
   $("goIn").textContent=k==="crew"?"Sign crew in":"Sign in";
-  if(typeof renderInd==="function")renderInd();
+  renderIndLine();
 }
 document.querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(){setKind(b.getAttribute("data-k"));});});
 var K_NOTE="elise_ci_note";
 function autoTime(cur){var d=cur.day.split("-");return new Date(+d[0],+d[1]-1,+d[2],18,0,0).getTime();}
 function endLocal(cur,by,at){ls(K_CUR,null);ls(K_NOTE,{day:cur.day,by:by,at:at});}
-/* ask the server whether this phone's sign-in is still open (6pm auto, or Elise signed them out) */
 async function checkStatus(){
   var cur=ls(K_CUR);if(!cur||!navigator.onLine)return;
   if(queue().some(function(j){return j.t==="in"&&j.row.client_id===cur.id;}))return;
   try{
-    var r=await fetch(URL_+"/rest/v1/rpc/site_status",{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({p_client_id:cur.id,p_token:cur.token})});
+    var r=await fetch(URL_+"/rest/v1/rpc/site_status",H(0,{p_client_id:cur.id,p_token:cur.token}));
     if(!r.ok)return;var j=await r.json();
     if(j&&j[0]&&j[0].out_at){endLocal(cur,j[0].out_by||"team",j[0].out_at);render();}
   }catch(e){}
 }
+function worker(){var m=ls(K_ME)||{};return m.worker||null;}
+function workerValid(w){return !!(w&&w.status!=="rejected"&&w.status!=="error"&&(!w.expires||w.expires>=today()));}
+function indText(){
+  var w=worker();
+  if(!w)return "";
+  if(w.status==="approved")return 'ELISE induction <span class="chip approved">Approved</span>'+(w.expires?' <span class="muted">until '+dmy(w.expires)+"</span>":"");
+  if(w.status==="pending")return 'ELISE induction <span class="chip pending">Waiting for approval</span>';
+  if(w.status==="sending")return 'ELISE induction <span class="chip sending">Sending</span>';
+  if(w.status==="rejected")return 'ELISE induction <span class="chip rejected">Not approved</span><br>'+esc(w.note||"See the Elise site office.")+" You'll redo it next time you sign in.";
+  if(w.status==="error")return 'ELISE induction <span class="chip error">Didn\'t go through</span> - you\'ll redo it next time you sign in.';
+  if(w.expires&&w.expires<today())return "ELISE induction expired - you'll redo it next time you sign in.";
+  return "";
+}
+function renderIndLine(){var t=kind==="visitor"?"":indText();$("formInd").innerHTML=t;$("onInd").innerHTML=indText();}
 function render(){
   netState();
   var cur=ls(K_CUR);
@@ -217,90 +362,241 @@ function render(){
   }
   var txt=pend?"Saved on this phone - sends when you have signal ("+pend+" waiting)":"";
   $("pend1").hidden=$("pend2").hidden=!pend;$("pend1").textContent=$("pend2").textContent=txt;
+  renderIndLine();renderMine();
 }
 var me=ls(K_ME);
-if(me){$("fName").value=me.name||"";$("fCo").value=me.co||"";$("fPhone").value=me.phone||"";if(me.kind)setKind(me.kind);}
-/* ---------- induction + SWMS documents ---------- */
+if(me){$("fName").value=me.name||"";$("fCo").value=me.co||"";$("fPhone").value=me.phone||"";if(me.kind)setKind(me.kind);}else setKind("gate");
+
+/* ---------- documents (SWMS, and the optional induction pack) ---------- */
 var K_DOCS="elise_ci_docs";
 function docs(){return ls(K_DOCS)||[];}
 async function loadDocs(){
   if(!navigator.onLine)return;
   try{var r=await fetch(URL_+"/rest/v1/site_docs?select=id,kind,co,title,path,mime&active=eq.true&order=uploaded_at.asc",{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}});
-    if(r.ok){ls(K_DOCS,await r.json());renderInd();}}catch(e){}
+    if(r.ok)ls(K_DOCS,await r.json());}catch(e){}
 }
 function docUrl(d){return URL_+"/storage/v1/object/public/site-docs/"+d.path.split("/").map(encodeURIComponent).join("/");}
-function signedSet(){var m=ls(K_ME)||{};return {ind:m.ind||[],swms:m.swms||[],seen:m.seen||[]};}
-function needInd(){var S=signedSet();return docs().filter(function(d){return d.kind==="induction"&&S.ind.indexOf(d.id)<0;});}
-/* SWMS: ask when the company has one this phone hasn't been shown yet (new or updated), or nothing's been signed for it */
 function needSwms(co){
-  var S=signedSet(),all=docs().filter(function(d){return d.kind==="swms"&&d.co===co;});
+  var m=ls(K_ME)||{},seen=m.seen||[],signed=m.swms||[],all=docs().filter(function(d){return d.kind==="swms"&&d.co===co;});
   if(!all.length)return [];
-  var fresh=all.filter(function(d){return S.seen.indexOf(d.id)<0;});
-  var any=all.some(function(d){return S.swms.indexOf(d.id)>=0;});
+  var fresh=all.filter(function(d){return seen.indexOf(d.id)<0;});
+  var any=all.some(function(d){return signed.indexOf(d.id)>=0;});
   return fresh.length||!any?all:[];
 }
-function hasInd(){return docs().some(function(d){return d.kind==="induction";});}
-/* once there's an online induction, it replaces the tick box for people signing themselves in */
-function renderInd(){
-  var online=hasInd()&&kind==="gate";
-  $("indBox").hidden=online;
+
+/* =====================================================================
+   ELISE Constructions Site Induction Record - done once, signed, approved by Elise
+   ===================================================================== */
+var ACK=["Shown and given the opportunity to read the Health & Safety Policy and other policies","Shown and given the opportunity to read the Site Rules","Given the opportunity to read Construction Health and Safety Plan and Risk Register","Informed of the method of reporting an incident or a hazard on site","Informed of the health and safety consultation arrangements","Informed of the Dispute Resolution Process","Informed of the location and access to Legislation, Standards and Codes of Practice","Informed of the safety representatives on site (if applicable)","Informed of the Daily Sign in Procedure","Informed of the emergency and evacuation procedures","Informed of the site notice board and your requirement to read the information on the board","Informed of the common use plant on site: scaffolding & personnel hoist","Advised of the opportunity to participate in Site Inspections and Audits (all workers)","Advised of the location of the amenities on site","Advised of Elise Constructions management on site","Informed of the safe access and egress paths on site","Informed of the location of the powerlines and other exclusion zones on and around site","Informed of the first aiders on site and the location of the first aid facilities","Informed of the fitness for work requirements","Informed of the alcohol and drugs policy","Informed of the smoking policy","Informed of the use & storage of hazardous substances and the location of safety data sheets","Informed of the location of power and water on site","Informed of your requirement for daily housekeeping","Informed of the site & task specific P.P.E requirements","Informed of the use of mobile plant and the requirement for exclusion zones","Informed of the young worker policy","Informed of the requirement to work within the controls of a Safe Work Method Statement","Informed of the requirement for a hot works permit","Informed of the tower crane safe lifting procedures","Informed of the requirements when using temporary power","Informed of the requirements to control respirable crystalline silica"];
+var EMP_TYPES=["Permanent employee","Casual employee","Subcontractor / sole trader","Labour hire","Apprentice / trainee"];
+var TK_CATS=[["hrwl","High risk work licence","e.g. dogging, rigging, scaffolding, EWP over 11 m (WP), forklift (LF)"],["plant","Plant & equipment licence / VOC","e.g. scissor lift, EWP under 11 m, skid steer, excavator"],["trade","Trade licence","e.g. electrical, plumbing, QBCC"],["activity","Activity-based competency","e.g. working at heights, confined space, silica, asbestos awareness"],["firstaid","First aid certificate",""],["other","Other licence",""]];
+var IND_PAGES=["Your details","Emergency contact","Health & fitness for work","Tickets & licences","Site induction","Statement of acknowledgement"];
+var ind=null;/* the induction being filled in */
+function startInduction(p){
+  var m=ls(K_ME)||{};
+  ind={page:0,p:p,d:{signed_name:p.name,name:p.name,phone:p.phone,co:p.co,employer:coName(p.co)==="Other / visitor"?"":coName(p.co),ack:ACK.map(function(){return null;}),tickets:[],docs_opened:{}}};
+  Object.keys(FILES).forEach(function(k){delete FILES[k];});
+  show("vInd");drawInd();
 }
-var steps=[],stepI=0,pending=null;
-function showStep(){
-  var st=steps[stepI];
-  $("vForm").hidden=true;$("vStep").hidden=false;$("stMsg").textContent="";$("stSign").value="";
-  $("stN").textContent="Step "+(stepI+1)+" of "+steps.length;
-  $("stH").textContent=st.kind==="induction"?"ELISE site induction":"Your company's SWMS";
-  $("stP").textContent=st.kind==="induction"?"Open and read each part of the site induction, then sign below. You only do this once.":"Open and read each SWMS you'll be working under today, tick it, then sign below.";
-  $("stDocs").innerHTML=st.docs.map(function(d,i){
-    return '<div class="doc" id="dc'+i+'"><a href="'+docUrl(d)+'" target="_blank" rel="noopener" data-di="'+i+'">'+esc(d.title)+'</a>'+
-      '<label class="check"><input type="checkbox" data-dk="'+i+'"> '+(st.kind==="induction"?"I've read and understood this":"I've read this SWMS and will work to it")+"</label></div>";
-  }).join("");
+function val(id){var e=$(id);return e?e.value.trim():"";}
+function keepInd(){
+  /* copy what's on screen into ind.d before moving page */
+  var d=ind.d;
+  ["name","phone","dob","address","employer","occupation","emp_type","em_name","em_phone","em_rel","medical_note","injury_note","meds_note","white_card","rego","signed_name"].forEach(function(k){var e=$("i_"+k);if(e)d[k]=e.value.trim();});
+  if(ind.page===0){var c=$("i_co");if(c)d.co=c.value;}
+  d.tickets.forEach(function(t,i){["cat","name","number","expiry"].forEach(function(k){var e=$("t_"+k+"_"+i);if(e)t[k]=e.value.trim();});});
+}
+function drawInd(){
+  var d=ind.d,pg=ind.page,h="";
+  $("inN").textContent="ELISE Constructions site induction - part "+(pg+1)+" of "+IND_PAGES.length;
+  $("inProg").innerHTML=IND_PAGES.map(function(_,i){return '<i class="'+(i<=pg?"on":"")+'"></i>';}).join("");
+  $("inH").textContent=IND_PAGES[pg];$("inMsg").textContent="";
+  function inp(k,label,type,extra){return '<label for="i_'+k+'">'+label+'</label><input id="i_'+k+'" type="'+(type||"text")+'" value="'+esc(d[k]||"")+'" '+(extra||"")+">";}
+  if(pg===0){
+    h='<p class="step-p">You only do this once. It goes to the Elise site manager to approve, and is good for 12 months.</p>'+
+      inp("name","Full name","text",'autocomplete="name" maxlength="80"')+
+      inp("phone","Mobile","tel",'inputmode="tel" autocomplete="tel" maxlength="20"')+
+      '<label for="i_co">Company on this site</label><select id="i_co">'+CO_OPTS+"</select>"+
+      inp("dob","Date of birth","date",'max="'+today()+'"')+
+      inp("address","Residential address","text",'autocomplete="street-address" maxlength="200"')+
+      inp("employer","Name of employer","text",'maxlength="80"')+
+      inp("occupation","Your occupation","text",'maxlength="80" placeholder="e.g. Formworker, Electrician"')+
+      '<label for="i_emp_type">Employment type</label><select id="i_emp_type"><option value="">Choose</option>'+EMP_TYPES.map(function(t){return "<option"+(d.emp_type===t?" selected":"")+">"+t+"</option>";}).join("")+"</select>"+
+      '<label>Photo of yourself <span class="opt">- so the site team know who you are</span></label>'+fileField("photo","Photo of yourself",false);
+  }else if(pg===1){
+    h='<p class="step-p">Who we call if something happens to you on site.</p>'+inp("em_name","Name","text",'maxlength="80"')+inp("em_phone","Mobile","tel",'inputmode="tel" maxlength="20"')+inp("em_rel","Relationship","text",'maxlength="40" placeholder="e.g. Wife, Father, Mate"');
+  }else if(pg===2){
+    h='<p class="step-p">Only the Elise site team sees this, and it is only used so first aiders know what to do in an emergency.</p>'+
+      [["medical","Do you have any medical condition and/or allergies?"],["injury","Do you have any pre-existing injuries that may impact your ability to work safely?"],["meds","Do you currently take any prescribed medications that could affect you at work?"]].map(function(q){
+        return '<div class="q"><p>'+q[1]+"</p>"+ynHtml(q[0],d[q[0]])+'<div id="nb_'+q[0]+'"'+(d[q[0]]?"":" hidden")+'><label for="i_'+q[0]+'_note">Details</label><textarea id="i_'+q[0]+'_note" rows="2" maxlength="500">'+esc(d[q[0]+"_note"]||"")+"</textarea></div></div>";
+      }).join("");
+  }else if(pg===3){
+    h='<p class="step-p">Upload every ticket and licence you need for your work on this project.</p>'+
+      '<div class="tk"><div class="tk-h"><b>Construction induction card (white card)</b></div>'+inp("white_card","Card number","text",'maxlength="40"')+'<label>Photo of the card</label>'+fileField("white_card","White card photo",true)+"</div>"+
+      d.tickets.map(function(t,i){
+        var c=TK_CATS.filter(function(x){return x[0]===t.cat;})[0]||TK_CATS[0];
+        return '<div class="tk"><div class="tk-h"><b>Ticket '+(i+1)+'</b><button class="link" type="button" data-tkdel="'+i+'">Remove</button></div>'+
+          '<label for="t_cat_'+i+'">Type</label><select id="t_cat_'+i+'" data-tkcat="'+i+'">'+TK_CATS.map(function(x){return '<option value="'+x[0]+'"'+(x[0]===t.cat?" selected":"")+">"+x[1]+"</option>";}).join("")+"</select>"+
+          '<label for="t_name_'+i+'">What it is <span class="opt">'+esc(c[2])+'</span></label><input id="t_name_'+i+'" value="'+esc(t.name||"")+'" maxlength="80">'+
+          '<div class="row2"><div><label for="t_number_'+i+'">Number</label><input id="t_number_'+i+'" value="'+esc(t.number||"")+'" maxlength="40"></div><div><label for="t_expiry_'+i+'">Expiry</label><input id="t_expiry_'+i+'" type="date" value="'+esc(t.expiry||"")+'"></div></div>'+
+          "<label>Photo of the ticket</label>"+fileField("tk"+t.k,"Ticket photo",true)+"</div>";
+      }).join("")+
+      '<button class="big alt" type="button" id="tkAdd">+ Add a ticket or licence</button>'+
+      '<p class="muted">High risk work licences, plant tickets / VOCs, trade licences, working at heights, first aid and so on. No other tickets? Just tap Next.</p>';
+  }else if(pg===4){
+    var pack=docs().filter(function(x){return x.kind==="induction";});
+    h=(pack.length?'<p class="step-p">Open and read the site induction pack first:</p>'+pack.map(function(x){return '<div class="doc'+(d.docs_opened[x.id]?" opened":"")+'"><a href="'+docUrl(x)+'" target="_blank" rel="noopener" data-pack="'+x.id+'">'+esc(x.title)+"</a></div>";}).join("")+'<p class="step-p" style="margin-top:14px">':'<p class="step-p">')+
+      "Answer Yes or No for each item to confirm it was covered in your site-specific induction. If something wasn't covered, answer No and ask the Elise site team before you finish.</p>"+
+      ACK.map(function(a,i){return '<div class="ack"><p>'+(i+1)+". "+esc(a)+"</p>"+ynHtml("ack"+i,d.ack[i])+(d.ack[i]===false?'<div class="no">Ask the Elise site team to go through this with you.</div>':"")+"</div>";}).join("");
+  }else if(pg===5){
+    h='<div class="stmt"><p class="stmt">I acknowledge that I have been inducted onto the site by a representative of Elise Constructions. By signing this acknowledgement, I am stating:</p><ul><li>That I have received training and education in the Induction contents</li><li>That I understand the Induction contents</li><li>That I have the skills and knowledge to perform the work as described in this Induction</li><li>That I can perform the work as described in this Induction and as allocated to me safely</li><li>I understand I must comply with the content of the Induction.</li></ul></div>'+
+      '<label class="check"><input type="checkbox" id="i_iack"'+(d.iack?" checked":"")+"> <span>I acknowledge</span></label>"+
+      '<div class="q"><p>Are you driving your vehicle to site?</p>'+ynHtml("driving",d.driving)+'<div id="nb_driving"'+(d.driving?"":" hidden")+">"+inp("rego","Rego","text",'maxlength="12" autocapitalize="characters"')+"</div></div>"+
+      inp("signed_name","Signed by (you) inductee - full name","text",'maxlength="80" autocomplete="name"')+
+      "<label>Signature</label>"+padHtml("indPad");
+  }
+  $("inBody").innerHTML=h;
+  if(pg===0)$("i_co").value=d.co||"";
+  if(pg===5){pads.indPad=Pad($("indPad"));}
+  $("inBack").textContent=pg?"Back":"Cancel";
+  $("inNext").textContent=pg===IND_PAGES.length-1?"Sign and send":"Next";
   window.scrollTo(0,0);
 }
-function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-$("stDocs").addEventListener("click",function(e){var a=e.target.closest("[data-di]");if(a)$("dc"+a.getAttribute("data-di")).classList.add("opened");});
-$("stBack").addEventListener("click",function(){$("vStep").hidden=true;$("vForm").hidden=false;steps=[];pending=null;});
-$("stGo").addEventListener("click",function(){
-  var st=steps[stepI],ticks=[].slice.call(document.querySelectorAll("[data-dk]"));
-  var chosen=st.docs.filter(function(d,i){return ticks[i].checked;});
-  if(st.kind==="induction"&&chosen.length<st.docs.length){$("stMsg").textContent="Read and tick every part of the induction.";return;}
-  if(st.kind==="swms"&&!chosen.length){$("stMsg").textContent="Tick at least one SWMS you're working under. If none fit, see your supervisor before starting.";return;}
-  var sig=$("stSign").value.trim();if(sig.length<3){$("stMsg").textContent="Type your full name to sign.";return;}
-  enqueue({t:"ind",row:{client_id:rid(12),kind:st.kind,co:pending.co,name:pending.name,phone:pending.phone||null,doc_ids:chosen.map(function(d){return d.id;}),signed_name:sig,at:new Date().toISOString()}});
-  var m=ls(K_ME)||{};m.ind=m.ind||[];m.swms=m.swms||[];m.seen=m.seen||[];
-  chosen.forEach(function(d){var L=st.kind==="induction"?m.ind:m.swms;if(L.indexOf(d.id)<0)L.push(d.id);});
-  if(st.kind==="swms")st.docs.forEach(function(d){if(m.seen.indexOf(d.id)<0)m.seen.push(d.id);});
-  ls(K_ME,m);
-  stepI++;
-  if(stepI<steps.length){showStep();return;}
-  $("vStep").hidden=true;var p=pending;pending=null;steps=[];finishSignIn(p);
+$("inBody").addEventListener("click",function(e){
+  var b=e.target.closest(".yn button");
+  if(b){
+    var key=b.parentNode.getAttribute("data-yn"),v=b.getAttribute("data-v")==="1";
+    [].forEach.call(b.parentNode.children,function(x){x.setAttribute("aria-pressed",x===b);});
+    if(/^ack\d+$/.test(key)){var i=+key.slice(3);ind.d.ack[i]=v;var a=b.closest(".ack"),n=a.querySelector(".no");if(!v&&!n)a.insertAdjacentHTML("beforeend",'<div class="no">Ask the Elise site team to go through this with you.</div>');if(v&&n)n.remove();}
+    else{ind.d[key]=v;var nb=$("nb_"+key);if(nb)nb.hidden=!v;}
+    return;
+  }
+  var p=e.target.closest("[data-pack]");if(p){ind.d.docs_opened[p.getAttribute("data-pack")]=1;p.parentNode.classList.add("opened");return;}
+  if(e.target.id==="tkAdd"){keepInd();ind.d.tickets.push({k:rid(4),cat:"hrwl"});drawInd();var last=$("t_name_"+(ind.d.tickets.length-1));if(last)last.scrollIntoView({block:"center"});return;}
+  var del=e.target.closest("[data-tkdel]");if(del){keepInd();var t=ind.d.tickets.splice(+del.getAttribute("data-tkdel"),1)[0];if(t)delete FILES["tk"+t.k];drawInd();}
 });
-$("goIn").addEventListener("click",function(){
+$("inBody").addEventListener("change",function(e){if(e.target.matches("[data-tkcat]")){keepInd();drawInd();}if(e.target.id==="i_iack")ind.d.iack=e.target.checked;});
+function indCheck(){
+  var d=ind.d,pg=ind.page;
+  if(pg===0){
+    if(d.name.length<3||d.name.indexOf(" ")<0)return "Put your full name in - first and last.";
+    if(!phoneOk(d.phone))return "Put your mobile number in.";
+    if(!d.co)return "Choose your company.";
+    if(!d.dob)return "Put your date of birth in.";
+    if(d.address.length<5)return "Put your residential address in.";
+    if(!d.employer)return "Put your employer's name in.";
+    if(!d.occupation)return "Put your occupation in.";
+    if(!d.emp_type)return "Choose your employment type.";
+  }
+  if(pg===1){if(!d.em_name)return "Put your emergency contact's name in.";if(!phoneOk(d.em_phone))return "Put your emergency contact's mobile in.";if(!d.em_rel)return "How are they related to you?";}
+  if(pg===2){var q=["medical","injury","meds"];for(var i=0;i<3;i++){if(d[q[i]]==null)return "Answer Yes or No to every question.";if(d[q[i]]&&!d[q[i]+"_note"])return "Add a few words of detail for each Yes.";}}
+  if(pg===3){
+    if(!d.white_card)return "Put your white card number in.";
+    if(!FILES.white_card)return "Add a photo of your white card.";
+    for(var j=0;j<d.tickets.length;j++){var t=d.tickets[j];if(!t.name)return "Say what ticket "+(j+1)+" is, or remove it.";if(!FILES["tk"+t.k])return "Add a photo of ticket "+(j+1)+".";}
+  }
+  if(pg===4){
+    var pack=docs().filter(function(x){return x.kind==="induction";});
+    for(var k=0;k<pack.length;k++)if(!d.docs_opened[pack[k].id])return "Open and read every part of the induction pack first.";
+    var un=d.ack.indexOf(null);if(un>=0)return "Answer item "+(un+1)+".";
+    var no=d.ack.indexOf(false);if(no>=0)return "Item "+(no+1)+" is No - ask the Elise site team to go through it with you, then change it to Yes.";
+  }
+  if(pg===5){
+    if(!d.iack)return "Tick 'I acknowledge'.";
+    if(d.driving==null)return "Are you driving your vehicle to site?";
+    if(d.driving&&!d.rego)return "Put your rego in.";
+    if(d.signed_name.length<3)return "Type your full name to sign.";
+    if(pads.indPad.empty())return "Sign in the box with your finger.";
+  }
+  return "";
+}
+$("inBack").addEventListener("click",function(){
+  if(!ind.page){ind=null;show(null);return;}
+  keepInd();ind.page--;drawInd();
+});
+$("inNext").addEventListener("click",function(){
+  keepInd();var err=indCheck();if(err){$("inMsg").textContent=err;return;}
+  if(ind.page<IND_PAGES.length-1){ind.page++;drawInd();return;}
+  submitInduction();
+});
+function submitInduction(){
+  var d=ind.d,id=rid(12),token=rid(16),ups=[];
+  function up(key,label){var f=FILES[key];if(!f)return null;var u=rid(12);ups.push({client_id:u,ref_type:"worker",ref_id:id,label:label,mime:f.mime,data:f.data});return u;}
+  var comps=d.tickets.map(function(t){return {cat:t.cat,name:t.name,number:t.number||null,expiry:t.expiry||null,upload:up("tk"+t.k,(TK_CATS.filter(function(x){return x[0]===t.cat;})[0]||["",""])[1]+": "+t.name)};});
+  comps.unshift({cat:"whitecard",name:"Construction induction card",number:d.white_card,upload:up("white_card","White card")});
+  up("photo","Photo of worker");
+  var row={client_id:id,token:token,name:d.name,phone:d.phone,co:d.co,dob:d.dob,address:d.address,em_name:d.em_name,em_phone:d.em_phone,em_rel:d.em_rel,employer:d.employer,occupation:d.occupation,emp_type:d.emp_type,
+    medical:d.medical,medical_note:d.medical?d.medical_note:null,injury:d.injury,injury_note:d.injury?d.injury_note:null,meds:d.meds,meds_note:d.meds?d.meds_note:null,
+    white_card:d.white_card,comps:comps,ack:d.ack,docs_read:Object.keys(d.docs_opened),driving:d.driving,rego:d.driving?d.rego:null,signed_name:d.signed_name,signature:pads.indPad.data(),submitted_at:new Date().toISOString()};
+  var ok=enqueue({t:"post",table:"site_worker",row:row});
+  ups.forEach(function(u){ok=enqueue({t:"post",table:"site_upload",row:u})&&ok;});
+  if(!ok){$("inMsg").textContent="This phone is out of storage for the photos. Get to signal and tap Sign and send again.";var q=queue().filter(function(j){return !(j.row&&(j.row.client_id===id||j.row.ref_id===id));});ls(K_Q,q);return;}
+  var m=ls(K_ME)||{};m.worker={id:id,token:token,status:"sending"};m.name=d.name;m.phone=d.phone;m.co=d.co;ls(K_ME,m);
+  $("fName").value=d.name;$("fPhone").value=d.phone;$("fCo").value=d.co;
+  var p=ind.p;p.name=d.name;p.phone=d.phone;p.co=d.co;ind=null;
+  Object.keys(FILES).forEach(function(k){delete FILES[k];});
+  afterInduction(p);
+}
+
+/* ---------- SWMS step ---------- */
+var swms=null;
+function showSwms(p,list){
+  swms={p:p,docs:list};show("vStep");$("stMsg").textContent="";$("stSign").value=p.name||"";
+  $("stN").textContent=coName(p.co);$("stH").textContent="Your company's SWMS";
+  $("stP").textContent="Open and read each SWMS you'll be working under today, tick it, then sign below.";
+  $("stDocs").innerHTML=list.map(function(d,i){
+    return '<div class="doc" id="dc'+i+'"><a href="'+docUrl(d)+'" target="_blank" rel="noopener" data-di="'+i+'">'+esc(d.title)+'</a><label class="check"><input type="checkbox" data-dk="'+i+'"> I\'ve read this SWMS and will work to it</label></div>';
+  }).join("");
+}
+$("stDocs").addEventListener("click",function(e){var a=e.target.closest("[data-di]");if(a)$("dc"+a.getAttribute("data-di")).classList.add("opened");});
+$("stBack").addEventListener("click",function(){swms=null;show(null);});
+$("stGo").addEventListener("click",function(){
+  var ticks=[].slice.call(document.querySelectorAll("[data-dk]")),chosen=swms.docs.filter(function(d,i){return ticks[i].checked;});
+  if(!chosen.length){$("stMsg").textContent="Tick at least one SWMS you're working under. If none fit, see your supervisor before starting.";return;}
+  var sig=$("stSign").value.trim();if(sig.length<3){$("stMsg").textContent="Type your full name to sign.";return;}
+  var p=swms.p;
+  enqueue({t:"ind",row:{client_id:rid(12),kind:"swms",co:p.co,name:p.name,phone:p.phone||null,doc_ids:chosen.map(function(d){return d.id;}),signed_name:sig,at:new Date().toISOString()}});
+  var m=ls(K_ME)||{};m.swms=m.swms||[];m.seen=m.seen||[];
+  chosen.forEach(function(d){if(m.swms.indexOf(d.id)<0)m.swms.push(d.id);});
+  swms.docs.forEach(function(d){if(m.seen.indexOf(d.id)<0)m.seen.push(d.id);});
+  ls(K_ME,m);swms=null;show(null);finishSignIn(p);
+});
+
+/* ---------- sign in ---------- */
+$("goIn").addEventListener("click",async function(){
   $("msg").textContent="";ls(K_NOTE,null);
-  var name=$("fName").value.trim(),co=$("fCo").value,phone=$("fPhone").value.trim(),ind=$("fInd").checked;
+  var name=$("fName").value.trim(),co=$("fCo").value,phone=$("fPhone").value.trim(),tick=$("fInd").checked;
   if(!name){$("msg").textContent="Put your name in.";return;}
   if(!co){$("msg").textContent="Choose your company.";return;}
+  if(kind!=="visitor"&&!phoneOk(phone)){$("msg").textContent="Put your mobile in - it links you to your ELISE induction.";return;}
   var n=1,names=null;
   if(kind==="crew"){n=parseInt($("fN").value,10);if(!(n>=1&&n<=99)){$("msg").textContent="How many in your crew today?";return;}
-    names=$("fNames").value.split(/\n/).map(function(s){return s.trim();}).filter(Boolean).slice(0,99);}
-  var online=hasInd()&&kind==="gate";
-  if(kind!=="visitor"&&!online&&!ind){$("msg").textContent="Not inducted yet? See the Elise site office before you go on site.";return;}
+    names=$("fNames").value.split(/\n/).map(function(s){return s.trim();}).filter(Boolean).slice(0,99);
+    if(!tick){$("msg").textContent="Everyone in your crew needs the ELISE induction first - each person does it on their own phone from this page.";return;}}
+  if(kind==="visitor"&&!tick){$("msg").textContent="Visitors stay with their Elise host - tick the box.";return;}
   var m=ls(K_ME)||{};m.name=name;m.co=co;m.phone=phone;m.kind=kind==="crew"?"crew":"gate";ls(K_ME,m);
-  pending={name:name,co:co,phone:phone,n:n,names:names,ind:ind,kind:kind};
-  steps=[];
-  if(kind==="gate"){
-    var ni=needInd();if(ni.length)steps.push({kind:"induction",docs:ni});
-    var ns=needSwms(co);if(ns.length)steps.push({kind:"swms",docs:ns});
+  var p={name:name,co:co,phone:phone,n:n,names:names,kind:kind};
+  if(kind==="visitor"){finishSignIn(p);return;}
+  var w=m.worker;
+  if(!workerValid(w)&&navigator.onLine){
+    /* new phone or cleared phone: look for an induction already done under this mobile */
+    $("goIn").disabled=true;
+    try{var r=await fetch(URL_+"/rest/v1/rpc/site_worker_find",H(0,{p_phone:phone,p_name:name}));
+      if(r.ok){var j=await r.json();if(j&&j[0]&&j[0].status!=="rejected"){m.worker={linked:true,status:j[0].status,expires:j[0].expires,phone:phone};ls(K_ME,m);w=m.worker;}}}catch(e){}
+    $("goIn").disabled=false;
   }
-  if(steps.length){stepI=0;showStep();return;}
-  var p=pending;pending=null;finishSignIn(p);
+  if(!workerValid(w)){startInduction(p);return;}
+  afterInduction(p);
 });
+function afterInduction(p){
+  var ns=p.kind==="gate"?needSwms(p.co):[];
+  if(ns.length){showSwms(p,ns);return;}
+  show(null);finishSignIn(p);
+}
 function finishSignIn(p){
-  var name=p.name,co=p.co,phone=p.phone,n=p.n,names=p.names,kind=p.kind;
-  var ind=kind==="gate"&&hasInd()?needInd().length===0:p.ind;
-  var at=new Date().toISOString(),row={client_id:rid(12),token:rid(16),day:today(),kind:kind,co:co,name:name,phone:phone||null,n:n,crew_names:names,inducted:ind,at:at};
-  ls(K_CUR,{id:row.client_id,token:row.token,day:row.day,kind:kind,name:name,n:n,at:at});
+  var w=worker();
+  var at=new Date().toISOString(),row={client_id:rid(12),token:rid(16),day:today(),kind:p.kind,co:p.co,name:p.name,phone:p.phone||null,n:p.n,crew_names:p.names,inducted:p.kind==="visitor"?false:!!(w&&w.status==="approved"),at:at};
+  ls(K_CUR,{id:row.client_id,token:row.token,day:row.day,kind:p.kind,name:p.name,n:p.n,at:at});
   enqueue({t:"in",row:row});
   $("fInd").checked=false;$("fNames").value="";$("fN").value="";
   render();
@@ -310,10 +606,153 @@ $("goOut").addEventListener("click",function(){
   enqueue({t:"out",id:cur.id,token:cur.token,at:new Date().toISOString()});
   ls(K_CUR,null);render();
 });
-renderInd();loadDocs();
-render();flush().then(checkStatus);
-setInterval(checkStatus,60000);
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")checkStatus();});
+
+/* =====================================================================
+   Permits and plant - sent to Elise for approval, status shown back here
+   ===================================================================== */
+var PERMITS={
+  hot:{n:"Hot works",fw:1,c:["Area within 10 m cleared of combustibles, or covered with fire blankets","Fire extinguisher and fire blanket at the work area","Screens in place to contain sparks and slag","Fire watch person named below for the whole job","Fire watch stays 60 minutes after hot works finish","Smoke detector / fire services isolation arranged where needed","Working to a hot works SWMS"]},
+  height:{n:"Work at height / EWP",c:["Edge protection or fall arrest in place","EWP operator holds the right licence (WP if over 11 m)","Harness and lanyard worn in boom EWPs","Exclusion zone set up below the work","Rescue plan in place","Working to the SWMS"]},
+  pen:{n:"Penetration / core drilling / slab cutting",c:["Slab scanned for PT tendons, conduits and services","Location approved by Elise (post-tensioned slab)","Exclusion zone and spotter on the level below","Silica dust controls - water or H-class vacuum","Working to the SWMS"]},
+  dig:{n:"Excavation",c:["Before You Dig done and services located and marked","Batters, benching or shoring in place","Barriers and edge protection around the excavation","Spoil kept back from the edge","Working to the SWMS"]},
+  iso:{n:"Electrical isolation / lock-out",c:["Isolation points identified","Personal lock and danger tag fitted","Tested for dead before work starts","Licensed electrician doing the work","Working to the SWMS"]},
+  conf:{n:"Confined space entry",c:["Atmosphere tested and recorded","Standby person at the entry the whole time","Rescue plan and equipment at the entry","Everyone entering is trained for confined space","Working to the SWMS"]},
+  ooh:{n:"Out of hours work",c:["Elise has agreed the work time","Lighting is enough for the task","Nobody works alone","Noise kept within permitted hours","Working to the SWMS"]},
+  crane:{n:"Crane lift outside the lifting plan",c:["Lift booked on the crane board","Dogman / rigger with a current licence","Exclusion zone under the load","Load weight known and within the crane chart","Working to the lifting SWMS"]},
+  other:{n:"Other permit",c:["Hazards identified and controlled","Working to the SWMS"]}
+};
+var PLANT_TYPES=["Scissor lift (EWP)","Boom lift (EWP)","Forklift","Telehandler","Excavator","Skid steer / bobcat","Mobile crane","Concrete pump","Generator / compressor","Hoist","Other"];
+var PLANT_CHECKS=["Service record / logbook sighted and up to date","Operator's manual is with the machine","Daily pre-start check done","Emergency stop works","Reversing alarm and flashing beacon work","Guards and covers in place","Fire extinguisher fitted (where required)","No leaks or visible damage","Operator holds the right licence / VOC"];
+function my(){var y=ls(K_MY)||{};y.permits=y.permits||[];y.plant=y.plant||[];return y;}
+var f2=null;
+function f2Who(){var m=ls(K_ME)||{};return '<div class="row2"><div><label for="f_name">Your name</label><input id="f_name" value="'+esc(m.name||"")+'" maxlength="80"></div><div><label for="f_phone">Mobile</label><input id="f_phone" type="tel" value="'+esc(m.phone||"")+'" maxlength="20"></div></div><label for="f_co">Company</label><select id="f_co">'+CO_OPTS+"</select>";}
+function openPermit(k){
+  Object.keys(FILES).forEach(function(x){delete FILES[x];});
+  f2={type:"permit",kind:k||"hot"};show("vForm2");drawF2();
+}
+function openPlant(){Object.keys(FILES).forEach(function(x){delete FILES[x];});f2={type:"plant"};show("vForm2");drawF2();}
+function drawF2(){
+  var m=ls(K_ME)||{},h;
+  $("f2Msg").textContent="";
+  if(f2.type==="permit"){
+    var P=PERMITS[f2.kind],t=new Date();if(t.getHours()>=17||t.getHours()<6){t.setHours(6,10,0,0);}
+    $("f2N").textContent="Permit to work";$("f2H").textContent=P.n;
+    h='<label for="f_kind">Permit type</label><select id="f_kind">'+Object.keys(PERMITS).map(function(k){return '<option value="'+k+'"'+(k===f2.kind?" selected":"")+">"+PERMITS[k].n+"</option>";}).join("")+"</select>"+f2Who()+
+      '<label for="f_loc">Where on site</label><input id="f_loc" maxlength="200" placeholder="e.g. Level 5 north-east corner">'+
+      '<label for="f_desc">What work</label><textarea id="f_desc" rows="3" maxlength="1500"></textarea>'+
+      '<label for="f_equip">Equipment <span class="opt">- optional</span></label><input id="f_equip" maxlength="200" placeholder="e.g. Grinder, welder, oxy set">'+
+      '<label for="f_day">Date</label><input id="f_day" type="date" value="'+today()+'" min="'+today()+'">'+
+      '<div class="row2"><div><label for="f_from">From</label><input id="f_from" type="time" value="'+pad(t.getHours())+":"+(t.getMinutes()<30?"30":"00")+'"></div><div><label for="f_to">To</label><input id="f_to" type="time" value="'+pad(Math.min(23,t.getHours()+2))+":"+(t.getMinutes()<30?"30":"00")+'"></div></div>'+
+      (P.fw?'<label for="f_fw">Fire watch person</label><input id="f_fw" maxlength="80">':"")+
+      '<div class="q"><p><b>Before work starts - tick each one</b></p>'+P.c.map(function(c,i){return '<label class="check"><input type="checkbox" data-pc="'+i+'"> <span>'+esc(c)+"</span></label>";}).join("")+"</div>"+
+      '<label for="f_sn">Your full name to sign</label><input id="f_sn" value="'+esc(m.name||"")+'" maxlength="80">'+'<label>Signature</label>'+padHtml("f2Pad");
+  }else{
+    $("f2N").textContent="Plant induction";$("f2H").textContent="Register plant for site";
+    h=f2Who()+'<label for="f_pt">Plant type</label><select id="f_pt"><option value="">Choose</option>'+PLANT_TYPES.map(function(x){return "<option>"+x+"</option>";}).join("")+"</select>"+
+      '<label for="f_mm">Make and model</label><input id="f_mm" maxlength="80">'+
+      '<label for="f_sr">Serial no. / rego / fleet no.</label><input id="f_sr" maxlength="60">'+
+      '<label for="f_ow">Owner / hire company</label><input id="f_ow" maxlength="80">'+
+      '<div class="row2"><div><label for="f_op">Operator</label><input id="f_op" maxlength="80" value="'+esc(m.name||"")+'"></div><div><label for="f_ol">Licence / VOC no.</label><input id="f_ol" maxlength="40"></div></div>'+
+      '<div class="row2"><div><label for="f_ls">Last service</label><input id="f_ls" type="date" max="'+today()+'"></div><div><label for="f_ns">Next service due</label><input id="f_ns" type="date"></div></div>'+
+      '<div class="q"><p><b>Checks - tick each one</b></p>'+PLANT_CHECKS.map(function(c,i){return '<label class="check"><input type="checkbox" data-pc="'+i+'"> <span>'+esc(c)+"</span></label>";}).join("")+"</div>"+
+      "<label>Photo of the plant</label>"+fileField("pl_photo","Plant photo",true)+
+      "<label>Service record / logbook page</label>"+fileField("pl_service","Service record",true)+
+      '<label>Plant risk assessment <span class="opt">- if you have one</span></label>'+fileField("pl_risk","Risk assessment",false)+
+      '<label>Operator\'s licence / VOC <span class="opt">- photo</span></label>'+fileField("pl_lic","Operator licence",false)+
+      '<label for="f_notes">Notes <span class="opt">- optional</span></label><textarea id="f_notes" rows="2" maxlength="1500"></textarea>'+
+      '<label for="f_sn">Your full name to sign</label><input id="f_sn" value="'+esc(m.name||"")+'" maxlength="80">'+'<label>Signature</label>'+padHtml("f2Pad");
+  }
+  $("f2Body").innerHTML=h;$("f_co").value=m.co||"";pads.f2Pad=Pad($("f2Pad"));
+}
+$("f2Body").addEventListener("change",function(e){if(e.target.id==="f_kind"){f2.kind=e.target.value;var keep={n:val("f_name"),p:val("f_phone"),c:$("f_co").value,l:val("f_loc"),d:val("f_desc")};drawF2();$("f_name").value=keep.n;$("f_phone").value=keep.p;$("f_co").value=keep.c;$("f_loc").value=keep.l;$("f_desc").value=keep.d;}});
+$("goPermit").addEventListener("click",function(){openPermit();});
+$("goPlant").addEventListener("click",openPlant);
+$("f2Back").addEventListener("click",function(){f2=null;show(null);});
+$("f2Go").addEventListener("click",function(){
+  var msg=function(t){$("f2Msg").textContent=t;};
+  var name=val("f_name"),phone=val("f_phone"),co=$("f_co").value,sn=val("f_sn");
+  if(name.length<3)return msg("Put your name in.");if(!co)return msg("Choose your company.");
+  var ticks=[].slice.call(document.querySelectorAll("[data-pc]")),checks={};
+  if(ticks.some(function(t){return !t.checked;}))return msg("Every check needs ticking before you send it. If one can't be done, talk to the Elise site team.");
+  var list=f2.type==="permit"?PERMITS[f2.kind].c:PLANT_CHECKS;list.forEach(function(c){checks[c]=true;});
+  if(sn.length<3)return msg("Type your full name to sign.");
+  if(pads.f2Pad.empty())return msg("Sign in the box with your finger.");
+  var id=rid(12),token=rid(16),row,y=my(),entry;
+  if(f2.type==="permit"){
+    var loc=val("f_loc"),desc=val("f_desc"),day=val("f_day"),fr=val("f_from"),to=val("f_to");
+    if(!loc)return msg("Where on site?");if(desc.length<5)return msg("Describe the work.");if(!day||!fr||!to)return msg("Put the date and times in.");
+    if(to<=fr)return msg("The finish time needs to be after the start.");
+    if(PERMITS[f2.kind].fw&&val("f_fw").length<3)return msg("Name the fire watch person.");
+    var st=new Date(day+"T"+fr),en=new Date(day+"T"+to);
+    row={client_id:id,token:token,kind:f2.kind,co:co,name:name,phone:phone||null,location:loc,starts:st.toISOString(),ends:en.toISOString(),description:desc,equipment:val("f_equip")||null,fire_watch:PERMITS[f2.kind].fw?val("f_fw"):null,checks:checks,signed_name:sn,signature:pads.f2Pad.data(),submitted_at:new Date().toISOString()};
+    entry={id:id,token:token,kind:f2.kind,what:PERMITS[f2.kind].n,where:loc,starts:row.starts,ends:row.ends,status:"sending"};
+    if(!enqueue({t:"post",table:"site_permit",row:row}))return msg("Phone storage is full - try again with signal.");
+    y.permits.unshift(entry);
+  }else{
+    var pt=$("f_pt").value;if(!pt)return msg("Choose the plant type.");
+    if(!val("f_mm"))return msg("Put the make and model in.");if(!val("f_sr"))return msg("Put the serial, rego or fleet number in.");
+    if(!val("f_op"))return msg("Who's operating it?");
+    if(!FILES.pl_photo)return msg("Add a photo of the plant.");if(!FILES.pl_service)return msg("Add a photo of the service record.");
+    row={client_id:id,token:token,co:co,name:name,phone:phone||null,plant_type:pt,make_model:val("f_mm"),serial:val("f_sr"),owner:val("f_ow")||null,operator:val("f_op"),operator_licence:val("f_ol")||null,last_service:val("f_ls")||null,next_service:val("f_ns")||null,checks:checks,notes:val("f_notes")||null,signed_name:sn,signature:pads.f2Pad.data(),submitted_at:new Date().toISOString()};
+    var ok=enqueue({t:"post",table:"site_plant",row:row});
+    [["pl_photo","Plant photo"],["pl_service","Service record"],["pl_risk","Plant risk assessment"],["pl_lic","Operator licence"]].forEach(function(f){var x=FILES[f[0]];if(x)ok=enqueue({t:"post",table:"site_upload",row:{client_id:rid(12),ref_type:"plant",ref_id:id,label:f[1],mime:x.mime,data:x.data}})&&ok;});
+    if(!ok){ls(K_Q,queue().filter(function(j){return !(j.row&&(j.row.client_id===id||j.row.ref_id===id));}));return msg("Phone storage is full for the photos - try again with signal.");}
+    entry={id:id,token:token,what:pt+" - "+val("f_mm"),where:val("f_sr"),status:"sending"};
+    y.plant.unshift(entry);
+  }
+  y.permits=y.permits.slice(0,20);y.plant=y.plant.slice(0,20);ls(K_MY,y);
+  Object.keys(FILES).forEach(function(x){delete FILES[x];});
+  f2=null;show(null);
+});
+function renderMine(){
+  var y=my(),h="",lab={sending:"Sending",pending:"Waiting for Elise",approved:"Approved",rejected:"Not approved",closed:"Closed",error:"Didn't go through",removed:"Removed"};
+  var sentIds={};queue().forEach(function(j){if(j.row)sentIds[j.row.client_id]=1;});
+  function chip(x){var s=x.status==="sending"&&!sentIds[x.id]?"pending":x.status;return '<span class="chip '+s+'">'+lab[s]+"</span>";}
+  var recent=y.permits.filter(function(p){return p.status!=="closed"||(Date.now()-new Date(p.ends).getTime()<86400000);});
+  h+=recent.map(function(p){
+    return '<div class="it"><b>'+esc(p.what)+"</b>"+chip(p)+"<br>"+esc(p.where)+" - "+dmy(p.starts)+", "+clock(p.starts)+" to "+clock(p.ends)+
+      (p.note?'<br><span class="muted">Elise: '+esc(p.note)+"</span>":"")+
+      (p.status==="approved"?'<br><button class="link" type="button" data-close="'+p.id+'">'+(p.kind==="hot"?"Works finished and fire watch done - close permit":"Works finished - close permit")+"</button>":"")+"</div>";
+  }).join("");
+  h+=y.plant.filter(function(p){return p.status!=="removed";}).map(function(p){
+    return '<div class="it"><b>'+esc(p.what)+"</b>"+chip(p)+"<br>"+esc(p.where||"")+(p.expires&&p.status==="approved"?' <span class="muted">- good until '+dmy(p.expires)+"</span>":"")+(p.note?'<br><span class="muted">Elise: '+esc(p.note)+"</span>":"")+"</div>";
+  }).join("");
+  $("mine").innerHTML=h;
+}
+$("mine").addEventListener("click",function(e){
+  var b=e.target.closest("[data-close]");if(!b)return;
+  if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to close the permit";return;}
+  var y=my(),p=y.permits.filter(function(x){return x.id===b.getAttribute("data-close");})[0];if(!p)return;
+  enqueue({t:"rpc",fn:"site_permit_close",body:{p_client_id:p.id,p_token:p.token,p_note:p.kind==="hot"?"Works finished, fire watch completed":"Works finished"}});
+  p.status="closed";ls(K_MY,y);renderMine();
+});
+async function refreshStatus(){
+  if(!navigator.onLine)return;
+  var m=ls(K_ME)||{},w=m.worker,ch=false;
+  try{
+    if(w&&w.id&&w.status!=="error"&&!queue().some(function(j){return j.row&&j.row.client_id===w.id;})){
+      var r=await fetch(URL_+"/rest/v1/rpc/site_worker_status",H(0,{p_client_id:w.id,p_token:w.token}));
+      if(r.ok){var j=await r.json();if(j&&j[0]){w.status=j[0].status;w.note=j[0].review_note;w.expires=j[0].expires;ch=true;}}
+    }else if(w&&w.linked&&w.status!=="approved"&&m.phone){
+      var r2=await fetch(URL_+"/rest/v1/rpc/site_worker_find",H(0,{p_phone:w.phone||m.phone,p_name:m.name||""}));
+      if(r2.ok){var j2=await r2.json();if(j2&&j2[0]){w.status=j2[0].status;w.expires=j2[0].expires;ch=true;}}
+    }
+    if(ch)ls(K_ME,m);
+    var y=my(),queued={};queue().forEach(function(q){if(q.row)queued[q.row.client_id]=1;});
+    async function poll(L,fn){
+      var open=L.filter(function(x){return !queued[x.id]&&x.status!=="error"&&x.status!=="removed"&&!(x.status==="closed"&&fn==="site_permit_status");});
+      if(!open.length)return;
+      var r3=await fetch(URL_+"/rest/v1/rpc/"+fn,H(0,{p_ids:open.map(function(x){return x.id;}),p_tokens:open.map(function(x){return x.token;})}));
+      if(!r3.ok)return;(await r3.json()).forEach(function(s){L.forEach(function(x){if(x.id===s.client_id){x.status=s.status;x.note=s.review_note;if(s.expires)x.expires=s.expires;}});});
+    }
+    await poll(y.permits,"site_permit_status");await poll(y.plant,"site_plant_status");ls(K_MY,y);
+  }catch(e){}
+  if($("vMain").hidden===false)render();
+}
+loadDocs();
+render();flush().then(function(){checkStatus();refreshStatus();});
+setInterval(function(){checkStatus();refreshStatus();},60000);
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){if(!$("vMain").hidden)render();flush();checkStatus();refreshStatus();}});
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 </script>
 </body></html>

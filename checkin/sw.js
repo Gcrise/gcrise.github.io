@@ -1,6 +1,6 @@
 /* ELISE site sign-in: keep the page on the phone so it opens with no signal.
    Only this page's own files are cached; sign-ins never go through here. */
-var C="elise-checkin-v3";
+var C="elise-checkin-v7";
 var FILES=["./","index.html","elise-logo.png","favicon.png","icon-180.png","icon-192.png","manifest.webmanifest","../board/config.js"];
 self.addEventListener("install",function(e){e.waitUntil(caches.open(C).then(function(c){return c.addAll(FILES);}).then(function(){return self.skipWaiting();}));});
 self.addEventListener("activate",function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.filter(function(n){return n!==C;}).map(function(n){return caches.delete(n);}));}).then(function(){return self.clients.claim();}));});
