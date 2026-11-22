@@ -1864,6 +1864,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 #v-lplan,#v-tester,#v-logi{--acc:var(--clock);--acc-ink:var(--clock)}
 .lg-back{padding:12px 0 0}
 a.ts-tile{text-decoration:none}
+.ts-tile span{text-transform:none;letter-spacing:normal}
 .lp-bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 14px 4px}
 .lp-seg{display:inline-flex;border:1px solid var(--line-hard);border-radius:4px;overflow:hidden}
 .lp-seg button{font:inherit;font-size:13px;padding:7px 12px;background:transparent;color:var(--ink-2);border:0;cursor:pointer}
@@ -2013,6 +2014,14 @@ a.ts-tile{text-decoration:none}
 .logcat.logdd{border-bottom:1px solid var(--line-hard)}
 .logday.logdd>summary{display:flex}
 .logday.logdd>summary span+span{margin-left:auto}
+@media (max-width:640px){
+  .ts-tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px}
+  .ts-tile{min-height:104px;padding:12px 4px 10px;gap:4px;border-radius:6px}
+  .ts-tile svg{width:30px;height:30px}
+  .ts-tile b{font-size:11px;letter-spacing:.03em;line-height:1.2;hyphens:manual}
+  .ts-tile span{font-size:10.5px;line-height:1.25;min-height:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ts-badge{top:4px;right:4px;min-width:20px;height:20px;font-size:11px;line-height:20px;padding:0 5px}
+}
 .ts-big{font-size:20px;font-weight:700;color:var(--ink);margin-right:4px}
 .ts-trades{padding:4px 14px 10px;overflow-x:auto}
 .ts-trades table{width:100%;border-collapse:collapse;font-size:14px}
@@ -2685,7 +2694,7 @@ a.ts-tile{text-decoration:none}
       <button type="button" class="ts-tile" data-tsv="permit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v2.5"/></svg><b>Permits</b><span id="tbPm"></span></button>
       <button type="button" class="ts-tile" data-tsv="plant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h13v-5H9l-2-4H3z"/><path d="M16 14h3l2 3h-5"/><circle cx="7" cy="18.5" r="1.8"/><circle cx="17" cy="18.5" r="1.8"/><path d="M9 8l6-4 2 4"/></svg><b>Plant</b><span id="tbPl"></span></button>
       <button type="button" class="ts-tile" data-tsv="gate"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3M14 20h2"/></svg><b>Gate QR code</b><span>Print the poster</span></button>
-      <button type="button" class="ts-tile" data-tsv="notice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9.5a3.5 3.5 0 0 1 0 5M19.5 7a7 7 0 0 1 0 10"/></svg><b>Site announcements</b><span id="tbNotice"></span></button>
+      <button type="button" class="ts-tile" data-tsv="notice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9.5a3.5 3.5 0 0 1 0 5M19.5 7a7 7 0 0 1 0 10"/></svg><b>Announce&shy;ments</b><span id="tbNotice"></span></button>
       <button type="button" class="ts-tile" data-tsv="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6l2 2h10V19H3z"/><path d="M8 13h8M8 16h5"/></svg><b>SWMS</b><span id="tbDocs"></span></button>
       <button type="button" class="ts-tile" data-tsv="sds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v5l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 14h9"/></svg><b>SDS</b><span id="tbSds"></span></button>
       <button type="button" class="ts-tile" data-tsv="policy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/></svg><b>Policies</b><span id="tbPol"></span></button>
@@ -2847,7 +2856,7 @@ a.ts-tile{text-decoration:none}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:20</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:25</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
