@@ -11,6 +11,7 @@
 <meta name="theme-color" content="#23271A">
 <meta name="robots" content="noindex,nofollow">
 <title>ELISE Lifts</title>
+<link rel="stylesheet" href="../board/fonts.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
 :root{
@@ -218,6 +219,28 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);
 @media (pointer:coarse){input,textarea,select,[contenteditable="true"]{font-size:16px!important}}
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 0}
+@media (min-width:560px){.tiles{gap:12px}}
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:112px;padding:12px 4px 10px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer;text-align:center}
+.tile:active{border-color:var(--accent)}
+.tile svg{width:32px;height:32px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tile b{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;line-height:1.2}
+.tile span{font-size:11px;color:var(--ink3);line-height:1.25}
+.tile i{position:absolute;top:6px;right:6px;border-radius:10px;background:var(--accent);color:var(--bg);font:800 10px/18px system-ui,sans-serif;font-style:normal;padding:0 6px}
+.backbtn{appearance:none;margin:12px 0 4px;font:inherit;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;border:1px solid var(--rule);border-radius:6px;background:transparent;color:var(--ink);cursor:pointer;min-height:44px}
+#vsw{display:none}
+
+/* ONE HEADING STYLE EVERYWHERE: same fonts as the board, gold upper-case headings with a gold underline */
+html,body{font-family:'Archivo','Helvetica Neue',Arial,sans-serif}
+.grp .ghead{border-bottom:2px solid var(--accent)!important}
+.grp .ghead .gt,.grp[data-grp] .ghead .gt{font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif;font-size:13px!important;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)!important}
+.grp[data-grp="del"]{--gacc:var(--accent)}
+.rvh{font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)!important;border-bottom:2px solid var(--accent)}
+.tile b,.backbtn,.tab b{font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif}
+.tile b{font-size:13px;letter-spacing:.08em}
+
+/* EVERY BUTTON AND LABEL UPPER CASE (Harry 22 Nov - standing rule) */
+button,.big,.link,.filebtn,label,.seg button,.yn button,.chip,.tab,.backbtn,summary{text-transform:uppercase;letter-spacing:.06em}
 </style>
 <script>
 (function(){
@@ -540,16 +563,27 @@ function render(){
   }
   nowNext();
   paintSwitch();
-  if(layout==="rows"){
-    var hd=document.querySelector("header");
-    if(hd) document.documentElement.style.setProperty("--hdr",hd.offsetHeight+"px");
-    list.innerHTML=rowsHtml(lifts,dels);
+  /* home is tiles; tap one to see that list */
+  if(!lv){
+    var nextL=lifts.filter(function(r){return r.kind!=="BOOM";})[0];
+    list.innerHTML='<div class="tiles">'+
+      '<button type="button" class="tile" data-lv="lift"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4M6 4h14M6 4l-3 3h3M9 4l3 3M12 4l3 3M15 4l3 3"/><path d="M18 4v6"/><rect x="15.5" y="12" width="5" height="4"/><path d="M18 10v2M3 21h6"/></svg><b>Crane lifts</b><span>'+(nLift?nLift+" lift"+(nLift===1?"":"s")+" - "+Math.floor(hook/60)+"h "+p2(hook%60)+"m":"None booked")+'</span>'+(tbc?'<i>'+tbc+' TBC</i>':'')+'</button>'+
+      '<button type="button" class="tile" data-lv="del"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><b>Deliveries</b><span>'+(nDel?nDel+" truck"+(nDel===1?"":"s"):"None booked")+'</span></button>'+
+      '<button type="button" class="tile" data-lv="rows"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16M4 7h3M4 12h3M4 17h3"/><rect x="9" y="5" width="5" height="5" rx="1"/><rect x="15" y="9" width="5" height="7" rx="1"/><rect x="9" y="13" width="5" height="4" rx="1"/></svg><b>Timeline</b><span>Crane and trucks side by side</span></button>'+
+      '</div>';
     return;
   }
-  list.innerHTML =
-    group("lift","Crane lifts",lifts,
-          nLift+(nLift===1?" lift":" lifts")+" · "+Math.floor(hook/60)+"h "+p2(hook%60)+"m",true)+
-    group("del","Deliveries",dels, nDel+(nDel===1?" truck":" trucks"),false);
+  var back='<button type="button" class="backbtn" data-lv="home">&larr; All</button>';
+  if(lv==="rows"){
+    var hd=document.querySelector("header");
+    if(hd) document.documentElement.style.setProperty("--hdr",hd.offsetHeight+"px");
+    list.innerHTML=back+rowsHtml(lifts,dels);
+    return;
+  }
+  open_[lv]=1;
+  list.innerHTML = back+(lv==="lift"
+    ? (lifts.length?group("lift","Crane lifts",lifts,nLift+(nLift===1?" lift":" lifts")+" · "+Math.floor(hook/60)+"h "+p2(hook%60)+"m",true):'<div class="empty"><b>No crane lifts</b>Nothing on the hook this day.</div>')
+    : (dels.length?group("del","Deliveries",dels, nDel+(nDel===1?" truck":" trucks"),false):'<div class="empty"><b>No deliveries</b>No trucks booked this day.</div>'));
 
   Array.prototype.forEach.call(list.querySelectorAll("[data-toggle]"),function(b){
     b.addEventListener("click",function(){
@@ -562,7 +596,11 @@ function render(){
   });
 }
 
-var layout="list";
+var layout="list", lv=null;
+document.addEventListener("click",function(e){
+  var t=e.target.closest&&e.target.closest("[data-lv]"); if(!t) return;
+  var v=t.getAttribute("data-lv"); lv=v==="home"?null:v; render(); window.scrollTo(0,0);
+});
 try{ if(localStorage.getItem("elise.lifts.layout")==="rows") layout="rows"; }catch(e){}
 
 /* Rows: crane and deliveries side by side on one time ruler, ten minutes a

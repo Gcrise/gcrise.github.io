@@ -11,6 +11,7 @@
 <meta name="theme-color" content="#23271A">
 <meta name="robots" content="noindex,nofollow">
 <title>ELISE Jobs</title>
+<link rel="stylesheet" href="../board/fonts.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
 :root{--bg:#23271A;--card:#2D3221;--rule:#3E4431;--ink:#E8E2D8;--ink2:#C6C7B9;
@@ -298,6 +299,16 @@ label.btn{display:inline-flex;align-items:center;justify-content:center}
 
 /* crisper type: grayscale smoothing on dark, real kerning, a touch more contrast in the greys */
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-kerning:normal}
+
+/* ONE HEADING STYLE EVERYWHERE: same fonts as the board, gold upper-case headings with a gold underline */
+html,body{font-family:'Archivo','Helvetica Neue',Arial,sans-serif}
+.sec{border-bottom:2px solid var(--accent)!important;padding-bottom:6px!important}
+.sec h2{font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif!important;font-size:13px!important;font-weight:700!important;letter-spacing:.12em!important;color:var(--accent)!important}
+.tile b,.backbtn,.tab b,.tab{font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif}
+.tile b{font-size:13px;letter-spacing:.08em}
+
+/* EVERY BUTTON AND LABEL UPPER CASE (Harry 22 Nov - standing rule) */
+button,.big,.link,.filebtn,label,.seg button,.yn button,.chip,.tab,.backbtn,summary{text-transform:uppercase;letter-spacing:.06em}
 </style>
 <script>
 (function(){

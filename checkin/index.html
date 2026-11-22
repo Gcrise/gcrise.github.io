@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="../board/fonts.css">
 <title>ELISE Site Sign-in</title>
 <style>
 :root{--bg:#23271A;--card:#2D3221;--rule:#3E4431;--ink:#E8E2D8;--ink2:#C6C7B9;--ink3:#9EA090;--accent:#DCCAA2;--stop:#FF6B6B;--go:#2FD44A;--warn:#DDB45F;color-scheme:dark}
@@ -112,6 +113,18 @@ input[type=date],input[type=time]{min-height:48px}
 .dd .dl small{color:var(--ink3);font-size:12px;margin-left:6px}
 .dd input{margin-bottom:8px}
 .dd .co{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:12px 0 2px}
+/* ONE HEADING STYLE EVERYWHERE: same fonts as the board, gold upper-case headings with a gold underline */
+html,body{font-family:'Archivo','Helvetica Neue',Arial,sans-serif}
+h1,.step-n{font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif!important;font-size:13px!important;font-weight:700;letter-spacing:.12em!important;text-transform:uppercase;color:var(--accent)!important;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.step-n{margin-bottom:8px}
+.step-h,.big,.dd summary,.chip,.yn button,.seg button{font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif}
+.dd summary{text-transform:uppercase;letter-spacing:.08em;font-size:15px}
+/* EVERY BUTTON AND LABEL UPPER CASE (Harry 22 Nov - standing rule) */
+button,.big,.link,.filebtn,label,.seg button,.yn button,.chip,.tab,.backbtn,summary{text-transform:uppercase;letter-spacing:.06em}
+.seg button,.yn button{font-weight:700}
+.check,.check span,label.check{text-transform:none;letter-spacing:normal}
+label .opt{text-transform:uppercase!important;letter-spacing:.06em!important}
+select{text-transform:uppercase;font-weight:600}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <div class="top"><div class="logo" role="img" aria-label="ELISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
