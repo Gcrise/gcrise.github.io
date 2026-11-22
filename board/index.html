@@ -2630,7 +2630,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 21 Nov 23:25</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 14:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9705,12 +9705,12 @@ function renderLPRec(dt){
   var nt=(R.notes||[]).length?'<div class="lp-rech">Notes vs the day-by-day</div><ul class="lp-reclist">'+R.notes.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>":"";
   box.innerHTML=sum+map+(list||'<div class="lp-none">No lifts seen on the deck.</div>')+ns+nt;
 }
-/* ---- Lift records tab: every recorded day, newest first ---- */
+/* ---- Lift records tab: every recorded day, in cycle order (Day 0 first), opens on the latest ---- */
 var lr={list:null,sel:null,loading:0};
 function lrLoad(){
   if(lr.loading)return;lr.loading=1;
   eliseAuth.rest("lift_record?select=date,cycle_start,level,day_label,rows&order=date.desc&limit=60").then(function(r){return r.ok?r.json():[];}).then(function(j){
-    lr.list=j||[];lr.loading=0;(j||[]).forEach(function(R){lpRec[R.date]=lpRec[R.date]&&lpRec[R.date].rec&&lpRec[R.date].rec.not_seen?lpRec[R.date]:null;});
+    lr.list=(j||[]).slice().reverse();lr.loading=0; /* oldest first: Day 0, Day 1, ... */(j||[]).forEach(function(R){lpRec[R.date]=lpRec[R.date]&&lpRec[R.date].rec&&lpRec[R.date].rec.not_seen?lpRec[R.date]:null;});
     if(state.view==="lrec")renderLRec();
   }).catch(function(){lr.list=[];lr.loading=0;if(state.view==="lrec")renderLRec();});
 }
@@ -9718,7 +9718,7 @@ function renderLRec(){
   if(lr.list==null){el("lrDays").innerHTML='<div class="lp-none">Loading&hellip;</div>';lrLoad();return;}
   var L=lr.list;
   if(!L.length){el("lrDays").innerHTML="";el("lrCycle").innerHTML="";el("lpRecN").textContent="";el("lpRecBody").innerHTML='<div class="lp-none">No days recorded yet. Each working day is recorded at 6pm.</div>';return;}
-  if(!lr.sel||!L.some(function(x){return x.date===lr.sel;}))lr.sel=L[0].date;
+  if(!lr.sel||!L.some(function(x){return x.date===lr.sel;}))lr.sel=L[L.length-1].date;
   var today=iso(new Date());
   el("lrDays").innerHTML=L.map(function(R){
     var d=parseISO(R.date),n=(R.rows||[]).filter(function(r){return !r.removed;}).length,m=/Day\s*(\d+)/i.exec(R.day_label||"");
