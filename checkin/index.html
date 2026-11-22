@@ -98,12 +98,27 @@ input[type=date],input[type=time]{min-height:48px}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .acts .big{margin-top:0;font-size:14px;padding:14px 8px}
 .ind-line{font-size:14px;margin-top:10px;text-align:center;color:var(--ink2)}
+.notice{background:var(--card);border:1px solid var(--warn);border-left:5px solid var(--warn);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:15px;line-height:1.4;white-space:pre-wrap}
+.notice.urg{border-color:var(--stop);border-left-color:var(--stop)}
+.notice small{display:block;margin-top:4px;font-size:12px;color:var(--ink3);white-space:normal}
+.dd{border-top:1px solid var(--rule)}
+.dd:first-of-type{margin-top:8px}
+.dd summary{display:flex;align-items:center;gap:8px;padding:14px 0;font-weight:700;font-size:16px;cursor:pointer;list-style:none}
+.dd summary::-webkit-details-marker{display:none}
+.dd summary::after{content:"\25BE";color:var(--ink3)}
+.dd[open] summary::after{transform:rotate(180deg)}
+.dd summary i{margin-left:auto;font-style:normal;font-weight:400;font-size:13px;color:var(--ink3)}
+.dd .dl{display:block;padding:9px 0;border-top:1px solid var(--rule);color:var(--ink);font-size:15px;overflow-wrap:anywhere}
+.dd .dl small{color:var(--ink3);font-size:12px;margin-left:6px}
+.dd input{margin-bottom:8px}
+.dd .co{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:12px 0 2px}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <div class="top"><div class="logo" role="img" aria-label="ELISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
 <h1>Site sign-in</h1>
 <div class="site">3 Twenty Fifth Ave, Palm Beach</div>
 <div class="date" id="date"></div>
+<div id="notices"></div>
 
 <!-- ELISE Constructions site induction (once only) -->
 <div class="card" id="vInd" hidden>
@@ -179,6 +194,12 @@ input[type=date],input[type=time]{min-height:48px}
   <div class="mine" id="mine"></div>
 </div>
 
+<div class="card" id="vDocs">
+  <div class="step-n">Site documents</div>
+  <details class="dd"><summary>Site policies<i id="dPolN"></i></summary><div id="dPol"></div></details>
+  <details class="dd"><summary>Safety data sheets (SDS)<i id="dSdsN"></i></summary><input type="search" id="dSdsQ" placeholder="Search product or company" aria-label="Search SDS"><div id="dSds"></div></details>
+  <details class="dd"><summary>Your company's SWMS<i id="dSwN"></i></summary><div id="dSw"></div></details>
+</div>
 <div class="card">
   <ul class="rules">
     <li>Sign in every day when you arrive and sign out when you leave. Anyone still signed in at 6pm is signed out automatically.</li>
@@ -247,7 +268,7 @@ async function flush(){
     }
   }finally{flushing=false;render();}
 }
-window.addEventListener("online",function(){netState();flush().then(refreshStatus);loadDocs();});
+window.addEventListener("online",function(){netState();flush().then(refreshStatus);loadDocs().then(renderDocs);loadNotices();});
 window.addEventListener("offline",netState);
 setInterval(flush,20000);
 function netState(){var on=navigator.onLine;$("net").classList.toggle("off",!on);$("net").querySelector("span").textContent=on?"Online":"No signal - saving on phone";}
@@ -444,8 +465,8 @@ function drawInd(){
       '<button class="big alt" type="button" id="tkAdd">+ Add a ticket or licence</button>'+
       '<p class="muted">High risk work licences, plant tickets / VOCs, trade licences, working at heights, first aid and so on. No other tickets? Just tap Next.</p>';
   }else if(pg===4){
-    var pack=docs().filter(function(x){return x.kind==="induction";});
-    h=(pack.length?'<p class="step-p">Open and read the site induction pack first:</p>'+pack.map(function(x){return '<div class="doc'+(d.docs_opened[x.id]?" opened":"")+'"><a href="'+docUrl(x)+'" target="_blank" rel="noopener" data-pack="'+x.id+'">'+esc(x.title)+"</a></div>";}).join("")+'<p class="step-p" style="margin-top:14px">':'<p class="step-p">')+
+    var pack=docs().filter(function(x){return x.kind==="induction"||x.kind==="policy";});
+    h=(pack.length?'<p class="step-p">Open and read each of these first - Elise policies and the site induction pack:</p>'+pack.map(function(x){return '<div class="doc'+(d.docs_opened[x.id]?" opened":"")+'"><a href="'+docUrl(x)+'" target="_blank" rel="noopener" data-pack="'+x.id+'">'+esc(x.title)+"</a></div>";}).join("")+'<p class="step-p" style="margin-top:14px">':'<p class="step-p">')+
       "Answer Yes or No for each item to confirm it was covered in your site-specific induction. If something wasn't covered, answer No and ask the Elise site team before you finish.</p>"+
       ACK.map(function(a,i){return '<div class="ack"><p>'+(i+1)+". "+esc(a)+"</p>"+ynHtml("ack"+i,d.ack[i])+(d.ack[i]===false?'<div class="no">Ask the Elise site team to go through this with you.</div>':"")+"</div>";}).join("");
   }else if(pg===5){
@@ -496,7 +517,7 @@ function indCheck(){
     for(var j=0;j<d.tickets.length;j++){var t=d.tickets[j];if(!t.name)return "Say what ticket "+(j+1)+" is, or remove it.";if(!FILES["tk"+t.k])return "Add a photo of ticket "+(j+1)+".";}
   }
   if(pg===4){
-    var pack=docs().filter(function(x){return x.kind==="induction";});
+    var pack=docs().filter(function(x){return x.kind==="induction"||x.kind==="policy";});
     for(var k=0;k<pack.length;k++)if(!d.docs_opened[pack[k].id])return "Open and read every part of the induction pack first.";
     var un=d.ack.indexOf(null);if(un>=0)return "Answer item "+(un+1)+".";
     var no=d.ack.indexOf(false);if(no>=0)return "Item "+(no+1)+" is No - ask the Elise site team to go through it with you, then change it to Yes.";
@@ -749,10 +770,34 @@ async function refreshStatus(){
   }catch(e){}
   if($("vMain").hidden===false)render();
 }
-loadDocs();
+
+/* ---------- announcements and site documents ---------- */
+var K_NOT="elise_ci_notices";
+async function loadNotices(){
+  if(navigator.onLine){try{var r=await fetch(URL_+"/rest/v1/site_notice?select=id,msg,urgent,created_at,expires_at&order=urgent.desc,created_at.desc",{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}});if(r.ok)ls(K_NOT,await r.json());}catch(e){}}
+  renderNotices();
+}
+function renderNotices(){
+  var L=(ls(K_NOT)||[]).filter(function(n){return new Date(n.expires_at).getTime()>Date.now();});
+  $("notices").innerHTML=L.map(function(n){return '<div class="notice'+(n.urgent?" urg":"")+'" role="status"><b>'+(n.urgent?"Urgent - ":"")+"Site announcement</b><br>"+esc(n.msg)+"<small>Posted by Elise "+clock(n.created_at)+", "+dmy(n.created_at)+"</small></div>";}).join("");
+}
+function renderDocs(){
+  var D=docs(),pol=D.filter(function(d){return d.kind==="policy";}),sds=D.filter(function(d){return d.kind==="sds";}),co=(ls(K_ME)||{}).co,sw=D.filter(function(d){return d.kind==="swms"&&d.co===co;});
+  function a(d){return '<a class="dl" href="'+docUrl(d)+'" target="_blank" rel="noopener">'+esc(d.title)+"</a>";}
+  $("dPolN").textContent=pol.length||"";$("dPol").innerHTML=pol.length?pol.map(a).join(""):'<p class="muted">None uploaded yet.</p>';
+  $("dSwN").textContent=sw.length||"";$("dSw").innerHTML=co?(sw.length?sw.map(a).join(""):'<p class="muted">None on file for '+esc(coName(co))+".</p>"):'<p class="muted">Sign in once and your company\'s SWMS show here.</p>';
+  var q=($("dSdsQ").value||"").toLowerCase().trim(),by={};
+  sds.filter(function(d){return !q||(d.title+" "+coName(d.co)).toLowerCase().indexOf(q)>=0;}).forEach(function(d){(by[d.co]=by[d.co]||[]).push(d);});
+  $("dSdsN").textContent=sds.length||"";
+  var ks=Object.keys(by).sort(function(x,y){return coName(x)<coName(y)?-1:1;});
+  $("dSds").innerHTML=ks.length?ks.map(function(c){return '<div class="co">'+esc(coName(c))+"</div>"+by[c].sort(function(x,y){return x.title<y.title?-1:1;}).map(a).join("");}).join(""):'<p class="muted">'+(q?"Nothing matches.":"None uploaded yet.")+"</p>";
+  $("vDocs").hidden=!D.length;
+}
+$("dSdsQ").addEventListener("input",renderDocs);
+loadDocs().then(renderDocs);loadNotices();renderDocs();
 render();flush().then(function(){checkStatus();refreshStatus();});
 setInterval(function(){checkStatus();refreshStatus();},60000);
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){if(!$("vMain").hidden)render();flush();checkStatus();refreshStatus();}});
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){if(!$("vMain").hidden)render();flush();checkStatus();refreshStatus();loadNotices();}});
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 </script>
 </body></html>

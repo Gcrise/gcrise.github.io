@@ -1989,6 +1989,28 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
 .ts-exp{color:var(--crit);font-weight:600}
 .ts-x dd,.ts-x .ts-p,.ts-x .ts-acklist,.ts-x figcaption,.ts-x textarea,.ts-li b,.ts-li small,#v-tester .ts-p,#v-tester .note{text-transform:none;letter-spacing:normal}
 .ts-sig{max-height:200px;object-fit:contain}
+.ts-dd{border-bottom:1px solid var(--line)}
+.ts-dd>summary{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;font-weight:600;font-size:14px;list-style:none}
+.ts-dd>summary::-webkit-details-marker{display:none}
+.ts-dd>summary::after{content:"\25BE";margin-left:6px;color:var(--ink-3);transition:transform .15s}
+.ts-dd[open]>summary::after{transform:rotate(180deg)}
+.ts-dd>summary i{font-style:normal;margin-left:auto;font-size:13px;color:var(--ink-3);font-weight:400}
+.ts-ddb{padding:0 14px 8px}
+.ts-card .ts-dd>summary,.ts-card .ts-ddb{padding-left:0;padding-right:0}
+.ts-notice{position:relative;margin:8px 14px;padding:10px 12px;border:1px solid var(--line-hard);border-left:4px solid var(--warn);border-radius:4px;display:flex;flex-direction:column;gap:6px}
+.ts-notice.urg{border-left-color:var(--alarm)}
+.ts-notice p{margin:0;font-size:15px;line-height:1.4;text-transform:none;letter-spacing:normal;white-space:pre-wrap}
+.ts-notice small{color:var(--ink-3);font-size:12px}
+.ts-notice .ts-out{align-self:flex-start;margin-left:0}
+.logdd>summary{cursor:pointer;list-style:none}
+.logdd>summary::-webkit-details-marker{display:none}
+.logcat.logdd>summary{display:flex;align-items:baseline;gap:10px}
+.logcat.logdd>summary span{margin-left:auto}
+.logcat.logdd>summary::after,.logday.logdd>summary::after{content:"\25BE";margin-left:10px;color:var(--ink-3);font-size:14px;transition:transform .15s;flex:none}
+.logdd[open]>summary::after{transform:rotate(180deg)}
+.logcat.logdd{border-bottom:1px solid var(--line-hard)}
+.logday.logdd>summary{display:flex}
+.logday.logdd>summary span+span{margin-left:auto}
 .ts-big{font-size:20px;font-weight:700;color:var(--ink);margin-right:4px}
 .ts-trades{padding:4px 14px 10px;overflow-x:auto}
 .ts-trades table{width:100%;border-collapse:collapse;font-size:14px}
@@ -2645,7 +2667,10 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <button type="button" class="ts-tile" data-tsv="permit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v2.5"/></svg><b>Permits</b><span id="tbPm"></span></button>
       <button type="button" class="ts-tile" data-tsv="plant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h13v-5H9l-2-4H3z"/><path d="M16 14h3l2 3h-5"/><circle cx="7" cy="18.5" r="1.8"/><circle cx="17" cy="18.5" r="1.8"/><path d="M9 8l6-4 2 4"/></svg><b>Plant</b><span id="tbPl"></span></button>
       <button type="button" class="ts-tile" data-tsv="gate"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3M14 20h2"/></svg><b>Gate QR code</b><span>Print the poster</span></button>
-      <button type="button" class="ts-tile" data-tsv="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6l2 2h10V19H3z"/><path d="M8 13h8M8 16h5"/></svg><b>SWMS &amp; docs</b><span id="tbDocs"></span></button>
+      <button type="button" class="ts-tile" data-tsv="notice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9.5a3.5 3.5 0 0 1 0 5M19.5 7a7 7 0 0 1 0 10"/></svg><b>Site announcements</b><span id="tbNotice"></span></button>
+      <button type="button" class="ts-tile" data-tsv="docs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6l2 2h10V19H3z"/><path d="M8 13h8M8 16h5"/></svg><b>SWMS</b><span id="tbDocs"></span></button>
+      <button type="button" class="ts-tile" data-tsv="sds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v5l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 14h9"/></svg><b>SDS</b><span id="tbSds"></span></button>
+      <button type="button" class="ts-tile" data-tsv="policy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/></svg><b>Policies</b><span id="tbPol"></span></button>
     </div>
 
     <div data-tsp="att" hidden>
@@ -2710,9 +2735,48 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       </div>
     </div>
 
+    <div data-tsp="notice" hidden>
+      <div class="ts-grid">
+        <div class="ts-card">
+          <h3>New announcement <span>shows at the top of the sign-in page for everyone</span></h3>
+          <label>Message<textarea id="tsNoMsg" rows="3" maxlength="1000" placeholder="e.g. Crane down 12-1pm for maintenance. No lifts."></textarea></label>
+          <label>Show until<select id="tsNoTill"><option value="today">End of today</option><option value="tomorrow">End of tomorrow</option><option value="week">One week</option><option value="month">One month</option></select></label>
+          <label class="ts-chk"><input type="checkbox" id="tsNoUrg"> Urgent - shows in red</label>
+          <button type="button" class="addbtn" id="tsNoGo">Post announcement</button>
+        </div>
+      </div>
+      <div class="subhead"><span>Showing now</span><span id="tsNoN"></span></div>
+      <div id="tsNoList"></div>
+      <p class="note">Workers see these on the sign-in page each time they open it, and again when they sign in. It doesn't send texts. For something urgent, also call or message the foremen.</p>
+    </div>
+
+    <div data-tsp="sds" hidden>
+      <div class="ts-grid">
+        <div class="ts-card">
+          <h3>Add SDS <span>safety data sheets, filed by company</span></h3>
+          <label>Company<select id="tsSdsCo"></select></label>
+          <div class="ts-drop" data-drop="sds" tabindex="0" role="button" aria-label="Add SDS for the chosen company">Drop SDS here<br><small>or tap to choose - goes to the company above</small></div>
+        </div>
+      </div>
+      <div class="ts-filt"><input type="search" id="tsSdsQ" placeholder="Search product or company" aria-label="Search SDS"></div>
+      <div id="tsSdsList"></div>
+      <p class="note">Workers can look these up from the sign-in page under Site documents.</p>
+    </div>
+
+    <div data-tsp="policy" hidden>
+      <div class="ts-grid">
+        <div class="ts-card">
+          <h3>Add a policy <span>H&amp;S policy, site rules, drug &amp; alcohol, smoking, young worker...</span></h3>
+          <div class="ts-drop" data-drop="policy" tabindex="0" role="button" aria-label="Add policy files">Drop policies here<br><small>workers open each one during the induction</small></div>
+        </div>
+      </div>
+      <div id="tsPolList"></div>
+      <p class="note">New workers have to open every policy during part 5 of the induction (items 1 and 2). Everyone can read them any time from the sign-in page under Site documents.</p>
+    </div>
+
     <div data-tsp="docs" hidden>
       <div class="ts-sec" id="tsDocs">
-        <div class="subhead"><span>SWMS &amp; induction pack</span><span id="tsDocN"></span></div>
+        <div class="subhead"><span>SWMS</span><span id="tsDocN"></span></div>
         <div class="ts-grid">
           <div class="ts-card">
             <h3>SWMS by company <span>workers sign on to their company's</span></h3>
@@ -2765,7 +2829,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:05</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:15</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5184,7 +5248,7 @@ function renderTabs(){
   el("tabs").innerHTML=VIEWS.map(function(x){
     if(x[0]==="tester"){
       var sn=window.__tsPend||0;
-      return '<button class="tab tabdd" type="button" data-dd="signin" aria-haspopup="menu" aria-expanded="false" aria-current="'+(state.view==="tester")+'">Sign-in'+(sn?'<b class="alert">'+sn+'</b>':'')+'<span class="ddcaret" aria-hidden="true">&#9662;</span></button>';
+      return '<button class="tab" type="button" data-tsv="home" aria-current="'+(state.view==="tester")+'">Sign-in'+(sn?'<b class="alert">'+sn+'</b>':'')+'</button>';
     }
     var g=tabGroupOf(x[0]);
     if(g){
@@ -6304,20 +6368,28 @@ function renderLog(){
     if(!rows.length) return "";
     var days=[],seen={};
     rows.forEach(function(e){ if(!seen[e.date]){seen[e.date]=[];days.push(e.date);} seen[e.date].push(e); });
-    return '<section class="logcat"><h3 class="loghead">'+esc(c[1])+'<span>'+rows.length+'</span></h3>'+
+    var ck="c:"+c[0];
+    return '<details class="logcat logdd" data-lk="'+ck+'"'+(LOG_OPEN[ck]?" open":"")+'><summary class="loghead">'+esc(c[1])+'<span>'+rows.length+(days.length?' &middot; last '+esc(longDate(days[0])):"")+'</span></summary>'+
       days.map(function(d){
-        var r=seen[d];
-        return '<div class="logday"><div class="subhead" data-acc="log"><span>'+esc(longDate(d))+'</span>'+
-          '<span>'+r.length+'</span></div>'+
+        var r=seen[d],dk=ck+":"+d;
+        return '<details class="logday logdd" data-lk="'+dk+'"'+(LOG_OPEN[dk]?" open":"")+'><summary class="subhead" data-acc="log"><span>'+esc(longDate(d))+'</span>'+
+          '<span>'+r.length+'</span></summary>'+
           r.map(function(e){
             return '<div class="logrow"><span class="tick">&#10003;</span>'+
               '<span class="ltext">'+esc(e.text)+(e.note?'<small class="lnote">'+esc(e.note)+'</small>':'')+'</span>'+
               (e.photo?'<a href="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" target="_blank" rel="noopener"><img class="lph" src="'+SB_PUB+'job-photos/'+esc(e.photo)+'.jpg" alt="Photo" loading="lazy"></a>':'')+
               (e.who?'<span class="lwho">'+esc(e.who)+'</span>':'')+'</div>';
-          }).join("")+'</div>';
-      }).join("")+'</section>';
+          }).join("")+'</details>';
+      }).join("")+'</details>';
   }).join("");
 }
+/* Completed works: every category and day is a drop-down; what's open survives the board redrawing */
+var LOG_OPEN=(function(){try{return JSON.parse(localStorage.getItem("elise_log_open")||"{}");}catch(e){return {};}})();
+document.addEventListener("toggle",function(e){
+  var d=e.target;if(!d||!d.matches||!d.matches(".logdd[data-lk]"))return;
+  var k=d.getAttribute("data-lk");if(d.open)LOG_OPEN[k]=1;else delete LOG_OPEN[k];
+  try{localStorage.setItem("elise_log_open",JSON.stringify(LOG_OPEN));}catch(x){}
+},true);
 /* ---------- matching a photo caption to the job it belongs to ----------
    Words are weighted by how rare they are across the day's job list, so
    "kerb" counts for far more than "clean" or "b1". A photo is only linked
@@ -9540,7 +9612,7 @@ document.addEventListener("click",function(e){
       go(a[n]);
       setX(dx<0?w*0.35:-w*0.35,false);
       requestAnimationFrame(function(){ requestAnimationFrame(function(){ setX(0,true); busy=false; }); });
-      var tab=document.querySelector('.tab[data-go="'+a[n]+'"]')||document.querySelector('.tab[data-dd="'+(a[n]==="tester"?"signin":tabGroupOf(a[n]))+'"]');
+      var tab=document.querySelector('.tab[data-go="'+a[n]+'"]')||(a[n]==="tester"?document.querySelector('.tab[data-tsv]'):null)||document.querySelector('.tab[data-dd="'+tabGroupOf(a[n])+'"]');
       if(tab&&tab.scrollIntoView) tab.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
     },170);
   },{passive:true});
@@ -9939,8 +10011,8 @@ function renderTester(){
   el("tsLock").hidden=signed||!needAuth;
   if(!signed){el("tsMeta").textContent="Sign in to the board to see who's on site";["tbAtt","tbAppr","tbInd","tbPm","tbPl","tbDocs"].forEach(function(i){el(i).textContent="";});el("tbApprN").hidden=true;}
   renderTsDocs();
-  if(!signed)return;
-  renderTsAdmin();
+  if(!signed){el("tbSds").textContent=el("tbPol").textContent=el("tbNotice").textContent="";return;}
+  renderTsAdmin();renderTsNotice();
   if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester"){tsFetch();tsaFetch();}},30000);}
   if(ts.rows==null){el("tsOn").innerHTML='<div class="lp-none">Loading&hellip;</div>';if(!ts.loading){ts.loading=1;tsFetch().then(function(){ts.loading=0;});}return;}
   var rows=ts.rows,on=rows.filter(function(x){return !x.out_at;}),off=rows.filter(function(x){return x.out_at;}),by={},tot=0;
@@ -10012,7 +10084,7 @@ document.addEventListener("change",function(e){
   if(m&&ts.muster){ts.muster[m.getAttribute("data-tsm")]=m.checked;renderTester();}
 });
 el("tsMuster").addEventListener("click",function(){ts.muster={};renderTester();el("tsMusterBox").scrollIntoView({block:"nearest"});});
-el("tsRefresh").addEventListener("click",function(){tsFetch();tsDocsFetch();tsaFetch();});
+el("tsRefresh").addEventListener("click",function(){tsFetch();tsDocsFetch();tsaFetch();tsnFetch();});
 el("tsOutAll").addEventListener("click",async function(){
   var b=this;if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again to sign everyone out";setTimeout(function(){b.dataset.arm="";b.textContent="Sign everyone out";},3000);return;}
   b.dataset.arm="";b.textContent="Sign everyone out";
@@ -10022,7 +10094,7 @@ el("tsOutAll").addEventListener("click",async function(){
 document.addEventListener("elise-signedout",function(){ts.rows=null;try{localStorage.removeItem(TS_CACHE);}catch(e){}if(state.view==="tester")renderTester();});
 
 /* ---------- inductions, permits, plant: approvals by Elise (Tester tab) ---------- */
-var TSV_T={att:"Attendance",appr:"Approvals",ind:"Inductions",permit:"Permits",plant:"Plant",gate:"Gate QR code",docs:"SWMS & docs"};
+var TSV_T={att:"Attendance",appr:"Approvals",ind:"Inductions",permit:"Permits",plant:"Plant",gate:"Gate QR code",notice:"Site announcements",docs:"SWMS",sds:"SDS",policy:"Policies"};
 var tsv=(function(){try{var v=localStorage.getItem("elise_tsv");return TSV_T[v]?v:"home";}catch(e){return "home";}})();
 var tsa={wk:null,pm:null,pl:null,at:null,f:{ind:"all",permit:"open",plant:"on"},q:""};
 var PERMIT_N={hot:"Hot works",height:"Work at height / EWP",pen:"Penetration / core drilling",dig:"Excavation",iso:"Electrical isolation",conf:"Confined space",ooh:"Out of hours work",crane:"Crane lift outside plan",other:"Other permit"};
@@ -10202,7 +10274,7 @@ document.addEventListener("click",function(e){
   var pd=e.target.closest("[data-tspdf]");if(pd){var u=tsx.ups.filter(function(x){return x.id===pd.getAttribute("data-tspdf");})[0];if(u){if(!u.blob){var b=atob(u.data.split(",")[1]),a8=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a8[i]=b.charCodeAt(i);u.blob=URL.createObjectURL(new Blob([a8],{type:"application/pdf"}));}window.open(u.blob,"_blank");}}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&tsx&&!document.querySelector(".lpv"))tsClose();});
-document.addEventListener("elise-signedout",function(){tsa.wk=tsa.pm=tsa.pl=null;tsClose();try{renderFrontSign();}catch(e){}});
+document.addEventListener("elise-signedout",function(){tsa.wk=tsa.pm=tsa.pl=null;tsn.list=null;tsClose();try{renderFrontSign();}catch(e){}});
 
 
 /* ---------- Today panel: site sign-in card ---------- */
@@ -10236,6 +10308,39 @@ function renderFrontSign(){
   b.innerHTML=h;
 }
 setInterval(function(){if(state.view==="today"&&tsSigned()){tsFetch();tsaFetch();}},60000);
+
+/* ---------- site announcements (Tester tab) ---------- */
+var tsn={list:null};
+async function tsnFetch(){
+  if(!tsSigned())return;
+  try{var r=await eliseAuth.rest("site_notice?select=id,msg,urgent,created_at,created_by,expires_at&active=eq.true&expires_at=gt."+new Date().toISOString()+"&order=created_at.desc&limit=50");if(r.ok)tsn.list=await r.json();}catch(e){}
+  renderTsNotice();
+}
+function renderTsNotice(){
+  if(tsn.list==null){if(tsSigned()&&!tsn.loading){tsn.loading=1;tsnFetch().then(function(){tsn.loading=0;});}return;}
+  var L=tsn.list;
+  el("tbNotice").textContent=L.length?L.length+" showing":"None showing";
+  el("tsNoN").textContent=L.length?L.length+"":"";
+  el("tsNoList").innerHTML=L.length?L.map(function(n){
+    return '<div class="ts-notice'+(n.urgent?" urg":"")+'"><p>'+esc(n.msg)+"</p><small>Posted "+tsDT(n.created_at)+" - showing until "+tsDT(n.expires_at)+'</small><button type="button" class="ts-out" data-tsnodel="'+n.id+'">Take down</button></div>';
+  }).join(""):'<div class="lp-none">Nothing showing on the sign-in page.</div>';
+}
+el("tsNoGo").addEventListener("click",async function(){
+  if(!tsSigned()){toast("Sign in to the board first");return;}
+  var m=el("tsNoMsg").value.trim();if(m.length<2){toast("Type the announcement");return;}
+  var t=new Date(),till=el("tsNoTill").value;
+  if(till==="today")t.setHours(23,59,0,0);else if(till==="tomorrow"){t.setDate(t.getDate()+1);t.setHours(23,59,0,0);}else t=new Date(Date.now()+(till==="week"?7:30)*864e5);
+  var r=await eliseAuth.rest("site_notice",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({msg:m,urgent:el("tsNoUrg").checked,expires_at:t.toISOString(),created_by:eliseAuth.email&&eliseAuth.email()})});
+  if(!r.ok){toast(navigator.onLine?"Couldn't post it":"No signal - try again");return;}
+  el("tsNoMsg").value="";el("tsNoUrg").checked=false;toast("Posted to the sign-in page");tsnFetch();
+});
+document.addEventListener("click",async function(e){
+  var b=e.target.closest("[data-tsnodel]");if(!b)return;
+  if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Tap again";setTimeout(function(){b.dataset.arm="";b.textContent="Take down";},3000);return;}
+  var r=await eliseAuth.rest("site_notice?id=eq."+b.getAttribute("data-tsnodel"),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({active:false})});
+  if(r.ok){toast("Taken down");tsnFetch();}else toast("Couldn't take it down");
+});
+el("tsSdsQ").addEventListener("input",function(){renderTsDocs();});
 /* ---------- induction + SWMS documents and register (Tester tab) ---------- */
 var tsd={docs:null,reg:null,kind:"induction"};
 function tsSize(n){return n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";}
@@ -10252,13 +10357,21 @@ async function tsDocsFetch(){
 function renderTsDocs(){
   var signed=tsSigned();el("tsDocs").hidden=!signed;if(!signed)return;
   if(!el("tsSwmsCo").options.length)el("tsSwmsCo").innerHTML=tsCoOpts();
+  if(!el("tsSdsCo").options.length)el("tsSdsCo").innerHTML=tsCoOpts();
   if(tsd.docs==null){if(!tsd.loading){tsd.loading=1;tsDocsFetch().then(function(){tsd.loading=0;});}return;}
   var D=tsd.docs,ind=D.filter(function(d){return d.kind==="induction";}),sw=D.filter(function(d){return d.kind==="swms";});
   function item(d){return '<div class="ts-doc"><a href="'+esc(eliseAuth.fileUrl(d.path))+'" target="_blank" rel="noopener">'+esc(d.title)+'</a><small>'+(d.size?tsSize(d.size)+" - ":"")+tsDay(d.uploaded_at)+'</small><button type="button" class="ts-out" data-tsdel="'+d.id+'">Remove</button></div>';}
   el("tsIndList").innerHTML=ind.length?ind.map(item).join(""):'<div class="lp-none">Nothing in the pack. The induction form works without it.</div>';
   var by={};sw.forEach(function(d){(by[d.co]=by[d.co]||[]).push(d);});
-  el("tsSwmsList").innerHTML=Object.keys(by).length?Object.keys(by).sort().map(function(c){return '<div class="ts-swco">'+lpTag(c)+esc(tsCoName(c))+"</div>"+by[c].map(item).join("");}).join(""):'<div class="lp-none">No SWMS uploaded yet.</div>';
+  el("tsSwmsList").innerHTML=Object.keys(by).length?Object.keys(by).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;}).map(function(c){return '<details class="ts-dd"><summary>'+lpTag(c)+esc(tsCoName(c))+"<i>"+by[c].length+'</i></summary><div class="ts-ddb">'+by[c].map(item).join("")+"</div></details>";}).join(""):'<div class="lp-none">No SWMS uploaded yet.</div>';
   el("tsDocN").textContent=sw.length+" SWMS"+(ind.length?", "+ind.length+" in the induction pack":"");el("tbDocs").textContent=sw.length+" SWMS";
+  var sd=D.filter(function(d){return d.kind==="sds";}),pol=D.filter(function(d){return d.kind==="policy";});
+  el("tbSds").textContent=sd.length+" sheets";el("tbPol").textContent=pol.length?pol.length+" polic"+(pol.length===1?"y":"ies"):"None yet";
+  el("tsPolList").innerHTML=pol.length?'<div class="ts-card" style="margin:0 14px">'+pol.map(item).join("")+"</div>":'<div class="lp-none">No policies uploaded yet.</div>';
+  var q=(el("tsSdsQ").value||"").toLowerCase().trim(),sb={};
+  sd.filter(function(d){return !q||(d.title+" "+tsCoName(d.co)).toLowerCase().indexOf(q)>=0;}).forEach(function(d){(sb[d.co]=sb[d.co]||[]).push(d);});
+  var sk=Object.keys(sb).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;});
+  el("tsSdsList").innerHTML=sk.length?sk.map(function(c){return '<details class="ts-dd"'+(q?" open":"")+"><summary>"+lpTag(c)+esc(tsCoName(c))+"<i>"+sb[c].length+'</i></summary><div class="ts-ddb">'+sb[c].sort(function(a,b){return a.title<b.title?-1:1;}).map(item).join("")+"</div></details>";}).join(""):'<div class="lp-none">'+(q?"Nothing matches.":"No SDS yet.")+"</div>";
   var R=tsd.reg||[],title={};D.forEach(function(d){title[d.id]=d.title;});
   el("tsRegN").textContent=R.length?R.length+" sign-ons":"";
   el("tsReg").innerHTML=R.length?R.slice(0,80).map(function(x){
@@ -10267,11 +10380,11 @@ function renderTsDocs(){
 }
 async function tsUpload(files){
   if(!tsSigned()){toast("Sign in to the board first");return;}
-  var kind=tsd.kind,co=kind==="swms"?el("tsSwmsCo").value:null,n=0;
+  var kind=tsd.kind,co=kind==="swms"?el("tsSwmsCo").value:kind==="sds"?el("tsSdsCo").value:null,n=0;
   for(var i=0;i<files.length;i++){
     var f=files[i];
     if(f.size>50*1048576){toast(f.name+" is over 50 MB");continue;}
-    var safe=f.name.replace(/[^\w.\-]+/g,"_").slice(-80),path=(kind==="swms"?"swms/"+co:"induction")+"/"+Date.now().toString(36)+"_"+safe;
+    var safe=f.name.replace(/[^\w.\-]+/g,"_").slice(-80),path=kind+(co?"/"+co:"")+"/"+Date.now().toString(36)+"_"+safe;
     toast("Uploading "+f.name+"...");
     try{
       var r=await eliseAuth.putFile(path,f);if(!r.ok)throw new Error(r.status);
