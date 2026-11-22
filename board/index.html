@@ -2942,7 +2942,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 23:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 23:20</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -9724,11 +9724,11 @@ document.addEventListener("click",function(e){
     if(x0==null||skip) return;
     var t=e.touches[0], mx=t.clientX-x0, my=t.clientY-y0;
     if(!lock){
-      if(Math.abs(mx)<14&&Math.abs(my)<10) return;
-      /* only a clearly sideways swipe changes tab - anything with real up/down in it is a scroll */
-      lock = (Math.abs(mx)>=14&&Math.abs(mx)>Math.abs(my)*2.5) ? 1 : -1;
+      if(Math.abs(mx)<10&&Math.abs(my)<10) return;
+      /* sideways wins when the finger is going more across than up/down */
+      lock = Math.abs(mx)>Math.abs(my)*1.4 ? 1 : -1;
     }
-    if(lock===1&&Math.abs(my)>60){ lock=-1; setX(0,true); return; }
+    if(lock===1&&Math.abs(my)>Math.max(90,Math.abs(mx))){ lock=-1; setX(0,true); return; }
     if(lock!==1) return;
     e.preventDefault();
     var a=ids(), i=a.indexOf(cur());
@@ -9742,7 +9742,7 @@ document.addEventListener("click",function(e){
     x0=null;
     var dt=Date.now()-t0, a=ids(), i=a.indexOf(cur());
     if(i<0){ setX(0,true); return; }
-    var fast=Math.abs(dx)>50&&dt<300, far=Math.abs(dx)>window.innerWidth*0.3;
+    var fast=Math.abs(dx)>40&&dt<300, far=Math.abs(dx)>window.innerWidth*0.22;
     var n=i+(dx<0?1:-1);
     if(!(fast||far)||n<0||n>=a.length){ setX(0,true); return; }
     busy=true;

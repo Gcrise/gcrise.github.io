@@ -1,0 +1,88 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link rel="stylesheet" href="../board/fonts.css">
+<style>
+:root{--bg:#23271A;--sf:#2D3221;--sf2:#353B28;--ln:#3E4431;--lh:#575D47;--ink:#E8E2D8;--ink2:#C6C7B9;--ink3:#9EA090;--gold:#DCCAA2;--crit:#E08A72;--ok:#8FBF93;--warn:#DDB45F;--alarm:#FF4A3A}
+*{box-sizing:border-box}body{margin:0;background:#151810;font-family:'Archivo',Arial,sans-serif;color:var(--ink);display:flex;gap:24px;padding:24px;align-items:flex-start}
+.ph{width:390px;background:var(--bg);border-radius:28px;overflow:hidden;border:1px solid #444;flex:none}
+.top{padding:18px 16px 10px;border-bottom:1px solid var(--ln)}
+.logo{font-family:'Archivo';font-weight:300;font-size:30px;letter-spacing:.12em}
+.tabs{display:flex;gap:16px;font-family:'Archivo Narrow';font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--ink3);margin-top:10px;white-space:nowrap;overflow:hidden}
+.tabs b{color:var(--ink);border-bottom:2px solid var(--gold);padding-bottom:6px}.tabs .r{color:#E06B5C}
+.clk{display:flex;gap:14px;align-items:baseline;padding:10px 16px;border-bottom:1px solid var(--ln)}
+.clk b{font-family:'IBM Plex Mono',monospace;font-size:26px;color:var(--gold)}.clk span{font-family:'Archivo Narrow';font-weight:700;letter-spacing:.1em;font-size:12px;color:var(--gold)}
+.lab{font-family:'Archivo Narrow';font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.h{padding:14px 16px 6px;margin:0 16px;padding-left:0;border-bottom:2px solid var(--gold);display:flex;justify-content:space-between}
+.h span{color:var(--ink3);font-size:10px}
+.cap{font-family:'Archivo Narrow';font-weight:700;letter-spacing:.14em;font-size:15px;color:var(--gold);text-align:center;padding:12px 0 2px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px 16px}
+.t{position:relative;background:var(--sf);border:1px solid var(--lh);border-radius:8px;min-height:102px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px;text-align:center}
+.t svg{width:28px;height:28px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.t b{font-family:'Archivo Narrow';font-weight:700;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+.t span{font-size:10.5px;color:var(--ink3);line-height:1.25}
+.t .n{font-family:'Archivo Narrow';font-weight:700;font-size:26px;line-height:1;color:var(--ink)}
+.t.alert{border-color:var(--crit)}.t.alert .n{color:var(--crit)}
+.bd{position:absolute;top:5px;right:5px;min-width:20px;height:20px;border-radius:10px;background:var(--alarm);color:#fff;font:700 11px/20px Archivo;padding:0 5px}
+.now{margin:12px 16px 0;padding:12px;border:1px solid var(--lh);border-left:4px solid var(--gold);border-radius:8px;background:var(--sf)}
+.now .lab{color:var(--ink3)}.now p{margin:4px 0 0;font-family:'Archivo Narrow';font-weight:700;font-size:17px;letter-spacing:.03em;text-transform:uppercase}
+.now small{display:block;margin-top:3px;color:var(--ink3);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);margin:12px 16px 0;border:1px solid var(--lh);border-radius:8px;overflow:hidden}
+.stats div{padding:10px 8px;text-align:center;background:var(--sf)}.stats div+div{border-left:1px solid var(--lh)}
+.stats b{display:block;font-family:'Archivo Narrow';font-size:28px;line-height:1}.stats span{font-family:'Archivo Narrow';font-weight:700;font-size:10px;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px 16px}
+.bt{background:var(--sf);border:1px solid var(--lh);border-radius:8px;padding:10px 12px;min-height:128px;position:relative}
+.bt .hd{display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:2px solid var(--gold)}
+.bt .hd svg{width:20px;height:20px;fill:none;stroke:var(--gold);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.bt .hd b{font-family:'Archivo Narrow';font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.bt .hd i{margin-left:auto;font-style:normal;font-family:'Archivo Narrow';font-weight:700;font-size:16px}
+.bt ul{list-style:none;margin:8px 0 0;padding:0;font-size:11.5px;line-height:1.35;text-transform:uppercase;letter-spacing:.02em;color:var(--ink2)}
+.bt li{display:flex;gap:6px;margin-bottom:4px}.bt li em{font-style:normal;font-family:'IBM Plex Mono';font-size:10.5px;color:var(--ink3);flex:none}
+.bt .x{color:var(--crit)}
+.wide{grid-column:1/-1}
+</style></head><body>
+
+<!-- A: all tiles -->
+<div class="ph" id="A">
+<div class="top"><div class="logo">ELISE</div><div class="tabs"><b>TODAY</b><span class="r">CRITICAL PATH</span><span>DAILY</span><span>LOGISTICS</span><span>LABOUR &amp; JOBS</span></div></div>
+<div class="clk"><b>07:02</b><span>MONDAY 23 NOV</span><span style="margin-left:auto;color:var(--ink2)">21° NNE 11</span></div>
+<div class="cap">OPTION A &middot; ALL TILES</div>
+<div class="grid">
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M6 21V4M6 4h14M18 4v6"/><rect x="15.5" y="12" width="5" height="4"/><path d="M3 21h6"/></svg><b>Crane</b><span>26 lifts &middot; 46%</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><b>Deliveries</b><span>3 trucks</span></div>
+ <div class="t alert"><i class="bd">!</i><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M8.5 10l1.5 1.5 3-3M8.5 15.5l1.5 1.5 3-3"/></svg><b>Prestart</b><span>Not signed off</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/></svg><b>On site</b><span>34 signed in</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="m7.5 9 1.5 1.5 3-3M14 9h3M7.5 15l1.5 1.5 3-3M14 15h3"/></svg><b>Jobs</b><span>6 open &middot; 2 priority</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.2v.3"/></svg><b>Safety</b><span>All clear</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M3 18h18M5 18v-4h14v4M9 14V9h6v5"/></svg><b>Next pour</b><span>L5 &middot; 2 Dec</span></div>
+ <div class="t"><i class="bd">2</i><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><circle cx="16.5" cy="16.5" r="3"/></svg><b>Approvals</b><span>2 waiting</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg><b>Orders</b><span>13 open</span></div>
+</div></div>
+
+<!-- B: glance + tiles -->
+<div class="ph" id="B">
+<div class="top"><div class="logo">ELISE</div><div class="tabs"><b>TODAY</b><span class="r">CRITICAL PATH</span><span>DAILY</span><span>LOGISTICS</span><span>LABOUR &amp; JOBS</span></div></div>
+<div class="clk"><b>07:02</b><span>MONDAY 23 NOV</span><span style="margin-left:auto;color:var(--ink2)">21° NNE 11</span></div>
+<div class="cap">OPTION B &middot; NUMBERS UP TOP</div>
+<div class="now"><div class="lab">On the hook now</div><p>AP precast install L5 day 1</p><small>7:10 – 10:00am &middot; 11 lifts &middot; next: EC survey &amp; pre-load 10:30</small></div>
+<div class="stats"><div><b>26</b><span>Lifts</span></div><div><b>3</b><span>Trucks</span></div><div><b>34</b><span>On site</span></div></div>
+<div class="grid">
+ <div class="t alert"><i class="bd">!</i><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M8.5 10l1.5 1.5 3-3M8.5 15.5l1.5 1.5 3-3"/></svg><b>Prestart</b><span>Not signed off</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="m7.5 9 1.5 1.5 3-3M14 9h3M7.5 15l1.5 1.5 3-3M14 15h3"/></svg><b>Jobs</b><span>6 open</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.2v.3"/></svg><b>Safety</b><span>All clear</span></div>
+ <div class="t"><i class="bd">2</i><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><circle cx="16.5" cy="16.5" r="3"/></svg><b>Approvals</b><span>2 waiting</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M3 18h18M5 18v-4h14v4M9 14V9h6v5"/></svg><b>Next pour</b><span>L5 &middot; 2 Dec</span></div>
+ <div class="t"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg><b>Orders</b><span>13 open</span></div>
+</div></div>
+
+<!-- C: tiles with a peek -->
+<div class="ph" id="C">
+<div class="top"><div class="logo">ELISE</div><div class="tabs"><b>TODAY</b><span class="r">CRITICAL PATH</span><span>DAILY</span><span>LOGISTICS</span><span>LABOUR &amp; JOBS</span></div></div>
+<div class="clk"><b>07:02</b><span>MONDAY 23 NOV</span><span style="margin-left:auto;color:var(--ink2)">21° NNE 11</span></div>
+<div class="cap">OPTION C &middot; TILES WITH A PEEK</div>
+<div class="big">
+ <div class="bt"><div class="hd"><svg viewBox="0 0 24 24"><path d="M6 21V4M6 4h14M18 4v6"/><rect x="15.5" y="12" width="5" height="4"/></svg><b>Crane</b><i>26</i></div><ul><li><em>7:10</em>AP precast L5</li><li><em>10:30</em>EC survey, pre-load</li><li><em>1:30</em>NS scaffold</li></ul></div>
+ <div class="bt"><div class="hd"><svg viewBox="0 0 24 24"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8"/></svg><b>Trucks</b><i>3</i></div><ul><li><em>6:30</em>S4U skip bin</li><li><em>6:40</em>AP precast semi</li><li><em>12:30</em>NS scaffold</li></ul></div>
+ <div class="bt" style="border-color:var(--crit)"><div class="hd"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M8.5 10l1.5 1.5 3-3"/></svg><b>Prestart</b><i class="x">!</i></div><ul><li class="x">Not signed off</li><li>12 workers signed</li><li>High risk: crane over street</li></ul></div>
+ <div class="bt"><div class="hd"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/></svg><b>On site</b><i>34</i></div><ul><li>GLF 9 &middot; RZE 6 &middot; EC 5</li><li>NS 4 &middot; AP 4 &middot; +3</li><li class="x">2 inductions waiting</li></ul></div>
+ <div class="bt wide"><div class="hd"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="m7.5 9 1.5 1.5 3-3M14 9h3"/></svg><b>Jobs today</b><i>6</i></div><ul><li class="x">&#9733; Clear deck for precast</li><li class="x">&#9733; Edge protection L5 north</li><li>Clean B2 stair &middot; + 3 more</li></ul></div>
+</div></div>
+</body></html>
