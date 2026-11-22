@@ -2907,7 +2907,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:35</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5311,7 +5311,7 @@ function go(v){
   if(v==="labour")applyLabSec();else labSec=null;
   if(v==="log")applyLogSec();else logSec=null;
   if(v==="logi")renderLogi();if(v==="dly"||v==="lab0"||v==="log0")renderHubs();
-  el("daystrip").hidden=(v==="logi"||v==="dly"||v==="log0"||v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders"||v==="lplan"||v==="lrec"||v==="tester");
+  el("daystrip").hidden=(v==="logi"||v==="dly"||v==="log0"||v==="lab0"||v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders"||v==="lplan"||v==="lrec"||v==="tester");
   if(v==="lplan")renderLPlan();
   if(v==="lrec")renderLRec();
   if(v==="tester")renderTester();
