@@ -2113,6 +2113,25 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 #v-camera .camhd b{font-family:var(--f-cond);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clock)}
 #v-camera .camhd{border-bottom:2px solid var(--clock);margin:0 14px;padding-left:0;padding-right:0}
 #v-camera .camhd span{display:none}
+
+/* Critical path on a phone: compact add row, hero boxes fill the width */
+#cpMileAdd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:8px;padding:10px 14px}
+#cpMileAdd #cpMileTxt{grid-column:1/-1}
+#cpWeek{display:none}
+#cpMileAdd input,#cpMileAdd select,#cpMileAdd .addbtn{font-size:14px!important;height:42px;min-height:42px;padding:0 10px;min-width:0;width:100%;box-sizing:border-box}
+#cpMileAdd .addbtn{width:auto;padding:0 18px}
+.cphero{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.cphero > div{padding:10px 14px}
+.cphero .v{font-size:22px}
+.cphero .v small{font-size:12px}
+.cphero .s{font-size:12px;-webkit-line-clamp:2}
+@media (max-width:640px){
+  .cpmile{padding:8px 14px}
+  .cpmile .ctl{padding-left:28px;gap:6px}
+  .cpmile .ctl .prisel,.cpmile .ctl .mdel{font-size:11px;height:30px;padding:0 8px}
+  .cpmile .ctl .prisel{padding-right:22px!important;max-width:none}
+  .cpmile .mt{font-size:13px!important}
+}
 </style>
 </head>
 <body>
@@ -2922,7 +2941,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
