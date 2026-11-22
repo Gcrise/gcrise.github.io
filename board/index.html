@@ -2134,6 +2134,41 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
   .cpmile .ctl .prisel{padding-right:22px!important;max-width:none}
   .cpmile .mt{font-size:13px!important}
 }
+
+/* ---- Today: compact living tiles ---- */
+.k3{padding-block:12px 16px;display:flex;flex-direction:column;gap:10px;max-width:760px;margin:0 auto}
+.k3-h{display:flex;justify-content:space-between;align-items:baseline}
+.k3-h b{font-family:'Archivo Narrow',sans-serif;font-size:13px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;border-bottom:1px solid var(--gold);padding-bottom:2px}
+.k3-h span{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
+.k3-hook{display:grid;grid-template-columns:1.25fr 1fr;gap:6px}
+.k3-hk{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--gold);border-left:5px solid var(--c,var(--gold));border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.k3-hk .hl{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:10.5px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
+.k3-hk .w{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;line-height:1.08;color:var(--ink);overflow-wrap:anywhere}
+.k3-hk .ht{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-2);text-transform:uppercase}
+.k3-hk .cd{align-self:flex-start;margin-top:4px;font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:11px;letter-spacing:.1em;padding:2px 8px;border-radius:10px;background:var(--ok);color:#fff;text-transform:uppercase}
+.k3-hk .cd.nx{background:var(--line-hard);color:var(--ink)}
+.k3-prog{display:flex;gap:2px;margin-top:6px}.k3-prog i{flex:1;height:5px;border-radius:2px;background:var(--line)}.k3-prog i.d{background:var(--gold)}
+.k3-q{display:flex;flex-direction:column;gap:4px;min-width:0}
+.k3-q button{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line-hard);border-left:4px solid var(--c);border-radius:6px;padding:5px 8px;font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);min-width:0}
+.k3-q button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.k3-q em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-3);flex:none}
+.k3-q .none{flex:1;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line-hard);border-radius:6px;font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:11px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+.k3-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.k3-t{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--line-hard);border-radius:10px;padding:10px;min-height:108px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.k3-t .hd{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.k3-t .hd b{font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.k3-t .hd i{font-style:normal;font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:20px;color:var(--ink)}
+.k3-t small{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;line-height:1.3;overflow:hidden;text-overflow:ellipsis}
+.k3-t.red{border-color:var(--crit)}.k3-t.red .hd b,.k3-t.red .hd i,.k3-t.red small.r{color:var(--crit)}
+.k3-t .ok{color:var(--ok)!important}
+.k3-bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}.k3-bar i{display:block;height:100%;background:var(--gold)}
+.k3-t.red .k3-bar i{background:var(--crit)}
+.k3-dots{position:relative;height:14px}.k3-dots::before{content:"";position:absolute;left:0;right:0;top:6px;height:2px;background:var(--line)}
+.k3-dots i{position:absolute;top:1px;width:12px;height:12px;border-radius:50%;background:var(--c);transform:translateX(-50%)}.k3-dots i.past{opacity:.35}
+.k3-hb{display:grid;grid-template-columns:30px 1fr 14px;gap:5px;align-items:center;font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:9.5px;color:var(--ink-2)}
+.k3-hb s{display:block;height:7px;border-radius:2px;text-decoration:none}
+.k3-sp{width:100%;height:30px;display:block}
+@media(min-width:700px){.k3-hk .w{font-size:26px}.k3-t{min-height:124px}.k3-t .hd b{font-size:12.5px}.k3-t small{font-size:11px}}
 </style>
 </head>
 <body>
@@ -2193,7 +2228,8 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 <div class="ts-bar lg-back" id="lgBack" hidden><button type="button" class="ts-backbtn" id="lgBackBtn" data-go="logi">&larr; Logistics</button></div>
 
 <section id="v-today" class="view">
-  <div class="front">
+  <div class="k3" id="k3"></div>
+  <div class="front" hidden>
     <div class="card k-crane">
       <button class="cardhead" data-go="crane"><span class="t">Crane lifts</span><span class="c" id="cCrane"></span><span class="go">&rsaquo;</span></button>
       <div class="cardbody" id="fCrane"></div>
@@ -2943,7 +2979,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 23:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5609,6 +5645,7 @@ function renderFront(){
   try{ renderWind(); }catch(e){}
   try{ renderWeather(); }catch(e){}
   try{ renderFrontSign(); }catch(e){}
+  setTimeout(function(){try{renderK3();}catch(e){console.error(e);}},0);
   var lab=state.labour.filter(function(r){return r.date===state.date;});
   var heads=lab.reduce(function(a,r){return a+(+r.qty||1);},0);
   var jobs=dayJobs(),openJobs=jobs.filter(function(j){return !j.done;});
@@ -5675,6 +5712,77 @@ function renderFront(){
     : '<div class="empty"><b>Nothing open</b></div>';
 }
 
+
+/* ---------- Today: on the hook + compact tiles ---------- */
+function k3Esc(t){return esc(String(t==null?"":t));}
+function renderK3(){
+  var box=el("k3");if(!box)return;
+  var isToday=state.date===iso(new Date()),d=new Date(),nowM=isToday?d.getHours()*60+d.getMinutes():-1;
+  var lifts=expand(dayRows()).filter(function(i){return i.row.type==="lift";});
+  var done=lifts.filter(function(it){return nowM>=0&&it.t+(it.mins||10)<=nowM;}).length;
+  var cur=null,ci=-1;
+  lifts.forEach(function(it,i){if(ci<0&&(nowM<0||it.t+(it.mins||10)>nowM)){cur=it;ci=i;}});
+  var onHook=cur&&nowM>=0&&cur.t<=nowM;
+  var nm=function(it){return (it.row.co||"")+" "+(it.row.desc||"")+(it.of>1?" "+it.n+"/"+it.of:"");};
+  var h='<div class="k3-h"><b>Crane lifts</b><span>'+(lifts.length?(isToday?done+" / ":"")+lifts.length+(isToday?" done":" booked"):"none booked")+'</span></div><div class="k3-hook">';
+  if(cur){
+    h+='<button type="button" class="k3-hk" data-go="crane" style="--c:'+colourOf(cur.row.co)+'"><span class="hl">'+(onHook?"On the hook":isToday?"Next lift":"First lift")+'</span><span class="w">'+k3Esc(nm(cur))+'</span><span class="ht">'+fmtClock(cur.t)+(cur.row.level?" &middot; "+k3Esc(cur.row.level):"")+(cur.row.status==="req"?" &middot; TBC":"")+'</span>'+
+      (isToday?'<span class="cd'+(onHook?"":" nx")+'">'+(onHook?"Live":"In "+k3Mins(cur.t-nowM))+'</span>':"")+
+      '<span class="k3-prog">'+lifts.slice(0,24).map(function(x,i){return '<i class="'+(i<done?"d":"")+'"></i>';}).join("")+'</span></button>';
+  }else h+='<button type="button" class="k3-hk" data-go="crane"><span class="hl">Crane</span><span class="w">'+(lifts.length?"All lifts done":"Nothing on the hook")+'</span><span class="ht">'+(lifts.length?lifts.length+" lifts today":"No lifts booked")+'</span></button>';
+  var nxt=cur?lifts.slice(ci+1,ci+4):[];
+  h+='<div class="k3-q">'+(nxt.length?nxt.map(function(it){return '<button type="button" data-go="crane" style="--c:'+colourOf(it.row.co)+'"><em>'+fmtClock(it.t)+'</em><span>'+k3Esc(nm(it))+'</span></button>';}).join(""):'<div class="none">Nothing after</div>')+'</div></div>';
+
+  /* tiles */
+  var T=[];
+  var dels=dayRows().filter(function(b){return b.type==="del";}).sort(function(a,b){return toMin(a.start)-toMin(b.start);});
+  var nd=dels.filter(function(b){return nowM<0||toMin(b.start)>=nowM-15;})[0];
+  var pc=function(m){var c=state.cfg||{},o=c.open==null?360:c.open,cl=c.close==null?1080:c.close;return Math.max(2,Math.min(98,(m-o)/(cl-o)*100));};
+  T.push('<button type="button" class="k3-t" data-go="crane"><div class="hd"><b>Deliveries</b><i>'+dels.length+'</i></div><div class="k3-dots">'+dels.map(function(b){var m=toMin(b.start);return '<i class="'+(nowM>=0&&m<nowM-15?"past":"")+'" style="left:'+pc(m).toFixed(1)+'%;--c:'+colourOf(b.co)+'"></i>';}).join("")+'</div><small>'+(nd?"Next "+k3Esc(nd.co)+" "+fmtClock(toMin(nd.start)):dels.length?"All in":"None booked")+'</small></button>');
+  /* on site: signed-in count when available, else the labour list */
+  var by={},tot=0;
+  if(tsSigned()&&ts.rows){ts.rows.forEach(function(x){if(!x.out_at){by[x.co]=(by[x.co]||0)+x.n;tot+=x.n;}});}
+  else state.labour.filter(function(r){return r.date===state.date;}).forEach(function(r){var k=r.supplier||"—";by[k]=(by[k]||0)+(+r.qty||1);tot+=(+r.qty||1);});
+  var cos=Object.keys(by).sort(function(a,b){return by[b]-by[a];}),mx=cos.length?by[cos[0]]:1;
+  T.push('<button type="button" class="k3-t" '+(tsSigned()?'data-tsv="att"':'data-go="labour"')+'><div class="hd"><b>On site</b><i>'+tot+'</i></div>'+(cos.length?cos.slice(0,3).map(function(c){return '<div class="k3-hb"><span>'+k3Esc(c)+'</span><s style="width:'+Math.round(by[c]/mx*100)+'%;background:'+colourOf(c)+'"></s><span>'+by[c]+'</span></div>';}).join(""):'<small>Nobody yet</small>')+'</button>');
+  /* wind */
+  var H=[];try{if(WX.state==="idle")wxFetch();H=wxDayHours(state.date);}catch(e){}
+  if(H.length>1){
+    var cn=H.filter(function(x){return x.h===(isToday?d.getHours():9);})[0]||H[0],pk=H.reduce(function(a,x){return (x.g||0)>(a.g||0)?x:a;},H[0]);
+    var mxw=Math.max(40,pk.g||0),pts=H.map(function(x,i){return (i/(H.length-1)*100).toFixed(1)+" "+(30-(x.w/mxw)*28).toFixed(1);}).join(" L");
+    var nx=isToday?((d.getHours()+d.getMinutes()/60-H[0].h)/(H[H.length-1].h-H[0].h)*100):-5;
+    var lim=30-(38/mxw)*28;
+    var hr=function(x){var a=x%12||12;return a+(x<12?"am":"pm");};
+    T.push('<button type="button" class="k3-t'+((pk.g||0)>=38?" red":"")+'" data-go="weather"><div class="hd"><b>Wind</b><i>'+Math.round(cn.w)+'</i></div><svg class="k3-sp" viewBox="0 0 100 30" preserveAspectRatio="none"><line x1="0" y1="'+lim.toFixed(1)+'" x2="100" y2="'+lim.toFixed(1)+'" stroke="var(--crit)" stroke-dasharray="3 3" stroke-width="1" vector-effect="non-scaling-stroke"/><path d="M'+pts+'" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/>'+(nx>=0&&nx<=100?'<line x1="'+nx.toFixed(1)+'" y1="0" x2="'+nx.toFixed(1)+'" y2="30" stroke="var(--alarm)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>':'')+'</svg><small>Gust '+Math.round(pk.g||0)+' @ '+hr(pk.h)+'</small></button>');
+  }else T.push('<button type="button" class="k3-t" data-go="weather"><div class="hd"><b>Wind</b><i>&ndash;</i></div><small>'+(WX.state==="loading"?"Reading forecast":"No forecast")+'</small></button>');
+  /* prestart signatures */
+  if(!SIGNS[state.date]&&!signBusy[state.date])try{loadSigns(state.date);}catch(e){}
+  var sg=(SIGNS[state.date]||[]).length,want=tot||0,low=isToday&&want&&sg<want;
+  T.push('<button type="button" class="k3-t'+(low?" red":"")+'" data-go="prestart"><div class="hd"><b>Prestart</b><i>'+(low?"!":sg)+'</i></div><div class="k3-bar"><i style="width:'+(want?Math.min(100,Math.round(sg/want*100)):sg?100:0)+'%"></i></div><small>'+sg+(want?" / "+want:"")+' signed</small></button>');
+  /* jobs */
+  var jobs=dayJobs(),open=jobs.filter(function(j){return !j.done;}),pri=open.filter(function(j){return j.pri;});
+  T.push('<button type="button" class="k3-t" data-go="lab0"><div class="hd"><b>Jobs</b><i>'+open.length+'</i></div><div class="k3-bar"><i style="width:'+(jobs.length?Math.round((jobs.length-open.length)/jobs.length*100):0)+'%"></i></div><small>'+(pri.length?pri.length+" priority":"No priority")+(jobs.length-open.length?" &middot; "+(jobs.length-open.length)+" done":"")+'</small></button>');
+  /* next pour off the programme */
+  var td=state.date,np=(state.progDoc.tasks||[]).filter(function(t){return /pour/i.test(t.task||"")&&!/^slab works/i.test(t.task||"")&&t.start>=td&&(+t.pct||0)<100;}).sort(function(a,b){return a.start<b.start?-1:1;})[0];
+  if(np){var dd=Math.round((parseISO(np.start)-parseISO(td))/86400000);
+    T.push('<button type="button" class="k3-t" data-go="path"><div class="hd"><b>Pour</b><i>'+(dd===0?"TODAY":dd+"D")+'</i></div><small>'+k3Esc(np.task.replace(/\s+/g," ").trim())+'</small><small>'+shortDate(np.start)+'</small></button>');}
+  else T.push('<button type="button" class="k3-t" data-go="path"><div class="hd"><b>Pour</b><i>&ndash;</i></div><small>None on the programme</small></button>');
+  /* hook time booked */
+  var cu=craneUse(),hp=cu.avail?Math.round(cu.used/cu.avail*100):0;
+  T.push('<button type="button" class="k3-t'+(hp>90?" red":"")+'" data-go="lplan"><div class="hd"><b>Hook time</b><i>'+hp+'%</i></div><div class="k3-bar"><i style="width:'+Math.min(100,hp)+'%"></i></div><small>'+Math.round(cu.used/6)/10+' of '+Math.round(cu.avail/6)/10+' hrs booked</small></button>');
+  /* approvals */
+  if(tsSigned()&&tsa.wk){
+    var pw=tsa.wk.filter(function(w){return w.status==="pending";}),pp=tsa.pm.filter(function(x){return x.status==="pending";}),pl=tsa.pl.filter(function(x){return x.status==="pending";});
+    var n=pw.length+pp.length+pl.length,lst=pw.map(function(w){return w.name;}).concat(pp.map(function(x){return (PERMIT_N[x.kind]||x.kind)+" permit";}),pl.map(function(x){return x.make||x.plant||x.kind||"Plant";}));
+    T.push('<button type="button" class="k3-t'+(n?" red":"")+'" data-tsv="appr"><div class="hd"><b>Approve</b><i'+(n?"":' class="ok"')+'>'+(n||"&#10003;")+'</i></div>'+(n?lst.slice(0,2).map(function(x){return '<small class="r">'+k3Esc(x)+'</small>';}).join(""):'<small>Nothing waiting</small>')+'</button>');
+  }else T.push('<button type="button" class="k3-t" data-tsv="home"><div class="hd"><b>Sign-in</b><i>&rsaquo;</i></div><small>Inductions, permits, plant</small></button>');
+  /* safety */
+  var sf=openSafety(),inc=sf.filter(function(i){return i.kind==="INC";}).length;
+  T.push('<button type="button" class="k3-t'+(inc?" red":"")+'" data-go="safety"><div class="hd"><b>Safety</b><i'+(sf.length?"":' class="ok"')+'>'+(sf.length||"&#10003;")+'</i></div>'+(sf.length?sf.slice(0,2).map(function(i){return '<small>'+k3Esc(i.text)+'</small>';}).join(""):'<small>Nothing open</small>')+'</button>');
+  box.innerHTML=h+'<div class="k3-g">'+T.join("")+'</div>';
+}
+function k3Mins(m){m=Math.max(0,Math.round(m));return m<60?m+" min":Math.floor(m/60)+"h "+(m%60?m%60+"m":"");}
+setInterval(function(){if(state.view==="today")try{renderK3();}catch(e){}},60000);
 /* ---------- labour ---------- */
 function renderLabour(){
   var rows=state.labour.filter(function(r){return r.date===state.date;});
@@ -6165,6 +6273,7 @@ function loadSigns(day){
 }
 function paintSigns(day){
   if(day!==state.date) return;
+  try{renderK3();}catch(e){}
   var L=SIGNS[day]||[], box=el("preSigns"); if(!box) return;
   box.innerHTML=L.length?L.map(function(r){
     var t=new Date(r.at);
@@ -10538,6 +10647,7 @@ document.addEventListener("elise-signedout",function(){tsa.wk=tsa.pm=tsa.pl=null
 
 /* ---------- Today panel: site sign-in card ---------- */
 function renderFrontSign(){
+  try{if(el("k3"))renderK3();}catch(e){}
   var b=el("fSign");if(!b)return;
   if(!tsSigned()){el("cSign").textContent="";b.innerHTML='<div class="empty"><b>Sign in to the board</b></div>';return;}
   if(ts.rows==null){
