@@ -2468,6 +2468,22 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
   </div>
 </div>
 
+<div class="scrim" id="cb-delayScrim" hidden>
+  <div class="sheet">
+    <div class="gut">
+      <h2>Delay</h2>
+      <div class="row">
+        <div class="f"><label for="cb-dFrom">First lift went at</label><input type="time" id="cb-dFrom" step="300"></div>
+      </div>
+      <p class="note" id="cb-delayWhat"></p>
+      <div class="acts">
+        <button class="btn primary grow" id="cb-dGo">Slide the day</button>
+        <button class="btn" id="cb-dCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="scrim" id="cb-rainScrim" hidden>
   <div class="sheet">
     <div class="gut">
@@ -3000,7 +3016,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 06:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 09:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -3753,10 +3769,11 @@ function autoQty(v){
       (nReq?'<span><b>'+nReq+'</b> tbc</span>':'')+
       (nCl?'<span class="flag"><b>'+nCl+'</b> clash</span>':'')+
       (function(){var n=craneItems.filter(overBreak).length;return n?'<span class="flag"><b>'+n+'</b> on break</span>':''})();
-    s+='<span class="right"><button class="btn" id="cb-undoBtn">Undo</button><button class="btn'+(ripple?" primary":"")+'" id="cb-ripBtn" title="Move one and the rest of the day follows">Slide '+(ripple?"on":"off")+'</button><button class="btn" id="cb-selBtn">'+(selMode?"Stop picking":"Pick")+'</button><button class="btn" id="cb-rainBtn" title="Rained out - move the day">Rain day</button><button class="btn" id="cb-copyBtn">Copy</button></span>';
+    s+='<span class="right"><button class="btn" id="cb-undoBtn">Undo</button><button class="btn'+(ripple?" primary":"")+'" id="cb-ripBtn" title="Move one and the rest of the day follows">Slide '+(ripple?"on":"off")+'</button><button class="btn" id="cb-selBtn">'+(selMode?"Stop picking":"Pick")+'</button><button class="btn" id="cb-delayBtn" title="Late start - slide the rest of the day">Delay</button><button class="btn" id="cb-rainBtn" title="Rained out - move the day">Rain day</button><button class="btn" id="cb-copyBtn">Copy</button></span>';
     $("stats").innerHTML=s;
     $("copyBtn").onclick=copyPrestart;
     $("rainBtn").onclick=openRain;
+    $("delayBtn").onclick=openDelay;
     $("selBtn").onclick=function(){setSelMode(!selMode)};
     $("undoBtn").onclick=undo;renderUndo();
     $("ripBtn").onclick=function(){
@@ -4184,6 +4201,56 @@ function autoQty(v){
     }else w.hidden=true;
     $("rGo").disabled=!src.length;
   }
+
+  /* Delay: the first lift went late - slide everything still to come on the day
+     by the same amount, trucks with it. resolve() re-applies the breaks and
+     pushes anything that lands on top of something else. */
+  function delaySet(){
+    var day=items.filter(function(L){return L.date===cur&&L.status!=="done"});
+    var cr=day.filter(function(L){return L.type==="lift"&&L.crane!=="none"}).sort(function(a,b){return a.start-b.start});
+    var first=cr[0];
+    if(!first)return {first:null,list:[]};
+    return {first:first,list:day.filter(function(L){return L.start>=first.start})};
+  }
+  function delayMins(){
+    var v=$("dFrom").value,ds=delaySet();
+    if(!v||!ds.first)return null;
+    var p=v.split(":");return (+p[0])*60+(+p[1])-ds.first.start;
+  }
+  function delayBlurb(){
+    var ds=delaySet(),d=delayMins(),w=$("delayWhat");
+    if(!ds.first){w.textContent="Nothing on the crane to slide.";$("dGo").disabled=true;return;}
+    $("dGo").disabled=!d;
+    w.textContent="FIRST LIFT BOOKED "+clock(ds.first.start)+(d?" · "+(d>0?"+":"-")+Math.floor(Math.abs(d)/60)+"H "+(Math.abs(d)%60)+"M":"")+" · "+ds.list.length+" BOOKINGS MOVE";
+  }
+  function openDelay(){
+    if(canWrite===false)return toast("View only — you can't move this board");
+    var now=new Date();
+    $("dFrom").value=clock(Math.floor((now.getHours()*60+now.getMinutes())/5)*5);
+    delayBlurb();
+    $("delayScrim").hidden=false;
+  }
+  $("dFrom").oninput=delayBlurb;
+  $("dCancel").onclick=function(){$("delayScrim").hidden=true};
+  $("dGo").onclick=function(){
+    if(!db)return toast("Board is offline — nothing moved");
+    var d=delayMins(),ds=delaySet();
+    if(!d||!ds.list.length)return;
+    var moves=ds.list.map(function(L){return {id:L.id,data:{start:Math.max(0,Math.min(1439,L.start+d))}}});
+    moves=resolve(moves);
+    if(!moves.length)return toast("Nothing needed moving");
+    var late=moves.filter(function(m){var L=items.filter(function(x){return x.id===m.id})[0];return L&&m.data.start+(L.dur||0)>18*60;}).length;
+    $("dGo").disabled=true;$("dGo").textContent="Moving";
+    pushUndo("delay",moves.map(function(m){return m.id}));
+    var chain=Promise.resolve();
+    moves.forEach(function(m){chain=chain.then(function(){return db.collection("lifts").doc(m.id).update(m.data)});});
+    chain.then(function(){
+      $("delayScrim").hidden=true;
+      toast("Slid "+moves.length+" bookings"+(late?" — "+late+" now run past 6pm":""));
+    },function(e){
+      toast(e&&e.code==="invalid_argument"?"Not moved — sign in again (padlock, top right)":"Not moved — try again");
+    }).then(function(){$("dGo").disabled=false;$("dGo").textContent="Slide the day"});
+  };
   function openRain(){
     if(canWrite===false)return toast("View only — you can't move this board");
     $("rScope").value="day";$("rDir").value="1";
