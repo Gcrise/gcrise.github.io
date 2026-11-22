@@ -14,6 +14,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="fonts.css">
+<script src="companies.js"></script>
 <script src="config.js"></script>
 <script src="vendor/supabase.js"></script>
 <script>
@@ -2942,7 +2943,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 23:20</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 23:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -10234,8 +10235,8 @@ function renderLogi(){
 var TS_URL=new URL("../checkin/",location.href).href,TS_CACHE="elise_ts_cache";
 var ts={rows:null,at:null,err:null,timer:null,muster:null};
 function tsRid(n){var a=new Uint8Array(n),s="";crypto.getRandomValues(a);for(var i=0;i<n;i++)s+=("0"+a[i].toString(16)).slice(-2);return s;}
-function tsCoOpts(){var T=trades();return Object.keys(T).map(function(c){return '<option value="'+c+'">'+esc(T[c][0])+"</option>";}).join("");}
-function tsCoName(c){var T=trades();return (T[c]||DEF_TRADES[c]||[c==="DAV"?"Davos Cranes":c==="HAR"?"Harwell":c])[0];}
+function tsCoOpts(){var T=trades(),seen={},o=Object.keys(T).map(function(c){seen[c]=1;return [c,T[c][0]];});(window.ELISE_COMPANIES||[]).forEach(function(t){if(!seen[t[0]])o.push(t);});o.sort(function(a,b){return a[0]==="OTH"?1:b[0]==="OTH"?-1:a[1].localeCompare(b[1]);});return o.map(function(t){return '<option value="'+t[0]+'">'+esc(t[1])+"</option>";}).join("");}
+function tsCoName(c){var T=trades();if(T[c]||DEF_TRADES[c])return (T[c]||DEF_TRADES[c])[0];var L=window.ELISE_COMPANIES||[];for(var i=0;i<L.length;i++)if(L[i][0]===c)return L[i][1];return c;}
 function tsClock(t){var d=new Date(t);return fmtClock(d.getHours()*60+d.getMinutes());}
 function tsSigned(){return !!(window.eliseAuth&&eliseAuth.canWrite());}
 async function tsFetch(){

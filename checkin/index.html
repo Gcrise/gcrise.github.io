@@ -145,6 +145,11 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
 .pblk.risk{border-left:4px solid var(--stop);padding-left:10px}
 .pblk .none{color:var(--ink3)}
 [hidden]{display:none!important}
+.cop{position:relative}
+.cop input{text-transform:uppercase}
+.cop-list{position:absolute;left:0;right:0;top:100%;z-index:30;max-height:260px;overflow-y:auto;background:var(--bg);border:1px solid var(--rule);border-radius:8px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.cop-list button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);color:inherit;padding:12px 14px;font:inherit;text-transform:uppercase;cursor:pointer}
+.cop-list button:hover,.cop-list button:focus{background:rgba(255,255,255,.06)}
 </style></head><body><div class="wrap">
 <div class="top"><div class="logo" role="img" aria-label="ELISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
 <h1>Site sign-in</h1>
@@ -265,10 +270,11 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
 </div>
 </div>
 <script src="../board/config.js"></script>
+<script src="../board/companies.js"></script>
 <script>
 "use strict";
 var CFG=window.ELISE_CONFIG||{},URL_=(CFG.url||"").replace(/\/+$/,""),KEY=CFG.key||"";
-var TRADES=[["EC","Elise"],["GLF","G+L Form"],["ECC","East Coast Concrete"],["BUT","Butlers"],["EEC","Encon PT"],["AP","Advanced Precast"],["NEU","Neumann Steel"],["RZE","Rize Reinforcements"],["NS","Newnham Scaffolding"],["EVS","Evolution Shotcrete"],["MDP","Matt Dyce Plumbing"],["MC","Multicool Mechanical"],["LRC","LRC Electrical"],["ACF","Auscoast Fire"],["CC","Classic Corp"],["BAY","Bayleys"],["EMP","Empire"],["S4U","Skips 4 U"],["DAV","Davos Cranes"],["LIN","Lindores (crane crew)"],["SHORE","Shore Plumbing"],["HAR","Harwell"],["OTH","Other / visitor"]];
+var TRADES=window.ELISE_COMPANIES||[["EC","Elise"],["GLF","G+L Form"],["ECC","East Coast Concrete"],["BUT","Butlers"],["EEC","Encon PT"],["AP","Advanced Precast"],["NEU","Neumann Steel"],["RZE","Rize Reinforcements"],["NS","Newnham Scaffolding"],["EVS","Evolution Shotcrete"],["MDP","Matt Dyce Plumbing"],["MC","Multicool Mechanical"],["LRC","LRC Electrical"],["ACF","Auscoast Fire"],["CC","Classic Corp"],["BAY","Bayleys"],["EMP","Empire"],["S4U","Skips 4 U"],["DAV","Davos Cranes"],["LIN","Lindores (crane crew)"],["SHORE","Shore Plumbing"],["HAR","Harwell"],["OTH","Other / visitor"]];
 var K_ME="elise_ci_me",K_CUR="elise_ci_cur",K_Q="elise_ci_queue",K_MY="elise_ci_my";
 var lsFull=false;
 function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"null");if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){if(v!==undefined)lsFull=true;return v===undefined?null:false;}}
@@ -285,6 +291,32 @@ var kind="gate";
 $("date").textContent=new Date().toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long"});
 var CO_OPTS='<option value="">Choose your company</option>'+TRADES.map(function(t){return '<option value="'+t[0]+'">'+t[1]+"</option>";}).join("");
 $("fCo").innerHTML=CO_OPTS;
+
+/* ---------- company picker: type to search, works offline ---------- */
+var SEL_D=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,"value");
+function coPick(sel){
+  if(!sel||sel._pick)return;sel._pick=1;
+  var w=document.createElement("div");w.className="cop";
+  var inp=document.createElement("input");inp.type="search";inp.placeholder="TYPE TO SEARCH COMPANY";inp.autocomplete="off";inp.setAttribute("aria-label","Company");
+  if(sel.id){inp.id=sel.id+"_q";var lb=document.querySelector('label[for="'+sel.id+'"]');if(lb)lb.htmlFor=inp.id;}
+  var ul=document.createElement("div");ul.className="cop-list";ul.hidden=true;
+  sel.parentNode.insertBefore(w,sel);w.appendChild(inp);w.appendChild(ul);w.appendChild(sel);sel.hidden=true;
+  function show(){inp.value=SEL_D.get.call(sel)?coName(SEL_D.get.call(sel)):"";}
+  Object.defineProperty(sel,"value",{get:function(){return SEL_D.get.call(sel);},set:function(v){SEL_D.set.call(sel,v);show();},configurable:true});
+  function draw(){
+    var q=inp.value.trim().toLowerCase(),hit=TRADES.filter(function(t){return !q||t[1].toLowerCase().indexOf(q)>-1||t[0].toLowerCase()===q;});
+    if(q&&!hit.some(function(t){return t[0]==="OTH";}))hit.push(["OTH","Other / visitor"]);
+    ul.innerHTML=hit.map(function(t){return '<button type="button" data-c="'+t[0]+'">'+esc(t[1])+"</button>";}).join("");ul.hidden=false;
+  }
+  inp.addEventListener("focus",function(){inp.select();draw();});
+  inp.addEventListener("input",function(){SEL_D.set.call(sel,"");draw();});
+  ul.addEventListener("mousedown",function(e){e.preventDefault();});
+  ul.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;sel.value=b.getAttribute("data-c");ul.hidden=true;inp.blur();sel.dispatchEvent(new Event("change",{bubbles:true}));});
+  inp.addEventListener("blur",function(){setTimeout(function(){ul.hidden=true;if(!SEL_D.get.call(sel)){var q=inp.value.trim().toLowerCase(),m=TRADES.filter(function(t){return t[1].toLowerCase()===q;});if(m.length)sel.value=m[0][0];else show();}},150);});
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();var b=ul.querySelector("button");if(b)b.click();}});
+  show();
+}
+coPick($("fCo"));
 function H(path,body){return {method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(body)};}
 
 /* ---------- the send queue: everything goes through here, online or not ---------- */
@@ -532,7 +564,7 @@ function drawInd(){
       "<label>Signature</label>"+padHtml("indPad");
   }
   $("inBody").innerHTML=h;
-  if(pg===0)$("i_co").value=d.co||"";
+  if(pg===0){coPick($("i_co"));$("i_co").value=d.co||"";}
   if(pg===5){pads.indPad=Pad($("indPad"));}
   $("inBack").textContent=pg?"Back":"Cancel";
   $("inNext").textContent=pg===IND_PAGES.length-1?"Sign and send":"Next";
@@ -742,7 +774,7 @@ function drawF2(){
       '<label for="f_notes">Notes <span class="opt">- optional</span></label><textarea id="f_notes" rows="2" maxlength="1500"></textarea>'+
       '<label for="f_sn">Your full name to sign</label><input id="f_sn" value="'+esc(m.name||"")+'" maxlength="80">'+'<label>Signature</label>'+padHtml("f2Pad");
   }
-  $("f2Body").innerHTML=h;$("f_co").value=m.co||"";pads.f2Pad=Pad($("f2Pad"));
+  $("f2Body").innerHTML=h;coPick($("f_co"));$("f_co").value=m.co||"";pads.f2Pad=Pad($("f2Pad"));
 }
 $("f2Body").addEventListener("change",function(e){if(e.target.id==="f_kind"){f2.kind=e.target.value;var keep={n:val("f_name"),p:val("f_phone"),c:$("f_co").value,l:val("f_loc"),d:val("f_desc")};drawF2();$("f_name").value=keep.n;$("f_phone").value=keep.p;$("f_co").value=keep.c;$("f_loc").value=keep.l;$("f_desc").value=keep.d;}});
 $("goPermit").addEventListener("click",function(){openPermit();});
