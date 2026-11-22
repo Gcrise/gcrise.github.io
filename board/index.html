@@ -680,7 +680,7 @@ button,input,select{font:inherit;color:inherit}
 /* crane and deliveries side by side up top; labour & jobs, then safety, full width under */
 @media (min-width:700px){
   .front{grid-template-columns:1fr 1fr}
-  .front .k-labour,.front .k-safety{grid-column:1/-1}
+  .front .k-labour,.front .k-safety,.front .k-sign{grid-column:1/-1}
 }
 .card{background:var(--surface);border:1px solid var(--line);border-radius:4px;min-width:0;overflow:hidden}
 .cardhead{width:100%;display:flex;align-items:baseline;gap:9px;padding:11px 14px;background:none;border:none;
@@ -878,6 +878,16 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .srow.done .tx{text-decoration:line-through;color:var(--ink-3)}
 .srow.done .tx small{color:var(--ink-3)}
 .srow .tick{color:var(--ok,#2E7D4F);font-size:12px;flex:none;line-height:1.3}
+.fs-top{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;padding:10px 14px 6px}
+.fs-top b{font-size:26px;font-family:var(--f-num);font-variant-numeric:tabular-nums;color:var(--ink);margin-right:4px}
+.fs-top span{font-size:13px;color:var(--ink-2)}
+.fs-trades{display:flex;flex-wrap:wrap;gap:6px 12px;padding:4px 14px 10px;font-size:13px;color:var(--ink-2)}
+.fs-trades span{display:inline-flex;align-items:center;gap:5px}
+.fs-trades .lp-tag{grid-row:auto;min-width:34px;font-size:10px;padding:2px 4px}
+.fs-alert{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border:0;border-top:1px solid var(--line);background:none;font:inherit;font-size:13px;text-align:left;color:var(--ink);cursor:pointer}
+.fs-alert i{font-style:normal;min-width:22px;height:22px;border-radius:11px;background:var(--alarm);color:#fff;font-weight:700;font-size:12px;display:inline-grid;place-items:center;padding:0 6px}
+.fs-alert.soft i{background:var(--warn)}
+.fs-alert:hover{background:var(--surface-2)}
 .empty{padding:20px 14px;text-align:center;color:var(--ink-2);font-size:13px}
 .empty b{display:block;font-family:var(--f-cond);text-transform:uppercase;letter-spacing:.1em;color:var(--ink);margin-bottom:4px}
 .chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--f-cond);font-size:11px;font-weight:700;letter-spacing:.07em;padding:1px 6px;border-radius:2px;white-space:nowrap;flex:none;
@@ -2122,6 +2132,10 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
       <div class="cardbody" id="fSafe"></div>
       <div class="cardtools"><button class="mini" data-copy="safety">Copy</button><button class="mini" data-pdf="safety">PDF</button></div>
     </div>
+    <div class="card k-sign">
+      <button class="cardhead" data-tsv="att"><span class="t">Site sign-in</span><span class="c" id="cSign"></span><span class="go">&rsaquo;</span></button>
+      <div class="cardbody" id="fSign"></div>
+    </div>
   </div>
 
 </section>
@@ -2751,7 +2765,7 @@ html:fullscreen,body:fullscreen{overflow-y:auto}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:10</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:05</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5168,6 +5182,10 @@ function tabGroupOf(v){for(var g in TAB_GROUPS)if(TAB_GROUPS[g].items.indexOf(v)
 function renderTabs(){
   var done={};
   el("tabs").innerHTML=VIEWS.map(function(x){
+    if(x[0]==="tester"){
+      var sn=window.__tsPend||0;
+      return '<button class="tab tabdd" type="button" data-dd="signin" aria-haspopup="menu" aria-expanded="false" aria-current="'+(state.view==="tester")+'">Sign-in'+(sn?'<b class="alert">'+sn+'</b>':'')+'<span class="ddcaret" aria-hidden="true">&#9662;</span></button>';
+    }
     var g=tabGroupOf(x[0]);
     if(g){
       if(done[g]) return "";
@@ -5187,13 +5205,22 @@ function renderTabs(){
   var menu=null, openBtn=null;
   function close(){ if(menu&&!menu.hidden){menu.hidden=true;} if(openBtn){openBtn.setAttribute("aria-expanded","false");openBtn=null;} }
   function open(btn){
-    var g=TAB_GROUPS[btn.getAttribute("data-dd")]; if(!g) return;
+    var key=btn.getAttribute("data-dd"),g=TAB_GROUPS[key];
     if(!menu){ menu=document.createElement("div"); menu.className="mastmenu ddmenu"; menu.setAttribute("role","menu"); menu.hidden=true; document.body.appendChild(menu); }
+    if(key==="signin"){
+      var cur=state.view==="tester"&&typeof tsv!=="undefined"?tsv:"";
+      menu.innerHTML=[["home","Overview"],["att","Attendance"],["appr","Approvals"],["ind","Inductions"],["permit","Permits"],["plant","Plant"],["gate","Gate QR code"],["docs","SWMS & docs"]].map(function(x){
+        var c=x[0]==="appr"&&window.__tsPend?'<i class="alert">'+window.__tsPend+'</i>':"";
+        return '<button class="mm-it'+(cur===x[0]?' on':'')+'" type="button" role="menuitem" data-tsv="'+x[0]+'"><span>'+esc(x[1])+'</span>'+c+'</button>';
+      }).join("");
+    } else {
+    if(!g) return;
     menu.innerHTML=g.items.map(function(v){
       var lab=(VIEWS.filter(function(y){return y[0]===v;})[0]||[v,v])[1], c=tabCount(v);
       return '<button class="mm-it'+(state.view===v?' on':'')+'" type="button" role="menuitem" data-go="'+v+'"><span>'+esc(lab)+'</span>'+
         (c?'<i class="'+(c.alert?'alert':'')+'">'+c.n+'</i>':'')+'</button>';
     }).join("");
+    }
     var r=btn.getBoundingClientRect();
     menu.hidden=false;
     var w=menu.offsetWidth||200;
@@ -5383,6 +5410,7 @@ function renderFront(){
   if(ll) ll.href="../lifts/#"+state.date;
   try{ renderWind(); }catch(e){}
   try{ renderWeather(); }catch(e){}
+  try{ renderFrontSign(); }catch(e){}
   var lab=state.labour.filter(function(r){return r.date===state.date;});
   var heads=lab.reduce(function(a,r){return a+(+r.qty||1);},0);
   var jobs=dayJobs(),openJobs=jobs.filter(function(j){return !j.done;});
@@ -9512,7 +9540,7 @@ document.addEventListener("click",function(e){
       go(a[n]);
       setX(dx<0?w*0.35:-w*0.35,false);
       requestAnimationFrame(function(){ requestAnimationFrame(function(){ setX(0,true); busy=false; }); });
-      var tab=document.querySelector('.tab[data-go="'+a[n]+'"]')||document.querySelector('.tab[data-dd="'+tabGroupOf(a[n])+'"]');
+      var tab=document.querySelector('.tab[data-go="'+a[n]+'"]')||document.querySelector('.tab[data-dd="'+(a[n]==="tester"?"signin":tabGroupOf(a[n]))+'"]');
       if(tab&&tab.scrollIntoView) tab.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
     },170);
   },{passive:true});
@@ -9888,6 +9916,7 @@ async function tsFetch(){
     if(!r.ok)throw new Error(r.status+"");
     ts.rows=await r.json();ts.at=Date.now();ts.err=null;
     try{localStorage.setItem(TS_CACHE,JSON.stringify({day:iso(new Date()),at:ts.at,rows:ts.rows}));}catch(e){}
+    try{renderFrontSign();}catch(e){}
   }catch(e){
     ts.err=navigator.onLine?"Couldn't load the list":"No signal - showing the last list this device saw";
     if(!ts.rows){try{var c=JSON.parse(localStorage.getItem(TS_CACHE)||"null");if(c&&c.day===iso(new Date())){ts.rows=c.rows;ts.at=c.at;}}catch(x){}}
@@ -9998,7 +10027,7 @@ var tsv=(function(){try{var v=localStorage.getItem("elise_tsv");return TSV_T[v]?
 var tsa={wk:null,pm:null,pl:null,at:null,f:{ind:"all",permit:"open",plant:"on"},q:""};
 var PERMIT_N={hot:"Hot works",height:"Work at height / EWP",pen:"Penetration / core drilling",dig:"Excavation",iso:"Electrical isolation",conf:"Confined space",ooh:"Out of hours work",crane:"Crane lift outside plan",other:"Other permit"};
 var TK_N={whitecard:"White card",hrwl:"High risk work licence",plant:"Plant licence / VOC",trade:"Trade licence",activity:"Activity-based competency",firstaid:"First aid",other:"Other licence"};
-function tsGo(v){tsv=v;try{localStorage.setItem("elise_tsv",v);}catch(e){}renderTester();var t=el("v-tester");if(t&&t.getBoundingClientRect().top<0)t.scrollIntoView({block:"start"});}
+function tsGo(v){tsv=TSV_T[v]?v:"home";try{localStorage.setItem("elise_tsv",tsv);}catch(e){}if(state.view!=="tester"){go("tester");window.scrollTo(0,0);return;}renderTester();renderTabs();var t=el("v-tester");if(t&&t.getBoundingClientRect().top<0)t.scrollIntoView({block:"start"});}
 document.addEventListener("click",function(e){var t=e.target.closest("[data-tsv]");if(t){tsGo(t.getAttribute("data-tsv"));}});
 el("tsBack").addEventListener("click",function(){tsGo("home");});
 function tsToday(){return iso(new Date());}
@@ -10018,6 +10047,8 @@ async function tsaFetch(){
     if(R.every(function(r){return r.ok;})){tsa.wk=await R[0].json();tsa.pm=await R[1].json();tsa.pl=await R[2].json();tsa.at=Date.now();}
   }catch(e){}
   if(state.view==="tester")renderTsAdmin();
+  else if(tsa.wk){var pn=tsa.wk.filter(function(w){return w.status==="pending";}).length+tsa.pm.filter(function(p){return p.status==="pending";}).length+tsa.pl.filter(function(p){return p.status==="pending";}).length;if(window.__tsPend!==pn){window.__tsPend=pn;renderTabs();}}
+  try{renderFrontSign();}catch(e){}
 }
 function wkLi(w){
   var tk=(w.comps||[]).filter(function(c){return c.expiry&&c.expiry<tsToday();}).length;
@@ -10041,6 +10072,7 @@ function renderTsAdmin(){
   var pw=W.filter(function(w){return w.status==="pending";}),pp=P.filter(function(p){return p.status==="pending";}),pl=L.filter(function(p){return p.status==="pending";});
   var n=pw.length+pp.length+pl.length;
   el("tbApprN").hidden=!n;el("tbApprN").textContent=n;
+  if(window.__tsPend!==n){window.__tsPend=n;renderTabs();}
   el("tbAppr").textContent=n?n+" waiting for you":"Nothing waiting";
   el("tbInd").textContent=W.filter(function(w){return wkState(w)==="approved";}).length+" approved";
   var po=P.filter(pmOpen).length;el("tbPm").textContent=po?po+" open":"None open";
@@ -10170,8 +10202,40 @@ document.addEventListener("click",function(e){
   var pd=e.target.closest("[data-tspdf]");if(pd){var u=tsx.ups.filter(function(x){return x.id===pd.getAttribute("data-tspdf");})[0];if(u){if(!u.blob){var b=atob(u.data.split(",")[1]),a8=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a8[i]=b.charCodeAt(i);u.blob=URL.createObjectURL(new Blob([a8],{type:"application/pdf"}));}window.open(u.blob,"_blank");}}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&tsx&&!document.querySelector(".lpv"))tsClose();});
-document.addEventListener("elise-signedout",function(){tsa.wk=tsa.pm=tsa.pl=null;tsClose();});
+document.addEventListener("elise-signedout",function(){tsa.wk=tsa.pm=tsa.pl=null;tsClose();try{renderFrontSign();}catch(e){}});
 
+
+/* ---------- Today panel: site sign-in card ---------- */
+function renderFrontSign(){
+  var b=el("fSign");if(!b)return;
+  if(!tsSigned()){el("cSign").textContent="";b.innerHTML='<div class="empty"><b>Sign in to the board</b>Who\'s on site, inductions waiting and open permits show here for the Elise team.</div>';return;}
+  if(ts.rows==null){
+    el("cSign").textContent="";
+    b.innerHTML='<div class="empty">Loading&hellip;</div>';
+    if(ts.rows==null&&!ts.loading){ts.loading=1;tsFetch().then(function(){ts.loading=0;});}
+    if(tsa.wk==null&&!tsa.loading){tsa.loading=1;tsaFetch().then(function(){tsa.loading=0;});}
+    return;
+  }
+  var rows=ts.rows,now=0,day=0,seen={},by={},flag=0;
+  rows.forEach(function(x){
+    if(!x.out_at){now+=x.n;by[x.co]=(by[x.co]||0)+x.n;
+      var ws=x.worker_status||(x.inducted?"approved":"none");if(x.kind!=="visitor"&&ws!=="approved")flag++;}
+    var k=x.kind==="crew"?null:x.co+"|"+String(x.name||"").trim().toLowerCase();if(k&&seen[k])return;if(k)seen[k]=1;day+=x.n;
+  });
+  el("cSign").textContent=now+" on site"+(state.date!==iso(new Date())?" today":"");
+  var cos=Object.keys(by).sort(function(a,c){return by[c]-by[a];});
+  var h='<div class="fs-top"><span><b>'+now+'</b>on site now</span><span><b>'+day+'</b>signed in today</span><span><b>'+cos.length+'</b>trade'+(cos.length===1?"":"s")+" on now</span></div>";
+  h+=cos.length?'<div class="fs-trades">'+cos.map(function(c){return "<span>"+lpTag(c)+esc(tsCoName(c))+" <b>"+by[c]+"</b></span>";}).join("")+"</div>":'<div class="fs-trades">Nobody signed in yet today.</div>';
+  if(tsa.wk){
+    var pend=tsa.wk.filter(function(w){return w.status==="pending";}).length+tsa.pm.filter(function(p){return p.status==="pending";}).length+tsa.pl.filter(function(p){return p.status==="pending";}).length;
+    if(pend)h+='<button type="button" class="fs-alert" data-tsv="appr"><i>'+pend+"</i>Waiting for your approval - inductions, permits, plant</button>";
+    var po=tsa.pm.filter(pmOpen);
+    if(po.length)h+='<button type="button" class="fs-alert soft" data-tsv="permit"><i>'+po.length+"</i>Permit"+(po.length>1?"s":"")+" open: "+esc(po.map(function(p){return (PERMIT_N[p.kind]||p.kind)+" "+(p.location||"");}).slice(0,3).join(", "))+"</button>";
+  }
+  if(flag)h+='<button type="button" class="fs-alert soft" data-tsv="att"><i>'+flag+"</i>On site without an approved ELISE induction</button>";
+  b.innerHTML=h;
+}
+setInterval(function(){if(state.view==="today"&&tsSigned()){tsFetch();tsaFetch();}},60000);
 /* ---------- induction + SWMS documents and register (Tester tab) ---------- */
 var tsd={docs:null,reg:null,kind:"induction"};
 function tsSize(n){return n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";}
