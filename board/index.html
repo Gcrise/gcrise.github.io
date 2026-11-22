@@ -2109,6 +2109,9 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 #cbapp .sechead .ln{display:none}
 #cbapp .sechead .caret{color:var(--clock)}
 .cranetools .ct-lab{font-family:var(--f-cond);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--clock)}
+#v-camera .camhd b{font-family:var(--f-cond);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clock)}
+#v-camera .camhd{border-bottom:2px solid var(--clock);margin:0 14px;padding-left:0;padding-right:0}
+#v-camera .camhd span{display:none}
 </style>
 </head>
 <body>
@@ -2627,16 +2630,21 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 <section id="v-camera" class="view" hidden>
   <div class="panel">
     <div class="phead" data-acc="camera"><h2>Live view</h2><span class="dcband" id="deckCount" hidden></span>
-      <span class="right"><a class="mini" id="camOpenLink" href="https://my.tikee.io/videos/a6c56c8d-1222-452a-b032-881045e8cfd5" target="_blank" rel="noopener">Open in myTikee</a></span>
     </div>
-    <div class="camhd tkhd"><b>Photo browser</b><span>Tap the arrow under the picture, then drag back through every shot</span>
+    <div class="ts-tiles" id="camTiles">
+      <button type="button" class="ts-tile" data-camsec="browser"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="9" cy="10" r="1.8"/><path d="m3 17 5-5 4 4 3-3 6 6"/></svg><b>Photo browser</b><span>Every shot</span></button>
+      <button type="button" class="ts-tile" data-camsec="tl"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1.5"/><path d="m16 10 5-3v10l-5-3"/></svg><b>Timelapse</b><span>Play the build</span></button>
+      <a class="ts-tile" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v6H4V6h6"/></svg><b>Open in Tikee</b><span>Photos</span></a>
+      <a class="ts-tile" href="https://my.tikee.io/videos/a6c56c8d-1222-452a-b032-881045e8cfd5" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v6H4V6h6"/></svg><b>Open in myTikee</b><span>Video</span></a>
+    </div>
+    <div class="camhd tkhd"><b>Photo browser</b>
       <a class="mini" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener">Open in Tikee</a>
       <button class="mini" type="button" id="tkRaw">Whole page</button><button class="mini" type="button" data-camfull="tkBox">Full screen</button></div>
     <div class="tkbox" id="tkBox"><div class="tkcrop" id="tkCrop">
       <iframe id="tkFrame" title="ELISE deck - Tikee photo browser" allow="fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
     </div>
-    <div class="camgrid">
+    <div class="camgrid" id="camGrid">
       <div class="camcol camlatest" hidden>
         <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" id="inkHide" hidden>Hide marks</button><button class="mini" type="button" id="inkBtn">Mark up</button><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
@@ -2652,14 +2660,13 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
         </div>
       </div>
       <div class="camcol">
-        <div class="camhd"><b>Timelapse</b><span>Drag the slide bar</span><button class="mini" type="button" data-camfull="tlBox">Full screen</button></div>
+        <div class="camhd"><b>Timelapse</b><button class="mini" type="button" data-camfull="tlBox">Full screen</button></div>
         <div class="cambox" id="tlBox">
           <iframe id="camFrame" title="ELISE deck timelapse" scrolling="no" allow="fullscreen; autoplay" allowfullscreen referrerpolicy="no-referrer"></iframe>
           <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
         </div>
       </div>
     </div>
-    <p class="note tknote">If Tikee&rsquo;s cookie box covers the picture: on a PC tap Reject all on it; on a phone tap Whole page, Reject all, then Photo only.</p>
   </div>
 </section>
 
@@ -2907,7 +2914,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5310,6 +5317,7 @@ function go(v){
   el("lgBack").hidden=!hub;if(hub){el("lgBackBtn").setAttribute("data-go",hub[0]);el("lgBackBtn").innerHTML="&larr; "+esc(hub[1]);}
   if(v==="labour")applyLabSec();else labSec=null;
   if(v==="log")applyLogSec();else logSec=null;
+  if(v==="camera")applyCamSec();else camSec=null;
   if(v==="logi")renderLogi();if(v==="dly"||v==="lab0"||v==="log0")renderHubs();
   el("daystrip").hidden=(v==="logi"||v==="dly"||v==="log0"||v==="lab0"||v==="crane"||v==="log"||v==="camera"||v==="eufy"||v==="path"||v==="orders"||v==="lplan"||v==="lrec"||v==="tester");
   if(v==="lplan")renderLPlan();
@@ -9344,7 +9352,7 @@ function camOpen(){
   if(!f)return;
   /* read from the link rather than a variable, so opening the board
      straight onto this tab works before the rest of the script has run */
-  if(!f.getAttribute("src"))f.setAttribute("src",el("camOpenLink").getAttribute("href"));
+  if(!f.getAttribute("src"))f.setAttribute("src","https://my.tikee.io/videos/a6c56c8d-1222-452a-b032-881045e8cfd5");
   requestAnimationFrame(camFit);
 }
 window.addEventListener("resize",camFit);
@@ -10073,6 +10081,19 @@ el("lpStart").addEventListener("change",function(){var v=this.value;lp.start=v&&
 
 
 
+
+/* Live view: tiles first, each opens one part */
+var camSec=null;
+document.addEventListener("click",function(e){var g=e.target.closest&&e.target.closest('[data-go="camera"]');if(g)camSec=null;},true);
+document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-camsec]");if(t){camSec=t.getAttribute("data-camsec");if(state.view==="camera"){applyCamSec();window.scrollTo(0,0);}else go("camera");}});
+function applyCamSec(){
+  var v=el("v-camera");if(!v)return;
+  el("camTiles").hidden=!!camSec;
+  v.querySelector(".tkhd").hidden=camSec!=="browser";el("tkBox").hidden=camSec!=="browser";
+  el("camGrid").hidden=camSec!=="tl";
+  var hub=camSec?["camera","Live view"]:["dly","Daily"];
+  el("lgBackBtn").setAttribute("data-go",hub[0]);el("lgBackBtn").innerHTML="&larr; "+esc(hub[1]);
+}
 /* Completed works overview: each tile opens just that part */
 var logSec=null;
 document.addEventListener("click",function(e){var g=e.target.closest&&e.target.closest('[data-go="log"]');if(g)logSec=null;},true);
