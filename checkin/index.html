@@ -139,6 +139,11 @@ select{text-transform:uppercase;font-weight:600}
 .date{letter-spacing:.08em;font-size:13px}
 input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;max-width:100%;min-width:0;width:100%}
 .row2 input{min-width:0}
+.pblk{border-top:1px solid var(--rule);padding:10px 0}
+.pblk h3{margin:0 0 4px;font-family:'Archivo Narrow','Arial Narrow',Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.pblk p{margin:0;font-size:15px;line-height:1.45;white-space:pre-wrap;color:var(--ink)}
+.pblk.risk{border-left:4px solid var(--stop);padding-left:10px}
+.pblk .none{color:var(--ink3)}
 [hidden]{display:none!important}
 </style></head><body><div class="wrap">
 <div class="top"><div class="logo" role="img" aria-label="ELISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
@@ -183,7 +188,7 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
   <div class="step-n">How to sign in</div>
   <ol class="howto">
     <li><b>First time on site</b>Do the ELISE Constructions induction on this page - about 10 minutes, once only. Elise approves it.</li>
-    <li><b>Every day</b>Scan the gate QR, tap SIGN IN, and read and sign your company's SWMS when there's a new one.</li>
+    <li><b>Every day</b>Scan the gate QR, tap SIGN IN, read and sign today's site prestart, and your company's SWMS when there's a new one.</li>
     <li><b>Leaving site</b>Tap SIGN OUT. Anyone still signed in at 6pm is signed out automatically.</li>
     <li><b>Crew</b>A foreman can sign the whole crew in with MY CREW - each person still does their own induction once.</li>
     <li><b>No signal</b>It still works. It saves on your phone and sends when you're back on the network.</li>
@@ -192,10 +197,24 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
   <button class="big alt" type="button" id="helpBack">&larr; Back</button>
 </div>
 
+<!-- today's site prestart: read and sign before signing in -->
+<div class="card" id="vPre" hidden>
+  <div class="step-n" id="prN">Site prestart</div>
+  <h2 class="step-h">Read today's prestart</h2>
+  <div id="prBody"></div>
+  <label for="prName">Your full name</label>
+  <input id="prName" autocomplete="name" maxlength="80">
+  <label>Signature</label>
+  <div id="prPadWrap"></div>
+  <div class="msg" id="prMsg" role="alert"></div>
+  <div class="navrow"><button class="big alt" id="prBack" type="button">Back</button><button class="big in" id="prGo" type="button">Sign</button></div>
+</div>
+
 <div id="vMain">
 <!-- signed in -->
 <div class="card" id="vOn" hidden>
   <div class="state on"><b id="onWho"></b><span id="onSince"></span></div>
+  <button class="big in" id="goPre" type="button" hidden>Sign today's prestart</button>
   <button class="big out" id="goOut" type="button">Sign out</button>
   <div class="ind-line" id="onInd"></div>
   <div class="pend" id="pend1" hidden></div>
@@ -303,7 +322,7 @@ async function flush(){
     }
   }finally{flushing=false;render();}
 }
-window.addEventListener("online",function(){netState();flush().then(refreshStatus);loadDocs().then(renderDocs);loadNotices();});
+window.addEventListener("online",function(){netState();flush().then(refreshStatus);loadDocs().then(renderDocs);loadNotices();loadPre();});
 window.addEventListener("offline",netState);
 setInterval(flush,20000);
 function netState(){var on=navigator.onLine;$("net").classList.toggle("off",!on);$("net").querySelector("span").textContent=on?"Online":"No signal - saving on phone";}
@@ -358,7 +377,7 @@ function ynHtml(key,val){return '<div class="yn" data-yn="'+key+'"><button type=
 
 /* ---------- screens ---------- */
 function show(which){
-  ["vInd","vStep","vForm2","vHelp"].forEach(function(v){$(v).hidden=v!==which;});
+  ["vInd","vStep","vForm2","vHelp","vPre"].forEach(function(v){$(v).hidden=v!==which;});
   $("vMain").hidden=!!which;window.scrollTo(0,0);
   if(!which)render();
 }
@@ -415,6 +434,7 @@ function render(){
     $("onWho").textContent=cur.kind==="crew"?cur.name+" + crew of "+cur.n:"Signed in";
     $("onSince").textContent=(cur.kind==="crew"?"Crew signed in":cur.name+", signed in")+" at "+clock(cur.at);
     $("goOut").textContent=cur.kind==="crew"?"Sign crew out":"Sign out";
+    $("goPre").hidden=!(cur.kind!=="visitor"&&preToday()&&!preSigned());
   }
   var txt=pend?"Saved on this phone - sends when you have signal ("+pend+" waiting)":"";
   $("pend1").hidden=$("pend2").hidden=!pend;$("pend1").textContent=$("pend2").textContent=txt;
@@ -615,7 +635,7 @@ $("stGo").addEventListener("click",function(){
   var m=ls(K_ME)||{};m.swms=m.swms||[];m.seen=m.seen||[];
   chosen.forEach(function(d){if(m.swms.indexOf(d.id)<0)m.swms.push(d.id);});
   swms.docs.forEach(function(d){if(m.seen.indexOf(d.id)<0)m.seen.push(d.id);});
-  ls(K_ME,m);swms=null;show(null);finishSignIn(p);
+  ls(K_ME,m);swms=null;beforeSignIn(p);
 });
 
 /* ---------- sign in ---------- */
@@ -647,6 +667,10 @@ $("goIn").addEventListener("click",async function(){
 function afterInduction(p){
   var ns=p.kind==="gate"?needSwms(p.co):[];
   if(ns.length){showSwms(p,ns);return;}
+  beforeSignIn(p);
+}
+function beforeSignIn(p){
+  if(p.kind!=="visitor"&&preToday()&&!preSigned()){showPre(p);return;}
   show(null);finishSignIn(p);
 }
 function finishSignIn(p){
@@ -808,6 +832,51 @@ async function refreshStatus(){
   if($("vMain").hidden===false)render();
 }
 
+
+/* ---------- today's site prestart: every worker reads and signs it before signing in, once a day ---------- */
+var K_PRE="elise_ci_pre",K_PRESIGNED="elise_ci_presigned";
+function getJ(u){return fetch(URL_+"/rest/v1/"+u,{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}}).then(function(r){return r.ok?r.json():[];});}
+function hm(m){var h=Math.floor(m/60),mi=m%60,ap=h<12?"am":"pm";return (h%12||12)+(mi?":"+pad(mi):"")+ap;}
+async function loadPre(){
+  if(!navigator.onLine)return;
+  var D=today();
+  try{
+    var R=await Promise.all([getJ("prestart?id=eq."+D+"&select=data"),getJ("lifts?date=eq."+D+"&select=start_min,dur,co,co2,descr,qty,type,crane,status&order=start_min.asc"),getJ("safety?select=id,data")]);
+    var d=(R[0][0]&&R[0][0].data)||null;
+    if(!d){ls(K_PRE,{day:D,none:1});return;}
+    var lifts=R[1].filter(function(b){return b.type!=="del"&&b.crane!=="none";}),dels=R[1].filter(function(b){return b.type==="del"||b.crane==="none";});
+    var by={};lifts.forEach(function(b){var k=b.co2?b.co+"/"+b.co2:b.co,s=b.start_min,e=s+(+b.dur||0),g=by[k]||(by[k]={k:k,s:s,e:e,n:0});g.s=Math.min(g.s,s);g.e=Math.max(g.e,e);g.n+=Math.max(1,+b.qty||1);});
+    var liftTxt=Object.keys(by).map(function(k){return by[k];}).sort(function(a,b){return a.s-b.s;}).map(function(g){return hm(g.s)+"-"+hm(g.e)+"  "+g.k+"  "+g.n+(g.n===1?" lift":" lifts");}).join("\n");
+    var delTxt=dels.map(function(b){return hm(b.start_min)+"  "+b.co+"  "+(b.descr||"");}).join("\n");
+    var open=[];R[2].forEach(function(r){(r.data&&r.data.items||[]).forEach(function(i){if(!i.done&&r.id<=D)open.push(i.text);});});
+    ls(K_PRE,{day:D,d:{type:d.type,risk:d.risk,weather:d.weather,works:d.works,finishes:d.finishes,safety:d.safety,by:d.by},lifts:liftTxt,dels:delTxt,open:open.join("\n")});
+  }catch(e){}
+  render();
+}
+function preToday(){var P=ls(K_PRE);return P&&P.day===today()&&!P.none?P:null;}
+function preSigned(){return ls(K_PRESIGNED)===today();}
+var prP=null;
+function showPre(p){
+  var P=preToday();prP=p;show("vPre");
+  function blk(t,v,cls,empty){return '<div class="pblk'+(cls?" "+cls:"")+'"><h3>'+esc(t)+'</h3>'+(v?'<p>'+esc(v)+'</p>':'<p class="none">'+esc(empty||"Nothing listed")+'</p>')+'</div>';}
+  var d=P.d;
+  $("prN").textContent=(d.type==="hr"?"High risk prestart":"Site prestart")+" - "+new Date().toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"});
+  $("prBody").innerHTML=blk("High risk works",d.risk,"risk","None listed")+blk("Weather",d.weather)+blk("Structures",d.works)+blk("Finishes",d.finishes)+
+    blk("Crane lifts",P.lifts,"","No crane lifts booked")+blk("Deliveries",P.dels,"","No deliveries booked")+(d.safety?blk("Safety notes",d.safety):"")+blk("Open safety items",P.open,"","Nothing open");
+  var m=ls(K_ME)||{};$("prName").value=(p&&p.name)||m.name||"";$("prMsg").textContent="";
+  $("prPadWrap").innerHTML=padHtml("prPad");pads.prPad=Pad($("prPad"));
+  $("prGo").textContent=p?"Sign and sign in":"Sign";
+}
+$("prBack").addEventListener("click",function(){prP=null;show(null);});
+$("prGo").addEventListener("click",function(){
+  var nm=$("prName").value.trim();if(nm.length<3){$("prMsg").textContent="Type your full name.";return;}
+  if(pads.prPad.empty()){$("prMsg").textContent="Sign in the box with your finger.";return;}
+  var m=ls(K_ME)||{},co=(prP&&prP.co)||m.co||"";
+  enqueue({t:"post",table:"prestart_sign",row:{day:today(),name:nm,company:coName(co)||co||"-",sig:pads.prPad.data()}});
+  ls(K_PRESIGNED,today());
+  var p=prP;prP=null;show(null);if(p)finishSignIn(p);
+});
+$("goPre").addEventListener("click",function(){if(preToday())showPre(null);});
 /* ---------- announcements and site documents ---------- */
 var K_NOT="elise_ci_notices";
 async function loadNotices(){
@@ -825,10 +894,10 @@ function renderDocs(){
   $("dSwN").textContent=sw.length||"";$("dSw").innerHTML=co?(sw.length?sw.map(a).join(""):'<p class="muted">None on file for '+esc(coName(co))+".</p>"):'<p class="muted">Sign in once and your company\'s SWMS show here.</p>';
   $("vDocs").hidden=!(pol.length||sw.length);
 }
-loadDocs().then(renderDocs);loadNotices();renderDocs();
+loadDocs().then(renderDocs);loadNotices();renderDocs();loadPre();setInterval(function(){if(document.visibilityState==="visible")loadPre();},120000);
 render();flush().then(function(){checkStatus();refreshStatus();});
 setInterval(function(){checkStatus();refreshStatus();},60000);
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){if(!$("vMain").hidden)render();flush();checkStatus();refreshStatus();loadNotices();}});
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){if(!$("vMain").hidden)render();flush();checkStatus();refreshStatus();loadNotices();loadPre();}});
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 </script>
 </body></html>

@@ -2556,7 +2556,6 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 
     <div id="preSignBox" hidden>
       <div class="subhead" data-acc="prestart"><span>Signatures</span><span id="preSignMeta"></span></div>
-      <p class="prenote">Everyone on the high risk work signs that they were briefed. Send the link to their phones, or hand this one round.</p>
       <div id="preSigns"></div>
       <div class="addrow top presign">
         <button class="mini" id="preSignLink" type="button">Send sign link</button>
@@ -2908,7 +2907,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:25</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -6137,7 +6136,7 @@ function paintSigns(day){
   }).join(""):'<p class="prenote">Nobody has signed yet.</p>';
   var m=el("preSignMeta"); if(m) m.textContent=L.length?L.length+" signed":"";
 }
-setInterval(function(){ if(state.view==="prestart"&&preDoc().type==="hr"&&document.visibilityState==="visible") loadSigns(state.date); },20000);
+setInterval(function(){ if(state.view==="prestart"&&document.visibilityState==="visible") loadSigns(state.date); },20000);
 document.addEventListener("click",function(e){
   if(e.target.closest&&e.target.closest("#preSignLink")){
     /* the link shows the prestart as it stands, so save every box first -
@@ -6354,7 +6353,7 @@ function renderPrestart(){
   });
   var rk=el("preRisk"); if(rk&&ptype==="hr") rk.disabled=false;
   var hd=document.querySelector("#v-prestart .phead h2"); if(hd) hd.textContent=ptype==="hr"?"High risk prestart":"Daily prestart";
-  var sb=el("preSignBox"); if(sb){ sb.hidden=ptype!=="hr"; if(ptype==="hr") loadSigns(state.date); }
+  var sb=el("preSignBox"); if(sb){ sb.hidden=false; loadSigns(state.date); }
   if(btn){ btn.hidden=signed; btn.textContent="Complete prestart"; btn.onclick=completePre; }
   if(ro){ ro.hidden=!signed; ro.onclick=reopenPre; }
 }
