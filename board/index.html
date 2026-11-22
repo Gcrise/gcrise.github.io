@@ -2239,13 +2239,12 @@ a.ts-tile{text-decoration:none}
 
 <section id="v-dly" class="view" hidden>
   <div class="panel">
-    <div class="phead" data-acc="prestart"><h2>Daily</h2><span class="meta" id="dyMeta"></span><span class="right"><a class="ts-signbtn" href="../checkin/" target="_blank" rel="noopener">Sign in</a></span></div>
+    <div class="phead" data-acc="prestart"><h2>Daily</h2><span class="meta" id="dyMeta"></span></div>
     <div class="ts-tiles">
       <button type="button" class="ts-tile" data-go="prestart"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M9 4V3h6v1M8.5 10l1.5 1.5 3-3M14.5 10.5h1.5M8.5 15.5l1.5 1.5 3-3M14.5 16h1.5"/></svg><b>Prestart</b><span id="dyPre"></span><i class="ts-badge" id="dyPreN" hidden>!</i></button>
       <button type="button" class="ts-tile" data-go="safety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.2v.3"/></svg><b>Safety</b><span id="dySafe"></span><i class="ts-badge" id="dySafeN" hidden></i></button>
       <button type="button" class="ts-tile" data-hubjump="delays"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg><b>Delays</b><span id="dyDel"></span></button>
       <button type="button" class="ts-tile" data-tsv="att"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="m15.5 11.5 2 2 4-4"/></svg><b>Who's on site</b><span id="dyOn"></span></button>
-      <a class="ts-tile" href="../checkin/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H5v16h5"/><path d="M14 8l4 4-4 4M18 12H9"/></svg><b>Sign-in page</b><span>Sign in or out</span></a>
       <button type="button" class="ts-tile" data-go="weather"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 10.5 3.8 3.8 0 0 0 7 18z"/></svg><b>Weather</b><span>Wind for the crane</span></button>
       <button type="button" class="ts-tile" data-go="camera"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1.5"/><path d="m16 10 5-3v10l-5-3"/></svg><b>Live view</b><span>Deck camera</span></button>
     </div>
@@ -2883,7 +2882,7 @@ a.ts-tile{text-decoration:none}
     <p class="note">Every labour job ticked off, newest first, kept by month. Jobs land here the moment the box is ticked and come back out if you untick one, so the log always matches the board.</p>
     <div class="addrow">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 21:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5284,7 +5283,7 @@ function go(v){
   state.view=v;
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
-  var hub=TAB_GROUPS.logistics.items.indexOf(v)>=0?["logi","Logistics"]:TAB_GROUPS.daily.items.indexOf(v)>=0?["dly","Daily"]:v==="labour"?["lab0","Labour & jobs"]:null;
+  var hub=TAB_GROUPS.logistics.items.indexOf(v)>=0?["logi","Logistics"]:(TAB_GROUPS.daily.items.indexOf(v)>=0||v==="weather"||v==="camera")?["dly","Daily"]:v==="labour"?["lab0","Labour & jobs"]:null;
   el("lgBack").hidden=!hub;if(hub){el("lgBackBtn").setAttribute("data-go",hub[0]);el("lgBackBtn").innerHTML="&larr; "+esc(hub[1]);}
   if(v==="labour")applyLabSec();else labSec=null;
   if(v==="logi")renderLogi();if(v==="dly"||v==="lab0")renderHubs();
@@ -5304,10 +5303,10 @@ function tabGroupOf(v){for(var g in TAB_GROUPS)if(TAB_GROUPS[g].items.indexOf(v)
 function renderTabs(){
   var done={};
   el("tabs").innerHTML=VIEWS.map(function(x){
-    if(x[0]==="logi"||x[0]==="dly"||x[0]==="lab0")return "";
+    if(x[0]==="logi"||x[0]==="dly"||x[0]==="lab0"||x[0]==="weather"||x[0]==="camera")return "";
     if(tabGroupOf(x[0])==="daily"){
       if(done.daily)return "";done.daily=1;
-      var don=state.view==="dly"||TAB_GROUPS.daily.items.indexOf(state.view)>=0,dt=0,da=false;
+      var don=state.view==="dly"||state.view==="weather"||state.view==="camera"||TAB_GROUPS.daily.items.indexOf(state.view)>=0,dt=0,da=false;
       TAB_GROUPS.daily.items.forEach(function(v){var c=tabCount(v);if(c){dt+=c.n;da=da||!!c.alert;}});
       return '<button class="tab" type="button" data-go="dly" aria-current="'+don+'">Daily'+(dt?'<b class="'+(da?"alert":"")+'">'+dt+'</b>':'')+'</button>';
     }
