@@ -2118,6 +2118,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 #cpMileAdd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:8px;padding:10px 14px}
 #cpMileAdd #cpMileTxt{grid-column:1/-1}
 #cpWeek{display:none}
+#cpNote{display:none!important}
 #cpMileAdd input,#cpMileAdd select,#cpMileAdd .addbtn{font-size:14px!important;height:42px;min-height:42px;padding:0 10px;min-width:0;width:100%;box-sizing:border-box}
 #cpMileAdd .addbtn{width:auto;padding:0 18px}
 .cphero{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
@@ -2916,7 +2917,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div data-cpg="works"><div class="subhead" data-acc="path"><span>Critical works</span><span id="cpWin"></span></div>
     <div class="cpwrap"><div class="cpgrid" id="cpGrid"></div></div>
     <div id="cpLevels" hidden></div>
-    <p class="note" id="cpNote"></p></div>
+    <p class="note" id="cpNote" hidden></p></div>
   </div>
 </section>
 
@@ -2941,7 +2942,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 23:00</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5612,7 +5613,7 @@ function renderFront(){
   var jobs=dayJobs(),openJobs=jobs.filter(function(j){return !j.done;});
   el("cLabour").textContent=heads?heads+" on site":"nobody on";
   var lh="";
-  if(!lab.length&&!jobs.length) lh='<div class="empty"><b>Nothing yet</b>Crews come up at 7pm. Jobs are yours to type.</div>';
+  if(!lab.length&&!jobs.length) lh='<div class="empty"><b>Nothing yet</b></div>';
   else{
     lh=lab.slice(0,6).map(function(r){
       return '<div class="srow">'+supChip(r.supplier)+'<span class="tx">'+esc(r.name)+
@@ -5651,7 +5652,7 @@ function renderFront(){
           (it.clash?'<span class="pill crit">BREAK</span>':'')+
           (it.row.status==="req"?'<span class="pill tbc">TBC</span>':'')+'</div>';
       }).join("")+(lifts.length>7?'<div class="more">+ '+(lifts.length-7)+' more lifts</div>':'')
-    : '<div class="empty"><b>Nothing on the hook</b>Pre-booked each evening off the programme.</div>';
+    : '<div class="empty"><b>Nothing on the hook</b></div>';
 
   var dels=dayRows().filter(function(b){return b.type==="del";}),dk=kindMap("del");
   el("cDel").textContent=dels.length?dels.length+" in":"none booked";
@@ -5661,7 +5662,7 @@ function renderFront(){
           '<span class="tx">'+esc(b.desc||"")+'<small>'+esc(dk[b.kind]||b.kind||"")+'</small></span>'+
           (b.status==="req"?'<span class="pill tbc">TBC</span>':'')+'</div>';
       }).join("")+(dels.length>7?'<div class="more">+ '+(dels.length-7)+' more</div>':'')
-    : '<div class="empty"><b>No deliveries</b>Trucks booked through the group land here.</div>';
+    : '<div class="empty"><b>No deliveries</b></div>';
 
   var safe=openSafety(),inc=safe.filter(function(i){return i.kind==="INC";}).length;
   el("cSafe").textContent=safe.length?safe.length+" open"+(inc?" · "+inc+" incident"+(inc>1?"s":""):""):"all clear";
@@ -5670,7 +5671,7 @@ function renderFront(){
         return '<div class="srow">'+skChip(i.kind)+'<span class="tx">'+esc(i.text)+
           (i.from&&i.from!==state.date?'<small>carried from '+esc(shortDate(i.from))+'</small>':'')+'</span></div>';
       }).join("")+(safe.length>7?'<div class="more">+ '+(safe.length-7)+' more</div>':'')
-    : '<div class="empty"><b>Nothing open</b>Log the toolbox topic, any hazard, permit or incident.</div>';
+    : '<div class="empty"><b>Nothing open</b></div>';
 }
 
 /* ---------- labour ---------- */
@@ -6807,7 +6808,7 @@ function renderJobs(){
   var items=dayJobs(),open=items.filter(function(j){return !j.done;});
   var openPri=open.filter(function(j){return j.pri;}).length;
   el("jobsMeta").textContent=items.length?(open.length?open.length+" open"+(openPri?" · "+openPri+" priority":""):"all done"):"";
-  if(!items.length){el("jobs").innerHTML='<div class="nojobs">Nothing listed. Chase-ups, checks, bits and pieces.</div>';return;}
+  if(!items.length){el("jobs").innerHTML='<div class="nojobs">Nothing listed.</div>';return;}
   /* what is finished drops out of the running list and into its own section,
      so the list on the wall is only what is still to do */
   var pri=[],rest=[],done=[];
@@ -6996,13 +6997,13 @@ function renderSafety(){
   var sOpen=[],sDone=[];
   items.forEach(function(i,n){ (i.done?sDone:sOpen).push(safeRow(i,n)); });
   html+=sOpen.length?sOpen.join("")
-    : (carried.length?'':'<div class="empty"><b>Nothing logged</b>Critical items and NCRs only — anything that has to be closed out.</div>');
+    : (carried.length?'':'<div class="empty"><b>Nothing logged</b></div>');
   el("safeList").innerHTML=html;
   /* closed items keep their place on the day, just further down - a crew
      wants to see what got dealt with, not have it vanish */
   var sdb=el("safeDone");
   if(sdb){
-    sdb.innerHTML=sDone.length?sDone.join(""):'<div class="empty"><b>Nothing closed out yet today</b>Tick an item above and it lands here.</div>';
+    sdb.innerHTML=sDone.length?sDone.join(""):'<div class="empty"><b>Nothing closed out yet today</b></div>';
     el("safeDoneMeta").textContent=sDone.length?sDone.length+" closed":"";
   }
   renderPhotos("safe");
@@ -7059,7 +7060,7 @@ function renderPour(){
     ? open.length+" to fix"+(held.length?" \u00b7 "+held.length+" holding the pour":"")
     : (items.length?"all clear":"");
   if(!items.length){
-    box.innerHTML='<div class="empty"><b>Nothing listed</b>Add what has to be right before the pour \u2014 penos, starters, formwork, clean-out.</div>';
+    box.innerHTML='<div class="empty"><b>Nothing listed</b></div>';
   } else {
     var order=items.map(function(i,n){return [i,n];});
     order.sort(function(a,b){
@@ -7160,7 +7161,7 @@ function renderDelays(){
   var hrs=items.reduce(function(a,i){return a+(+i.hours||0);},0);
   el("delayMeta").textContent=items.length?items.length+(items.length===1?" delay":" delays")+(hrs?" · "+(Math.round(hrs*10)/10)+" hrs lost":""):"";
   if(!items.length){
-    el("delayList").innerHTML='<div class="empty"><b>No delays logged</b>Anything that cost time today — weather, access, a trade not showing, materials short. Photo it while you are standing there.</div>';
+    el("delayList").innerHTML='<div class="empty"><b>No delays logged</b></div>';
     return;
   }
   el("delayList").innerHTML=items.map(function(i,n){
@@ -7210,7 +7211,7 @@ function renderPhotos(sc){
   var items=S.list();
   el(S.meta).textContent=items.length?items.length+(items.length===1?" photo":" photos"):"";
   if(!items.length){
-    holder.innerHTML='<div class="nojobs">'+(assets?S.none:"Photos can be added by anyone who can edit this board.")+'</div>';
+    holder.innerHTML='<div class="nojobs">'+(assets?S.none:"No photos yet.")+'</div>';
     return;
   }
   holder.innerHTML='<div class="pgrid">'+items.map(function(p,i){
@@ -7754,7 +7755,7 @@ function renderProg(){
     });
   }
   if(!list.length){
-    el("progRows").innerHTML='<div class="empty"><b>No tasks in window</b>Updated from the programme PDF every three days.</div>';
+    el("progRows").innerHTML='<div class="empty"><b>No tasks in window</b></div>';
     el("progMeta").textContent="";return;
   }
   var behind=0;
@@ -8537,7 +8538,6 @@ function askFormat(label){
     var w=document.createElement("div");
     w.className="scrim";w.id="fmtAsk";
     w.innerHTML='<div class="sheet fmt"><h3>'+esc(label)+'</h3>'+
-      '<p class="note">JPG opens on any phone. PDF is better to print.</p>'+
       '<div class="fmtrow"><button class="btn primary" data-fmt="jpg">JPG</button>'+
       '<button class="btn" data-fmt="pdf">PDF</button>'+
       '<button class="btn" data-fmt="">Cancel</button></div></div>';
@@ -10037,7 +10037,7 @@ function renderLPRec(dt){
   if(!c||(!c.rec&&!c.err&&Date.now()-(c.at||0)>120000)){lpRecFetch(dt);}
   if(!c||c.loading){el("lpRecN").textContent="";box.innerHTML='<div class="lp-none">Loading&hellip;</div>';return;}
   var R=c.rec,today=iso(new Date());
-  if(!R){el("lpRecN").textContent="";box.innerHTML='<div class="lp-none">'+(c.err?"Couldn't load the lift record.":dt>today?"Not recorded yet - each working day is recorded off the Tikee camera at 6pm.":dt===today?"Today's record comes through after 6pm.":"No lift record for this day.")+"</div>";return;}
+  if(!R){el("lpRecN").textContent="";box.innerHTML='<div class="lp-none">'+(c.err?"Couldn't load the lift record.":dt>today?"Not recorded yet.":dt===today?"Today's record comes through after 6pm.":"No lift record for this day.")+"</div>";return;}
   var rows=R.rows||[],T=trades(),by={};
   rows.forEach(function(r){if(!r.removed)by[r.trade]=(by[r.trade]||0)+1;});
   var landed=rows.filter(function(r){return !r.removed;}).length,off=rows.length-landed;
@@ -10073,7 +10073,7 @@ function lrLoad(){
 function renderLRec(){
   if(lr.list==null){el("lrDays").innerHTML='<div class="lp-none">Loading&hellip;</div>';lrLoad();return;}
   var L=lr.list;
-  if(!L.length){el("lrDays").innerHTML="";el("lrCycle").innerHTML="";el("lpRecN").textContent="";el("lpRecBody").innerHTML='<div class="lp-none">No days recorded yet. Each working day is recorded at 6pm.</div>';return;}
+  if(!L.length){el("lrDays").innerHTML="";el("lrCycle").innerHTML="";el("lpRecN").textContent="";el("lpRecBody").innerHTML='<div class="lp-none">No days recorded yet.</div>';return;}
   if(!lr.sel||!L.some(function(x){return x.date===lr.sel;}))lr.sel=L[L.length-1].date;
   var today=iso(new Date());
   el("lrDays").innerHTML=L.map(function(R){
@@ -10530,7 +10530,7 @@ document.addEventListener("elise-signedout",function(){tsa.wk=tsa.pm=tsa.pl=null
 /* ---------- Today panel: site sign-in card ---------- */
 function renderFrontSign(){
   var b=el("fSign");if(!b)return;
-  if(!tsSigned()){el("cSign").textContent="";b.innerHTML='<div class="empty"><b>Sign in to the board</b>Who\'s on site, inductions waiting and open permits show here for the Elise team.</div>';return;}
+  if(!tsSigned()){el("cSign").textContent="";b.innerHTML='<div class="empty"><b>Sign in to the board</b></div>';return;}
   if(ts.rows==null){
     el("cSign").textContent="";
     b.innerHTML='<div class="empty">Loading&hellip;</div>';
@@ -10611,7 +10611,7 @@ function renderTsDocs(){
   if(tsd.docs==null){if(!tsd.loading){tsd.loading=1;tsDocsFetch().then(function(){tsd.loading=0;});}return;}
   var D=tsd.docs,ind=D.filter(function(d){return d.kind==="induction";}),sw=D.filter(function(d){return d.kind==="swms";});
   function item(d){return '<div class="ts-doc"><a href="'+esc(eliseAuth.fileUrl(d.path))+'" target="_blank" rel="noopener">'+esc(d.title)+'</a><small>'+(d.size?tsSize(d.size)+" - ":"")+tsDay(d.uploaded_at)+'</small><button type="button" class="ts-out" data-tsdel="'+d.id+'">Remove</button></div>';}
-  el("tsIndList").innerHTML=ind.length?ind.map(item).join(""):'<div class="lp-none">Nothing in the pack. The induction form works without it.</div>';
+  el("tsIndList").innerHTML=ind.length?ind.map(item).join(""):'<div class="lp-none">Nothing uploaded yet.</div>';
   var by={};sw.forEach(function(d){(by[d.co]=by[d.co]||[]).push(d);});
   el("tsSwmsList").innerHTML=Object.keys(by).length?Object.keys(by).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;}).map(function(c){return '<details class="ts-dd"><summary>'+lpTag(c)+esc(tsCoName(c))+"<i>"+by[c].length+'</i></summary><div class="ts-ddb">'+by[c].map(item).join("")+"</div></details>";}).join(""):'<div class="lp-none">No SWMS uploaded yet.</div>';
   el("tsDocN").textContent=sw.length+" SWMS"+(ind.length?", "+ind.length+" in the induction pack":"");el("tbDocs").textContent=sw.length+" SWMS";

@@ -557,7 +557,7 @@ function render(){
     : "";
 
   if(!rows.length){
-    list.innerHTML='<div class="empty"><b>Nothing booked</b>No lifts or deliveries on this day yet.</div>';
+    list.innerHTML='<div class="empty"><b>Nothing booked</b></div>';
     nowNext();
     return;
   }
@@ -582,8 +582,8 @@ function render(){
   }
   open_[lv]=1;
   list.innerHTML = back+(lv==="lift"
-    ? (lifts.length?group("lift","Crane lifts",lifts,nLift+(nLift===1?" lift":" lifts")+" · "+Math.floor(hook/60)+"h "+p2(hook%60)+"m",true):'<div class="empty"><b>No crane lifts</b>Nothing on the hook this day.</div>')
-    : (dels.length?group("del","Deliveries",dels, nDel+(nDel===1?" truck":" trucks"),false):'<div class="empty"><b>No deliveries</b>No trucks booked this day.</div>'));
+    ? (lifts.length?group("lift","Crane lifts",lifts,nLift+(nLift===1?" lift":" lifts")+" · "+Math.floor(hook/60)+"h "+p2(hook%60)+"m",true):'<div class="empty"><b>No crane lifts</b></div>')
+    : (dels.length?group("del","Deliveries",dels, nDel+(nDel===1?" truck":" trucks"),false):'<div class="empty"><b>No deliveries</b></div>'));
 
   Array.prototype.forEach.call(list.querySelectorAll("[data-toggle]"),function(b){
     b.addEventListener("click",function(){

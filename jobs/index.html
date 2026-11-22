@@ -682,7 +682,7 @@ function render(){
     if(view==="crew") html+='';
     else{var S=SECS[view];
       html+='<div class="sec '+S.cls+'"><h2>'+esc(S.t)+'</h2><span class="n">'+(view==="daily"?S.sub:S.n)+'</span>'+(S.hint?'<span class="hint">'+esc(S.hint)+'</span>':'')+'</div>'+
-        (S.n?S.body:'<div class="empty"><b>Nothing here</b>'+(view==="done"?"Nothing ticked off yet for this day.":"No jobs in this list for this day.")+'</div>');}
+        (S.n?S.body:'<div class="empty"><b>Nothing here</b></div>');}
   }
   el("crew").hidden=view!=="crew";
   el("addBtn").hidden=!(view==="pri"||view==="todo");
