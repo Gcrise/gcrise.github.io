@@ -2137,6 +2137,9 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 
 /* ---- Today: compact living tiles ---- */
 .k3{padding-block:12px 16px;display:flex;flex-direction:column;gap:10px;max-width:760px;margin:0 auto}
+.k3-l{display:flex;flex-direction:column;gap:10px;min-width:0}
+.k3-q button:nth-child(n+4){display:none}
+
 .k3-h{display:flex;justify-content:space-between;align-items:baseline}
 .k3-h b{font-family:'Archivo Narrow',sans-serif;font-size:13px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;border-bottom:1px solid var(--gold);padding-bottom:2px}
 .k3-h span{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase}
@@ -2169,6 +2172,18 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 .k3-hb s{display:block;height:7px;border-radius:2px;text-decoration:none}
 .k3-sp{width:100%;height:30px;display:block}
 @media(min-width:700px){.k3-hk .w{font-size:26px}.k3-t{min-height:124px}.k3-t .hd b{font-size:12.5px}.k3-t small{font-size:11px}}
+@media(min-width:1000px){
+  .k3{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:14px;max-width:1500px;align-items:start}
+  .k3-hook{grid-template-columns:1fr;gap:8px}
+  .k3-q button:nth-child(n+4){display:flex}
+  .k3-q button{flex:none;padding:9px 12px;font-size:13.5px}
+  .k3-q em{font-size:12px;width:auto}
+  .k3-g{gap:10px}
+  .k3-t{min-height:150px;padding:14px}
+  .k3-t .hd i{font-size:26px}
+  .k3-hk{padding:16px 18px}
+  .k3-hk .w{font-size:30px}
+}
 </style>
 </head>
 <body>
@@ -2979,7 +2994,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 22 Nov 22:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 06:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5730,7 +5745,7 @@ function renderK3(){
       (isToday?'<span class="cd'+(onHook?"":" nx")+'">'+(onHook?"Live":"In "+k3Mins(cur.t-nowM))+'</span>':"")+
       '<span class="k3-prog">'+lifts.slice(0,24).map(function(x,i){return '<i class="'+(i<done?"d":"")+'"></i>';}).join("")+'</span></button>';
   }else h+='<button type="button" class="k3-hk" data-go="crane"><span class="hl">Crane</span><span class="w">'+(lifts.length?"All lifts done":"Nothing on the hook")+'</span><span class="ht">'+(lifts.length?lifts.length+" lifts today":"No lifts booked")+'</span></button>';
-  var nxt=cur?lifts.slice(ci+1,ci+4):[];
+  var nxt=cur?lifts.slice(ci+1,ci+8):[];
   h+='<div class="k3-q">'+(nxt.length?nxt.map(function(it){return '<button type="button" data-go="crane" style="--c:'+colourOf(it.row.co)+'"><em>'+fmtClock(it.t)+'</em><span>'+k3Esc(nm(it))+'</span></button>';}).join(""):'<div class="none">Nothing after</div>')+'</div></div>';
 
   /* tiles */
@@ -5779,7 +5794,7 @@ function renderK3(){
   /* safety */
   var sf=openSafety(),inc=sf.filter(function(i){return i.kind==="INC";}).length;
   T.push('<button type="button" class="k3-t'+(inc?" red":"")+'" data-go="safety"><div class="hd"><b>Safety</b><i'+(sf.length?"":' class="ok"')+'>'+(sf.length||"&#10003;")+'</i></div>'+(sf.length?sf.slice(0,2).map(function(i){return '<small>'+k3Esc(i.text)+'</small>';}).join(""):'<small>Nothing open</small>')+'</button>');
-  box.innerHTML=h+'<div class="k3-g">'+T.join("")+'</div>';
+  box.innerHTML='<div class="k3-l">'+h+'</div><div class="k3-g">'+T.join("")+'</div>';
 }
 function k3Mins(m){m=Math.max(0,Math.round(m));return m<60?m+" min":Math.floor(m/60)+"h "+(m%60?m%60+"m":"");}
 setInterval(function(){if(state.view==="today")try{renderK3();}catch(e){}},60000);
