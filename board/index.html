@@ -2173,7 +2173,13 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 .k3-sp{width:100%;height:30px;display:block}
 @media(min-width:700px){.k3-hk .w{font-size:26px}.k3-t{min-height:124px}.k3-t .hd b{font-size:12.5px}.k3-t small{font-size:11px}}
 @media(min-width:1000px){
-  .k3{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:14px;max-width:1500px;align-items:start}
+  .k3{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:10px 14px;max-width:none;margin:0;align-items:stretch}
+  .k3-h{grid-column:1/-1}
+  .k3-l,.k3-hook{height:100%}
+  .k3-hook{grid-template-rows:auto 1fr}
+  .k3-q{justify-content:space-between}
+  .k3-g{grid-auto-rows:1fr}
+  .k3-t{min-height:0}
   .k3-hook{grid-template-columns:1fr;gap:8px}
   .k3-q button:nth-child(n+4){display:flex}
   .k3-q button{flex:none;padding:9px 12px;font-size:13.5px}
@@ -2994,7 +3000,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 06:35</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 06:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5794,7 +5800,7 @@ function renderK3(){
   /* safety */
   var sf=openSafety(),inc=sf.filter(function(i){return i.kind==="INC";}).length;
   T.push('<button type="button" class="k3-t'+(inc?" red":"")+'" data-go="safety"><div class="hd"><b>Safety</b><i'+(sf.length?"":' class="ok"')+'>'+(sf.length||"&#10003;")+'</i></div>'+(sf.length?sf.slice(0,2).map(function(i){return '<small>'+k3Esc(i.text)+'</small>';}).join(""):'<small>Nothing open</small>')+'</button>');
-  box.innerHTML='<div class="k3-l">'+h+'</div><div class="k3-g">'+T.join("")+'</div>';
+  var hi=h.indexOf('<div class="k3-hook">');box.innerHTML=h.slice(0,hi)+'<div class="k3-l">'+h.slice(hi)+'</div><div class="k3-g">'+T.join("")+'</div>';
 }
 function k3Mins(m){m=Math.max(0,Math.round(m));return m<60?m+" min":Math.floor(m/60)+"h "+(m%60?m%60+"m":"");}
 setInterval(function(){if(state.view==="today")try{renderK3();}catch(e){}},60000);
