@@ -125,7 +125,8 @@ button,.big,.link,.filebtn,label,.seg button,.yn button,.chip,.tab,.backbtn,summ
 .check,.check span,label.check{text-transform:none;letter-spacing:normal}
 label .opt{text-transform:uppercase!important;letter-spacing:.06em!important}
 select{text-transform:uppercase;font-weight:600}
-.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+a.tile{text-decoration:none}
 .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:96px;padding:12px 4px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer;text-align:center}
 .tile:active{border-color:var(--accent)}
 .tile svg{width:30px;height:30px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -256,6 +257,7 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
   <button type="button" class="tile" id="goPermit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2.5"/></svg><b>Permit</b></button>
   <button type="button" class="tile" id="goPlant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h13v-5H9l-2-4H3z"/><path d="M16 14h3l2 3h-5"/><circle cx="7" cy="18.5" r="1.8"/><circle cx="17" cy="18.5" r="1.8"/><path d="M9 8l6-4 2 4"/></svg><b>Plant</b></button>
   <button type="button" class="tile" id="goHelp"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg><b>How to sign in</b></button>
+  <a class="tile" href="homescreen.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 8v6M9 11h6M10.5 18.5h3"/></svg><b>Add to home screen</b></a>
 </div>
 <div class="card" id="vMine">
   <div class="mine" id="mine"></div>

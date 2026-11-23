@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en-AU"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Add ELISE to Home Screen</title>
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="../board/fonts.css">
+<style>
+@page{size:A4 portrait;margin:10mm}
+*{box-sizing:border-box}
+:root{--ink:#23271A;--ink2:#4E5340;--ink3:#717462;--rule:#D2CBBC;--card:#F5F1EA;--gold:#B8913A;--hi:#E8A33D}
+html,body{margin:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right)) 32px max(16px,env(safe-area-inset-left))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.logo{width:120px;height:28px;background:var(--ink);-webkit-mask:url(elise-logo.png) left center/contain no-repeat;mask:url(elise-logo.png) left center/contain no-repeat}
+.back{font:700 13px "Archivo Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);text-decoration:none;border:1px solid var(--rule);border-radius:6px;padding:9px 12px}
+h1{font-family:"Archivo Narrow","Archivo",system-ui,sans-serif;font-weight:700;font-size:clamp(30px,7vw,48px);line-height:1;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.02em}
+.sub{margin:0;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+.tabs{display:flex;gap:6px;margin:18px 0 6px}
+.tabs button{flex:1;font:700 15px "Archivo Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:12px;border-radius:8px;border:1px solid var(--rule);background:#fff;color:var(--ink);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+h2{font-family:"Archivo Narrow",sans-serif;font-size:20px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border-bottom:2px solid var(--gold);display:inline-block;padding-bottom:3px;margin:22px 0 12px}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.steps li{border:1px solid var(--rule);border-radius:12px;background:var(--card);padding:12px;display:flex;flex-direction:column;gap:10px;break-inside:avoid}
+.n{display:flex;align-items:center;gap:10px}
+.n i{font-style:normal;flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:700 16px "Archivo Narrow",sans-serif}
+.n b{font:700 17px "Archivo Narrow",sans-serif;letter-spacing:.05em;text-transform:uppercase;line-height:1.15}
+.steps p{margin:0;font-size:13px;line-height:1.4;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)}
+.steps svg{display:block;width:100%;max-width:200px;height:auto;margin:0 auto}
+.tip{margin:18px 0 0;padding:12px 14px;border-left:4px solid var(--gold);background:var(--card);font-size:13px;letter-spacing:.03em;text-transform:uppercase;line-height:1.45}
+.print{margin-top:18px;text-align:center}
+.print button{font:700 14px "Archivo Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:12px 18px;border-radius:6px;border:0;background:var(--ink);color:#fff;cursor:pointer}
+@media print{.tabs,.back,.print{display:none}.os{display:block!important}.os+.os{break-before:page}}
+</style></head><body>
+<div class="wrap">
+  <div class="top"><div class="logo" role="img" aria-label="ELISE"></div><a class="back" href="./">&larr; Back to sign-in</a></div>
+  <h1>Add ELISE to your home screen</h1>
+  <p class="sub">Do it once. Then sign in every day with one tap.</p>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tIos" aria-selected="true">iPhone</button>
+    <button type="button" role="tab" id="tAnd" aria-selected="false">Android</button>
+  </div>
+
+  <!-- iPhone -->
+  <section class="os" id="osIos">
+    <h2>iPhone (Safari)</h2>
+    <ol class="steps">
+      <li><div class="n"><i>1</i><b>Open the sign-in in Safari</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Phone showing the ELISE sign-in page in Safari">
+          <use href="#phone"/><use href="#page"/>
+          <rect x="22" y="326" width="156" height="30" rx="15" fill="#fff" stroke="#D2CBBC"/>
+          <text x="100" y="345" text-anchor="middle" font-size="10" fill="#4E5340" font-family="system-ui">gcrise.github.io</text>
+          <rect x="18" y="322" width="164" height="38" rx="19" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>Scan the QR code at the gate with your camera. It opens in Safari.</p></li>
+      <li><div class="n"><i>2</i><b>Tap the Share button</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Share button highlighted at the bottom of Safari">
+          <use href="#phone"/><use href="#page"/>
+          <rect x="14" y="320" width="172" height="42" fill="#F2F2F2"/>
+          <g fill="none" stroke="#2F6FE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M34 334l-5 7 5 7M66 334l5 7-5 7"/>
+            <rect x="93" y="335" width="14" height="15" rx="2"/><path d="M100 330v13M96 333l4-4 4 4"/>
+            <path d="M130 336h10M130 342h10M130 348h10"/><rect x="160" y="334" width="12" height="14" rx="2"/>
+          </g>
+          <circle cx="100" cy="340" r="17" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>The square with the arrow pointing up. On the newest iPhones tap <b>&bull;&bull;&bull;</b> first, then <b>Share</b>.</p></li>
+      <li><div class="n"><i>3</i><b>Tap &ldquo;Add to Home Screen&rdquo;</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Share sheet with Add to Home Screen highlighted">
+          <use href="#phone"/><use href="#page"/>
+          <rect x="14" y="150" width="172" height="212" rx="14" fill="#F2F2F2"/>
+          <rect x="24" y="162" width="152" height="26" rx="6" fill="#fff"/><text x="34" y="179" font-size="9" fill="#333" font-family="system-ui">Copy</text>
+          <rect x="24" y="194" width="152" height="26" rx="6" fill="#fff"/><text x="34" y="211" font-size="9" fill="#333" font-family="system-ui">Add to Reading List</text>
+          <rect x="24" y="226" width="152" height="26" rx="6" fill="#fff"/><text x="34" y="243" font-size="9" fill="#333" font-family="system-ui">Add Bookmark</text>
+          <rect x="24" y="258" width="152" height="26" rx="6" fill="#fff"/><text x="34" y="275" font-size="9.5" font-weight="700" fill="#111" font-family="system-ui">Add to Home Screen</text>
+          <rect x="157" y="265" width="12" height="12" rx="2" fill="none" stroke="#333"/><path d="M163 268v6M160 271h6" stroke="#333"/>
+          <rect x="20" y="254" width="160" height="34" rx="8" fill="none" stroke="#E8A33D" stroke-width="3"/>
+          <rect x="24" y="290" width="152" height="26" rx="6" fill="#fff"/><text x="34" y="307" font-size="9" fill="#333" font-family="system-ui">Print</text>
+        </svg>
+        <p>Scroll down the list if you can't see it.</p></li>
+      <li><div class="n"><i>4</i><b>Tap &ldquo;Add&rdquo;</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Add to Home Screen screen with Add highlighted top right">
+          <use href="#phone"/>
+          <rect x="14" y="40" width="172" height="322" fill="#F2F2F2"/>
+          <text x="24" y="62" font-size="7.5" fill="#2F6FE0" font-family="system-ui">Cancel</text>
+          <text x="100" y="62" text-anchor="middle" font-size="7.5" font-weight="700" fill="#111" font-family="system-ui">Add to Home Screen</text>
+          <text x="174" y="62" text-anchor="end" font-size="10" font-weight="700" fill="#2F6FE0" font-family="system-ui">Add</text>
+          <circle cx="164" cy="58" r="15" fill="none" stroke="#E8A33D" stroke-width="3"/>
+          <rect x="24" y="78" width="152" height="54" rx="8" fill="#fff"/>
+          <image href="icon-180.png" x="32" y="84" width="42" height="42"/>
+          <text x="84" y="103" font-size="9.5" fill="#111" font-family="system-ui">ELISE Sign-in</text>
+          <text x="84" y="117" font-size="7.5" fill="#888" font-family="system-ui">gcrise.github.io</text>
+        </svg>
+        <p>Top right corner. Leave the name as it is.</p></li>
+      <li><div class="n"><i>5</i><b>Done - tap ELISE every day</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Home screen with the ELISE icon">
+          <use href="#phone"/><use href="#home"/>
+          <image href="icon-180.png" x="113" y="128" width="34" height="34"/>
+          <text x="130" y="173" text-anchor="middle" font-size="6.5" fill="#fff" font-family="system-ui">ELISE Sign-in</text>
+          <rect x="106" y="121" width="48" height="58" rx="10" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>The ELISE icon is on your home screen. It opens straight to the sign-in, even with no signal.</p></li>
+    </ol>
+  </section>
+
+  <!-- Android -->
+  <section class="os" id="osAnd" hidden>
+    <h2>Android (Chrome)</h2>
+    <ol class="steps">
+      <li><div class="n"><i>1</i><b>Open the sign-in in Chrome</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Phone showing the ELISE sign-in page in Chrome">
+          <use href="#phone"/>
+          <rect x="14" y="40" width="172" height="28" fill="#F2F2F2"/>
+          <rect x="22" y="45" width="136" height="18" rx="9" fill="#fff" stroke="#D2CBBC"/>
+          <text x="34" y="57" font-size="8" fill="#4E5340" font-family="system-ui">gcrise.github.io/checkin</text>
+          <g fill="#333"><circle cx="172" cy="49" r="1.6"/><circle cx="172" cy="54" r="1.6"/><circle cx="172" cy="59" r="1.6"/></g>
+          <use href="#pageA"/>
+          <rect x="18" y="41" width="144" height="26" rx="13" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>Scan the QR code at the gate with your camera. Open it in Chrome.</p></li>
+      <li><div class="n"><i>2</i><b>Tap the three dots &#8942;</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Chrome menu button highlighted top right">
+          <use href="#phone"/>
+          <rect x="14" y="40" width="172" height="28" fill="#F2F2F2"/>
+          <rect x="22" y="45" width="136" height="18" rx="9" fill="#fff" stroke="#D2CBBC"/>
+          <text x="34" y="57" font-size="8" fill="#4E5340" font-family="system-ui">gcrise.github.io/checkin</text>
+          <g fill="#333"><circle cx="172" cy="49" r="1.6"/><circle cx="172" cy="54" r="1.6"/><circle cx="172" cy="59" r="1.6"/></g>
+          <use href="#pageA"/>
+          <circle cx="172" cy="54" r="13" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>Top right corner of Chrome.</p></li>
+      <li><div class="n"><i>3</i><b>Tap &ldquo;Add to home screen&rdquo;</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Chrome menu with Add to home screen highlighted">
+          <use href="#phone"/>
+          <rect x="14" y="40" width="172" height="28" fill="#F2F2F2"/>
+          <use href="#pageA"/>
+          <rect x="70" y="46" width="112" height="190" rx="8" fill="#fff" stroke="#D2CBBC"/>
+          <text x="82" y="70" font-size="8.5" fill="#333" font-family="system-ui">New tab</text>
+          <text x="82" y="96" font-size="8.5" fill="#333" font-family="system-ui">History</text>
+          <text x="82" y="122" font-size="8.5" fill="#333" font-family="system-ui">Downloads</text>
+          <text x="82" y="148" font-size="8.5" fill="#333" font-family="system-ui">Share&hellip;</text>
+          <text x="82" y="174" font-size="8.5" font-weight="700" fill="#111" font-family="system-ui">Add to home screen</text>
+          <text x="82" y="200" font-size="8.5" fill="#333" font-family="system-ui">Settings</text>
+          <rect x="74" y="161" width="104" height="20" rx="5" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>Some phones say <b>Install app</b> instead - tap that.</p></li>
+      <li><div class="n"><i>4</i><b>Tap &ldquo;Add&rdquo; or &ldquo;Install&rdquo;</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Add to home screen box with Add highlighted">
+          <use href="#phone"/><use href="#pageA"/>
+          <rect x="14" y="40" width="172" height="322" fill="#000" opacity=".35"/>
+          <rect x="26" y="138" width="148" height="100" rx="12" fill="#fff"/>
+          <text x="38" y="160" font-size="9.5" font-weight="700" fill="#111" font-family="system-ui">Add to home screen</text>
+          <image href="icon-180.png" x="38" y="170" width="28" height="28"/>
+          <text x="74" y="188" font-size="9" fill="#111" font-family="system-ui">ELISE Sign-in</text>
+          <text x="110" y="224" font-size="9" fill="#2F6FE0" font-family="system-ui">Cancel</text>
+          <text x="150" y="224" font-size="9.5" font-weight="700" fill="#2F6FE0" font-family="system-ui">Add</text>
+          <circle cx="157" cy="221" r="14" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>If it asks again, tap <b>Add</b> once more.</p></li>
+      <li><div class="n"><i>5</i><b>Done - tap ELISE every day</b></div>
+        <svg viewBox="0 0 200 380" role="img" aria-label="Home screen with the ELISE icon">
+          <use href="#phone"/><use href="#home"/>
+          <image href="icon-180.png" x="113" y="128" width="34" height="34"/>
+          <text x="130" y="173" text-anchor="middle" font-size="6.5" fill="#fff" font-family="system-ui">ELISE Sign-in</text>
+          <rect x="106" y="121" width="48" height="58" rx="10" fill="none" stroke="#E8A33D" stroke-width="3"/>
+        </svg>
+        <p>The ELISE icon is on your home screen. It opens straight to the sign-in, even with no signal.</p></li>
+    </ol>
+  </section>
+
+  <p class="tip">Can't see the option? Make sure the page is open in <b>Safari</b> on iPhone or <b>Chrome</b> on Android - not inside WhatsApp, Facebook or another app. If it opened inside another app, tap its menu and choose &ldquo;Open in browser&rdquo;.</p>
+  <div class="print"><button type="button" onclick="window.print()">Print these steps</button></div>
+</div>
+
+<!-- shared drawing parts -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="phone"><rect x="6" y="6" width="188" height="368" rx="30" fill="#1B1D16"/><rect x="14" y="16" width="172" height="350" rx="23" fill="#fff"/><rect x="74" y="22" width="52" height="12" rx="6" fill="#1B1D16"/></g>
+    <g id="page"><rect x="14" y="40" width="172" height="280" fill="#23271A"/><text x="28" y="66" font-size="11" fill="#E8E2D8" font-family="system-ui" letter-spacing="2">ELISE</text><rect x="28" y="82" width="144" height="40" rx="6" fill="#2D3221"/><text x="100" y="106" text-anchor="middle" font-size="10" font-weight="700" fill="#E8E2D8" font-family="system-ui">SITE SIGN-IN</text><rect x="28" y="132" width="144" height="34" rx="6" fill="#2FD44A"/><text x="100" y="153" text-anchor="middle" font-size="10" font-weight="700" fill="#10220F" font-family="system-ui">SIGN IN</text><rect x="28" y="174" width="144" height="34" rx="6" fill="none" stroke="#3E4431"/><text x="100" y="195" text-anchor="middle" font-size="9" fill="#C6C7B9" font-family="system-ui">SIGN OUT</text><g fill="#2D3221"><rect x="28" y="220" width="44" height="40" rx="5"/><rect x="78" y="220" width="44" height="40" rx="5"/><rect x="128" y="220" width="44" height="40" rx="5"/></g></g>
+    <g id="pageA"><rect x="14" y="68" width="172" height="294" fill="#23271A"/><text x="28" y="92" font-size="11" fill="#E8E2D8" font-family="system-ui" letter-spacing="2">ELISE</text><rect x="28" y="106" width="144" height="40" rx="6" fill="#2D3221"/><text x="100" y="130" text-anchor="middle" font-size="10" font-weight="700" fill="#E8E2D8" font-family="system-ui">SITE SIGN-IN</text><rect x="28" y="156" width="144" height="34" rx="6" fill="#2FD44A"/><text x="100" y="177" text-anchor="middle" font-size="10" font-weight="700" fill="#10220F" font-family="system-ui">SIGN IN</text><rect x="28" y="198" width="144" height="34" rx="6" fill="none" stroke="#3E4431"/><text x="100" y="219" text-anchor="middle" font-size="9" fill="#C6C7B9" font-family="system-ui">SIGN OUT</text></g>
+    <g id="home"><rect x="14" y="16" width="172" height="350" rx="23" fill="#3A5A78"/><g fill="#fff" opacity=".85"><rect x="33" y="72" width="34" height="34" rx="8"/><rect x="73" y="72" width="34" height="34" rx="8"/><rect x="113" y="72" width="34" height="34" rx="8"/><rect x="33" y="128" width="34" height="34" rx="8"/><rect x="73" y="128" width="34" height="34" rx="8"/><rect x="33" y="184" width="34" height="34" rx="8"/></g><rect x="26" y="316" width="148" height="40" rx="14" fill="#fff" opacity=".25"/></g>
+  </defs>
+</svg>
+<script>
+(function(){
+  var ios=document.getElementById("osIos"),and=document.getElementById("osAnd"),ti=document.getElementById("tIos"),ta=document.getElementById("tAnd");
+  function pick(a){ios.hidden=!a;and.hidden=a;ti.setAttribute("aria-selected",a);ta.setAttribute("aria-selected",!a);}
+  ti.onclick=function(){pick(true)};ta.onclick=function(){pick(false)};
+  if(/android/i.test(navigator.userAgent))pick(false);
+})();
+</script>
+</body></html>
