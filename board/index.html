@@ -3016,7 +3016,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 09:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 21:50</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5962,10 +5962,19 @@ function jobOverlay(items,date){
     if(j.id) ids[j.id]=1;
     var l=j.id&&L[j.id]; if(!l) return j;
     var o={};for(var k in j)o[k]=j[k];
-    if(l.done){ o.done=l.done.a==="done"; if(o.done&&l.done.who&&!o.doneBy)o.doneBy=l.done.who; }
+    if(l.done){
+      if(l.done.a==="done"){
+        /* a job ticked off (here or on the crew sheet) belongs to the day it
+           was finished: gone from the days after, still open on the days before */
+        var dd=l.done.at?iso(new Date(l.done.at)):"";
+        if(dd&&dd<date&&!j.done) return null;
+        o.done=!!j.done||!dd||dd<=date;
+      } else o.done=false;
+      if(o.done&&l.done.who&&!o.doneBy)o.doneBy=l.done.who;
+    }
     if(l.pri) o.pri=l.pri.a==="pri";
     return o;
-  });
+  }).filter(Boolean);
   /* jobs the crew added on the sheet: open ones carry forward to today,
      finished ones show on the day they were finished */
   var today=iso(new Date());
@@ -6907,7 +6916,9 @@ function rollJobs(announce){
   var dates=Object.keys(state.jobDocs).filter(function(d){return d<state.date;}).sort();
   var src=dates[dates.length-1];
   if(!src)return 0;
-  var openOnes=(state.jobDocs[src].items||[]).filter(function(j){return !j.done;});
+  /* read the last day through the job log, so a job the crew ticked off on
+     their sheet (or deleted) is not carried as if it were still open */
+  var openOnes=jobOverlay(state.jobDocs[src].items||[],src).filter(function(j){return !j.done&&!j.crew;});
   var cur=dayJobs(),out=[],keys=[],dropped=0,moved={};
   /* Which jobs are already on today, by id. An id survives a re-wording and
      the text does not, which is the whole bug: someone appends "- Waiting on
