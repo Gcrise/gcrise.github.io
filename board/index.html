@@ -780,7 +780,7 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 .tkbox:fullscreen{margin:0;height:100%;border:0}
 .tkbox.camfull .camclose,.tkbox:fullscreen .camclose{display:block;z-index:2}
 .tknote{margin:6px 14px 0}
-#v-camera .camgrid{grid-template-columns:1fr;padding-bottom:14px}
+#v-camera .camgrid{padding-top:12px;padding-bottom:14px}
 .dcband{display:inline-flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
 .dcband .dcl{font-family:var(--f-cond);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
 .dcband .dcn{font-family:var(--f-num);font-size:20px;font-weight:700;line-height:1;color:var(--clock)}
@@ -2732,7 +2732,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
       <button type="button" class="ts-tile" data-camsec="tl"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1.5"/><path d="m16 10 5-3v10l-5-3"/></svg><b>Timelapse</b><span>Play the build</span></button>
       <button type="button" class="ts-tile" data-camsec="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg><b>Mark up</b><span>Draw on the deck</span></button>
     </div>
-    <div class="camhd tkhd"><b>Photo browser</b>
+    <div class="camhd tkhd"><b>Camera</b>
       <a class="mini" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener">Open in Tikee</a>
       <button class="mini" type="button" id="tkRaw">Whole page</button><button class="mini" type="button" data-camfull="tkBox">Full screen</button></div>
     <div class="tkbox" id="tkBox"><div class="tkcrop" id="tkCrop">
@@ -2741,7 +2741,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     </div>
     <div class="camgrid" id="camGrid">
       <div class="camcol camlatest">
-        <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" id="inkHide" hidden>Hide marks</button><button class="mini" type="button" id="inkBtn">Mark up</button><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
+        <div class="camhd"><b>Mark up - latest photo</b><span id="camMeta"></span><button class="mini" type="button" id="inkHide" hidden>Hide marks</button><button class="mini" type="button" id="inkBtn">Mark up</button><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
           <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><div class="camzoom" id="camZoom"><div class="camstage" id="camStage"><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"><svg id="camInk" viewBox="0 0 7360 2650" preserveAspectRatio="none" aria-label="Mark-up on the deck photo"></svg></div></div></div>
           <div class="camtools" id="camTools" hidden>
@@ -3016,7 +3016,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 24 Nov 20:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 24 Nov 20:50</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -10332,15 +10332,14 @@ var camSec=null;
 document.addEventListener("click",function(e){var g=e.target.closest&&e.target.closest('[data-go="camera"]');if(g)camSec=null;},true);
 document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-camsec]");if(t){camSec=t.getAttribute("data-camsec");if(state.view==="camera"){applyCamSec();window.scrollTo(0,0);}else go("camera");}});
 function applyCamSec(){
+  /* Live view is one page: camera (photo browser), latest photo with mark-up, and the timelapse */
   var v=el("v-camera");if(!v)return;
-  el("camTiles").hidden=!!camSec;
-  v.querySelector(".tkhd").hidden=camSec!=="browser";el("tkBox").hidden=camSec!=="browser";
-  el("camGrid").hidden=camSec!=="tl"&&camSec!=="mark";
-  v.querySelector(".camlatest").hidden=camSec!=="mark";v.querySelector(".camtl").hidden=camSec!=="tl";
-  el("camGrid").classList.toggle("one",!!camSec);
-  if(camSec==="mark"){try{camLiveLoad();}catch(e){}}
-  var hub=camSec?["camera","Live view"]:["dly","Daily"];
-  el("lgBackBtn").setAttribute("data-go",hub[0]);el("lgBackBtn").innerHTML="&larr; "+esc(hub[1]);
+  el("camTiles").hidden=true;
+  v.querySelector(".tkhd").hidden=false;el("tkBox").hidden=false;
+  el("camGrid").hidden=false;el("camGrid").classList.remove("one");
+  v.querySelector(".camlatest").hidden=false;v.querySelector(".camtl").hidden=false;
+  try{camLiveLoad();}catch(e){}
+  el("lgBackBtn").setAttribute("data-go","dly");el("lgBackBtn").innerHTML="&larr; Daily";
 }
 
 var _rp0=renderPath;renderPath=function(){_rp0.apply(this,arguments);if(state.view==="path")applyCpSec();};
