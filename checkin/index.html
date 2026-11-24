@@ -704,6 +704,14 @@ function afterInduction(p){
   beforeSignIn(p);
 }
 function beforeSignIn(p){
+  /* always check for today's prestart first, so nobody slips through because
+     the page opened before the prestart was written or hadn't finished loading */
+  if(p.kind!=="visitor"&&!preSigned()&&navigator.onLine){
+    var done=false,go=function(){if(done)return;done=true;
+      if(preToday()&&!preSigned()){showPre(p);return;}
+      show(null);finishSignIn(p);};
+    loadPre().then(go,go);setTimeout(go,6000);return;
+  }
   if(p.kind!=="visitor"&&preToday()&&!preSigned()){showPre(p);return;}
   show(null);finishSignIn(p);
 }
