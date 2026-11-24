@@ -2190,6 +2190,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
   .k3-hk{padding:16px 18px}
   .k3-hk .w{font-size:30px}
 }
+#camGrid.one{grid-template-columns:1fr}
 </style>
 </head>
 <body>
@@ -2727,10 +2728,9 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div class="phead" data-acc="camera"><h2>Live view</h2><span class="dcband" id="deckCount" hidden></span>
     </div>
     <div class="ts-tiles" id="camTiles">
-      <button type="button" class="ts-tile" data-camsec="browser"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="9" cy="10" r="1.8"/><path d="m3 17 5-5 4 4 3-3 6 6"/></svg><b>Photo browser</b><span>Every shot</span></button>
+      <button type="button" class="ts-tile" data-camsec="browser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Camera</b><span>Every shot</span></button>
       <button type="button" class="ts-tile" data-camsec="tl"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1.5"/><path d="m16 10 5-3v10l-5-3"/></svg><b>Timelapse</b><span>Play the build</span></button>
-      <a class="ts-tile" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v6H4V6h6"/></svg><b>Open in Tikee</b><span>Photos</span></a>
-      <a class="ts-tile" href="https://my.tikee.io/videos/a6c56c8d-1222-452a-b032-881045e8cfd5" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v6H4V6h6"/></svg><b>Open in myTikee</b><span>Video</span></a>
+      <button type="button" class="ts-tile" data-camsec="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg><b>Mark up</b><span>Draw on the deck</span></button>
     </div>
     <div class="camhd tkhd"><b>Photo browser</b>
       <a class="mini" href="https://my.tikee.io/viewpoints/280295/timelapse?secure_link=true" target="_blank" rel="noopener">Open in Tikee</a>
@@ -2740,7 +2740,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
       <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
     </div>
     <div class="camgrid" id="camGrid">
-      <div class="camcol camlatest" hidden>
+      <div class="camcol camlatest">
         <div class="camhd"><b>Latest photo</b><span id="camMeta"></span><button class="mini" type="button" id="inkHide" hidden>Hide marks</button><button class="mini" type="button" id="inkBtn">Mark up</button><button class="mini" type="button" data-camfull="camBox">Full screen</button></div>
         <div class="cambox live" id="camBox">
           <div class="camlive" id="camLive"><span class="camwait" id="camWait">Loading the latest photo&hellip;</span><div class="camzoom" id="camZoom"><div class="camstage" id="camStage"><img id="camImg" alt="ELISE deck, latest photo" data-src="https://my.tikee.io/v2/time_lapses/111161/redirect_to_last_img/a6c56c8d-1222-452a-b032-881045e8cfd5"><svg id="camInk" viewBox="0 0 7360 2650" preserveAspectRatio="none" aria-label="Mark-up on the deck photo"></svg></div></div></div>
@@ -2754,7 +2754,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
           <button class="camclose" type="button" data-camclose aria-label="Close full screen">&times;</button>
         </div>
       </div>
-      <div class="camcol">
+      <div class="camcol camtl">
         <div class="camhd"><b>Timelapse</b><button class="mini" type="button" data-camfull="tlBox">Full screen</button></div>
         <div class="cambox" id="tlBox">
           <iframe id="camFrame" title="ELISE deck timelapse" scrolling="no" allow="fullscreen; autoplay" allowfullscreen referrerpolicy="no-referrer"></iframe>
@@ -3016,7 +3016,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 23 Nov 21:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 24 Nov 20:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -10335,7 +10335,10 @@ function applyCamSec(){
   var v=el("v-camera");if(!v)return;
   el("camTiles").hidden=!!camSec;
   v.querySelector(".tkhd").hidden=camSec!=="browser";el("tkBox").hidden=camSec!=="browser";
-  el("camGrid").hidden=camSec!=="tl";
+  el("camGrid").hidden=camSec!=="tl"&&camSec!=="mark";
+  v.querySelector(".camlatest").hidden=camSec!=="mark";v.querySelector(".camtl").hidden=camSec!=="tl";
+  el("camGrid").classList.toggle("one",!!camSec);
+  if(camSec==="mark"){try{camLiveLoad();}catch(e){}}
   var hub=camSec?["camera","Live view"]:["dly","Daily"];
   el("lgBackBtn").setAttribute("data-go",hub[0]);el("lgBackBtn").innerHTML="&larr; "+esc(hub[1]);
 }
