@@ -2191,6 +2191,22 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
   .k3-hk .w{font-size:30px}
 }
 #camGrid.one{grid-template-columns:1fr}
+
+/* attendance - day by day by company */
+.ah-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 12px}
+.ah-bar b{font-family:var(--f-cond);font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.ah-wrap{overflow-x:auto;border:1px solid var(--line-hard);border-radius:6px}
+.ah-t{border-collapse:collapse;width:100%;min-width:560px;font-size:13px}
+.ah-t th,.ah-t td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.ah-t th{font-family:var(--f-cond);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);background:var(--surface)}
+.ah-t th.d{cursor:pointer}.ah-t th.d.on{color:var(--gold);box-shadow:inset 0 -2px 0 var(--gold)}
+.ah-t td:first-child,.ah-t th:first-child{text-align:left;position:sticky;left:0;background:var(--surface)}
+.ah-t td.z{color:var(--ink-3)}.ah-t tr.tot td{font-weight:700;border-top:2px solid var(--line-hard)}
+.ah-t .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:middle}
+.ah-day h3{font-family:var(--f-cond);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--gold);display:inline-block;margin:18px 0 8px}
+.ah-co{margin:8px 0;border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.ah-co b{font-family:var(--f-cond);letter-spacing:.06em;text-transform:uppercase}
+.ah-co ul{margin:6px 0 0;padding-left:18px;font-size:13px}.ah-co li small{color:var(--ink-3)}
 </style>
 </head>
 <body>
@@ -2835,6 +2851,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div class="ts-tiles" id="tsHomeV">
       <a class="ts-tile" href="../checkin/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H5v16h5"/><path d="M14 8l4 4-4 4M18 12H9"/></svg><b>Sign-in page</b><span>Sign in or out</span></a>
       <button type="button" class="ts-tile" data-tsv="att"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="m15.5 11.5 2 2 4-4"/></svg><b>Attendance</b><span id="tbAtt"></span></button>
+      <button type="button" class="ts-tile" data-tsv="hist"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 10h17M8 3v4M16 3v4M7 14h2M11 14h2M15 14h2M7 17h2M11 17h2"/></svg><b>Day by day</b><span id="tbHist">Attendance by company</span></button>
       <button type="button" class="ts-tile" data-tsv="appr"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 9h6M9 13h3"/><circle cx="16.5" cy="16.5" r="3"/><path d="m15.2 16.5 1 1 1.8-1.8"/></svg><b>Approvals</b><span id="tbAppr"></span><i class="ts-badge" id="tbApprN" hidden></i></button>
       <button type="button" class="ts-tile" data-tsv="ind"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="11" r="2.3"/><path d="M5.8 16.5c.6-1.8 1.8-2.6 3.2-2.6s2.6.8 3.2 2.6M14 10h4M14 13.5h3"/></svg><b>Inductions</b><span id="tbInd"></span></button>
       <button type="button" class="ts-tile" data-tsv="permit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v2.5"/></svg><b>Permits</b><span id="tbPm"></span></button>
@@ -2846,6 +2863,11 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
       <button type="button" class="ts-tile" data-tsv="policy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/></svg><b>Policies</b><span id="tbPol"></span></button>
     </div>
 
+    <div data-tsp="hist" hidden>
+      <div class="ah-bar"><button type="button" class="ts-btn ts-ghost" id="ahPrev">&larr; Week</button><b id="ahWk"></b><button type="button" class="ts-btn ts-ghost" id="ahNext">Week &rarr;</button></div>
+      <div class="ah-wrap" id="ahTable"><div class="lp-none">Loading&hellip;</div></div>
+      <div id="ahDay"></div>
+    </div>
     <div data-tsp="att" hidden>
       <div id="tsLive">
         <div class="subhead"><span>Trades on site today</span><span id="tsTrN"></span></div>
@@ -3016,7 +3038,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 24 Nov 20:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 25 Nov 11:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5531,7 +5553,7 @@ function renderTabs(){
     if(!menu){ menu=document.createElement("div"); menu.className="mastmenu ddmenu"; menu.setAttribute("role","menu"); menu.hidden=true; document.body.appendChild(menu); }
     if(key==="signin"){
       var cur=state.view==="tester"&&typeof tsv!=="undefined"?tsv:"";
-      menu.innerHTML=[["home","Overview"],["att","Attendance"],["appr","Approvals"],["ind","Inductions"],["permit","Permits"],["plant","Plant"],["gate","Gate QR code"],["docs","SWMS & docs"]].map(function(x){
+      menu.innerHTML=[["home","Overview"],["att","Attendance"],["hist","Day by day"],["appr","Approvals"],["ind","Inductions"],["permit","Permits"],["plant","Plant"],["gate","Gate QR code"],["docs","SWMS & docs"]].map(function(x){
         var c=x[0]==="appr"&&window.__tsPend?'<i class="alert">'+window.__tsPend+'</i>':"";
         return '<button class="mm-it'+(cur===x[0]?' on':'')+'" type="button" role="menuitem" data-tsv="'+x[0]+'"><span>'+esc(x[1])+'</span>'+c+'</button>';
       }).join("");
@@ -10482,6 +10504,7 @@ function renderTester(){
   renderTsDocs();
   if(!signed){el("tbSds").textContent=el("tbPol").textContent=el("tbNotice").textContent="";return;}
   renderTsAdmin();renderTsNotice();
+  if(tsv==="hist")renderAh();
   if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester"){tsFetch();tsaFetch();}},30000);}
   if(ts.rows==null){el("tsOn").innerHTML='<div class="lp-none">Loading&hellip;</div>';if(!ts.loading){ts.loading=1;tsFetch().then(function(){ts.loading=0;});}return;}
   var rows=ts.rows,on=rows.filter(function(x){return !x.out_at;}),off=rows.filter(function(x){return x.out_at;}),by={},tot=0;
@@ -10492,7 +10515,7 @@ function renderTester(){
   var _sn={},_dt=rows.reduce(function(s,x){var k=x.kind==="crew"?null:x.co+"|"+String(x.name||"").trim().toLowerCase();if(k&&_sn[k])return s;if(k)_sn[k]=1;return s+x.n;},0);
   el("tsMeta").innerHTML='<b class="ts-big">'+_dt+'</b> on site today'+(ts.err?" - "+esc(ts.err):"")+(ts.at?" - updated "+tsClock(ts.at):"");
   function who(x){
-    var s=x.kind==="crew"?esc(x.name)+" + crew of "+x.n+(x.crew_names&&x.crew_names.length?' <small>('+esc(x.crew_names.join(", "))+")</small>":""):esc(x.name)+(x.kind==="visitor"?" <small>visitor</small>":"");
+    var s=x.kind==="crew"?esc(x.name)+(x.n>1?" + "+(x.n-1)+" not named":"")+' <small>foreman</small>':esc(x.name)+(x.kind==="visitor"?" <small>visitor</small>":"");
     var ws=x.worker_status||(x.inducted?"approved":"none");
     if(x.kind!=="visitor"&&ws!=="approved")s+=' <span class="flag">'+(ws==="pending"?"induction waiting for approval":ws==="rejected"?"induction not approved":"no ELISE induction")+"</span>";
     if(x.phone)s+=' <small class="ts-ph">'+esc(x.phone)+"</small>";
@@ -10563,7 +10586,49 @@ el("tsOutAll").addEventListener("click",async function(){
 document.addEventListener("elise-signedout",function(){ts.rows=null;try{localStorage.removeItem(TS_CACHE);}catch(e){}if(state.view==="tester")renderTester();});
 
 /* ---------- inductions, permits, plant: approvals by Elise (Tester tab) ---------- */
-var TSV_T={att:"Attendance",appr:"Approvals",ind:"Inductions",permit:"Permits",plant:"Plant",gate:"Gate QR code",notice:"Site announcements",docs:"SWMS",sds:"SDS",policy:"Policies"};
+
+/* ---------- Sign-in: attendance day by day, by company ---------- */
+var ah={wk:0,rows:null,key:"",day:null,busy:0};
+function ahMonday(off){var d=new Date();d.setHours(12,0,0,0);var w=(d.getDay()+6)%7;d.setDate(d.getDate()-w+off*7);return d;}
+async function ahFetch(){
+  var m=ahMonday(ah.wk),e=new Date(m);e.setDate(e.getDate()+6);var key=iso(m);
+  ah.busy=1;
+  try{var r=await eliseAuth.rest("site_signin?day=gte."+iso(m)+"&day=lte."+iso(e)+"&select=day,kind,co,name,n,worker_status,inducted,at,out_at,out_by&order=at.asc");
+    if(!r.ok)throw new Error(r.status);ah.rows=await r.json();ah.key=key;}catch(x){ah.rows=ah.rows||[];ah.err="Couldn't load - "+x.message;}
+  ah.busy=0;renderAh();
+}
+function renderAh(){
+  if(tsv!=="hist"||!tsSigned())return;
+  var m=ahMonday(ah.wk),days=[];for(var i=0;i<7;i++){var d=new Date(m);d.setDate(d.getDate()+i);days.push(iso(d));}
+  var e=new Date(m);e.setDate(e.getDate()+6);
+  el("ahWk").textContent="Week of "+m.toLocaleDateString("en-AU",{day:"numeric",month:"short"})+" - "+e.toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"});
+  el("ahNext").disabled=ah.wk>=0;
+  if(ah.key!==iso(m)){if(!ah.busy){el("ahTable").innerHTML='<div class="lp-none">Loading&hellip;</div>';ahFetch();}return;}
+  var R=ah.rows||[],by={},tot={};
+  R.forEach(function(x){var c=x.co||"OTH";(by[c]=by[c]||{})[x.day]=(by[c][x.day]||0)+(+x.n||1);tot[x.day]=(tot[x.day]||0)+(+x.n||1);});
+  var cos=Object.keys(by).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;});
+  if(!ah.day||days.indexOf(ah.day)<0){var t=iso(new Date());ah.day=days.indexOf(t)>=0?t:days.filter(function(d){return tot[d];}).pop()||days[0];}
+  var h='<table class="ah-t"><thead><tr><th>Company</th>'+days.map(function(d){var dt=new Date(d+"T12:00:00");return '<th class="d'+(d===ah.day?" on":"")+'" data-ahday="'+d+'">'+dt.toLocaleDateString("en-AU",{weekday:"short"})+"<br>"+dt.getDate()+"</th>";}).join("")+"<th>Week</th></tr></thead><tbody>";
+  if(!cos.length)h+='<tr><td colspan="9" class="z">Nobody signed in this week</td></tr>';
+  cos.forEach(function(c){var w=0;h+='<tr><td><span class="sw" style="background:'+colourOf(c)+'"></span>'+esc(tsCoName(c))+"</td>"+days.map(function(d){var v=by[c][d]||0;w+=v;return '<td class="'+(v?"":"z")+'">'+(v||"-")+"</td>";}).join("")+"<td><b>"+w+"</b></td></tr>";});
+  var wt=0;h+='<tr class="tot"><td>Total on site</td>'+days.map(function(d){var v=tot[d]||0;wt+=v;return '<td class="'+(v?"":"z")+'">'+(v||"-")+"</td>";}).join("")+"<td>"+wt+"</td></tr></tbody></table>";
+  el("ahTable").innerHTML=h+(ah.err?'<div class="lp-none">'+esc(ah.err)+"</div>":"");
+  /* who was on site on the chosen day */
+  var DR=R.filter(function(x){return x.day===ah.day;}),g={};DR.forEach(function(x){(g[x.co||"OTH"]=g[x.co||"OTH"]||[]).push(x);});
+  var dt=new Date(ah.day+"T12:00:00");
+  el("ahDay").innerHTML='<div class="ah-day"><h3>'+dt.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"short"})+" - "+(tot[ah.day]||0)+" on site</h3>"+
+    (DR.length?Object.keys(g).sort(function(a,b){return tsCoName(a)<tsCoName(b)?-1:1;}).map(function(c){var n=g[c].reduce(function(s,x){return s+(+x.n||1);},0);
+      return '<div class="ah-co"><b>'+esc(tsCoName(c))+"</b> - "+n+"<ul>"+g[c].map(function(x){
+        var nm=esc(x.name)+(x.kind==="crew"&&x.n>1?" + "+(x.n-1)+" not named":"")+(x.kind==="visitor"?" <small>visitor</small>":"");
+        var ws=x.worker_status||(x.inducted?"approved":"none");if(x.kind!=="visitor"&&ws!=="approved")nm+=' <small>no approved induction</small>';
+        return "<li>"+nm+" <small>"+tsClock(x.at)+(x.out_at?" - "+tsClock(x.out_at)+(x.out_by==="auto"?" (auto)":""):" - on site")+"</small></li>";}).join("")+"</ul></div>";}).join(""):'<div class="lp-none">Nobody signed in</div>')+"</div>";
+}
+document.addEventListener("click",function(e){
+  var d=e.target.closest&&e.target.closest("[data-ahday]");if(d){ah.day=d.getAttribute("data-ahday");renderAh();return;}
+  if(e.target.id==="ahPrev"){ah.wk--;ah.day=null;renderAh();}
+  if(e.target.id==="ahNext"&&ah.wk<0){ah.wk++;ah.day=null;renderAh();}
+});
+var TSV_T={att:"Attendance",hist:"Day by day",appr:"Approvals",ind:"Inductions",permit:"Permits",plant:"Plant",gate:"Gate QR code",notice:"Site announcements",docs:"SWMS",sds:"SDS",policy:"Policies"};
 var tsv=(function(){try{var v=localStorage.getItem("elise_tsv");return TSV_T[v]?v:"home";}catch(e){return "home";}})();
 var tsa={wk:null,pm:null,pl:null,at:null,f:{ind:"all",permit:"open",plant:"on"},q:""};
 var PERMIT_N={hot:"Hot works",height:"Work at height / EWP",pen:"Penetration / core drilling",dig:"Excavation",iso:"Electrical isolation",conf:"Confined space",ooh:"Out of hours work",crane:"Crane lift outside plan",other:"Other permit"};

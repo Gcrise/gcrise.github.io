@@ -54,6 +54,7 @@ input[type=date],input[type=time]{min-height:48px}
 .doc a{color:var(--ink);font-weight:700;font-size:16px;overflow-wrap:anywhere}
 .doc a::after{content:" - open";font-weight:400;color:var(--ink3);font-size:13px}
 .doc .check{margin-top:8px}
+.docs-opt{margin:8px 0}.docs-opt summary{cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 0}
 .doc.opened a::after{content:" - opened";color:var(--go)}
 .muted{color:var(--ink3);font-size:13px;line-height:1.45}
 /* induction wizard */
@@ -555,13 +556,13 @@ function drawInd(){
       '<p class="muted">High risk work licences, plant tickets / VOCs, trade licences, working at heights, first aid and so on. No other tickets? Just tap Next.</p>';
   }else if(pg===4){
     var pack=docs().filter(function(x){return x.kind==="induction"||x.kind==="policy";});
-    h=(pack.length?'<p class="step-p">Open and read each of these first - Elise policies and the site induction pack:</p>'+pack.map(function(x){return '<div class="doc'+(d.docs_opened[x.id]?" opened":"")+'"><a href="'+docUrl(x)+'" target="_blank" rel="noopener" data-pack="'+x.id+'">'+esc(x.title)+"</a></div>";}).join("")+'<p class="step-p" style="margin-top:14px">':'<p class="step-p">')+
+    h=(pack.length?'<div class="q"><p>Have you read the Elise policies and the site induction pack?</p>'+ynHtml("polread",d.polread)+(d.polread===false?'<div class="no">Read them below, or ask the Elise site team, then change it to Yes.</div>':"")+'</div>'+
+       '<details class="docs-opt"><summary>Elise policies and induction pack</summary>'+pack.map(function(x){return '<div class="doc'+(d.docs_opened[x.id]?" opened":"")+'"><a href="'+docUrl(x)+'" target="_blank" rel="noopener" data-pack="'+x.id+'">'+esc(x.title)+"</a></div>";}).join("")+'</details><p class="step-p" style="margin-top:14px">':'<p class="step-p">')+
       "Answer Yes or No for each item to confirm it was covered in your site-specific induction. If something wasn't covered, answer No and ask the Elise site team before you finish.</p>"+
       ACK.map(function(a,i){return '<div class="ack"><p>'+(i+1)+". "+esc(a)+"</p>"+ynHtml("ack"+i,d.ack[i])+(d.ack[i]===false?'<div class="no">Ask the Elise site team to go through this with you.</div>':"")+"</div>";}).join("");
   }else if(pg===5){
     h='<div class="stmt"><p class="stmt">I acknowledge that I have been inducted onto the site by a representative of Elise Constructions. By signing this acknowledgement, I am stating:</p><ul><li>That I have received training and education in the Induction contents</li><li>That I understand the Induction contents</li><li>That I have the skills and knowledge to perform the work as described in this Induction</li><li>That I can perform the work as described in this Induction and as allocated to me safely</li><li>I understand I must comply with the content of the Induction.</li></ul></div>'+
       '<label class="check"><input type="checkbox" id="i_iack"'+(d.iack?" checked":"")+"> <span>I acknowledge</span></label>"+
-      '<div class="q"><p>Are you driving your vehicle to site?</p>'+ynHtml("driving",d.driving)+'<div id="nb_driving"'+(d.driving?"":" hidden")+">"+inp("rego","Rego","text",'maxlength="12" autocapitalize="characters"')+"</div></div>"+
       inp("signed_name","Signed by (you) inductee - full name","text",'maxlength="80" autocomplete="name"')+
       "<label>Signature</label>"+padHtml("indPad");
   }
@@ -607,14 +608,12 @@ function indCheck(){
   }
   if(pg===4){
     var pack=docs().filter(function(x){return x.kind==="induction"||x.kind==="policy";});
-    for(var k=0;k<pack.length;k++)if(!d.docs_opened[pack[k].id])return "Open and read every part of the induction pack first.";
+    if(pack.length&&d.polread!==true)return d.polread===false?"Read the policies and induction pack, then change it to Yes.":"Have you read the Elise policies and the site induction pack?";
     var un=d.ack.indexOf(null);if(un>=0)return "Answer item "+(un+1)+".";
     var no=d.ack.indexOf(false);if(no>=0)return "Item "+(no+1)+" is No - ask the Elise site team to go through it with you, then change it to Yes.";
   }
   if(pg===5){
     if(!d.iack)return "Tick 'I acknowledge'.";
-    if(d.driving==null)return "Are you driving your vehicle to site?";
-    if(d.driving&&!d.rego)return "Put your rego in.";
     if(d.signed_name.length<3)return "Type your full name to sign.";
     if(pads.indPad.empty())return "Sign in the box with your finger.";
   }
@@ -637,7 +636,7 @@ function submitInduction(){
   up("photo","Photo of worker");
   var row={client_id:id,token:token,name:d.name,phone:d.phone,co:d.co,dob:d.dob,address:d.address,em_name:d.em_name,em_phone:d.em_phone,em_rel:d.em_rel,employer:d.employer,occupation:d.occupation,emp_type:d.emp_type,
     medical:d.medical,medical_note:d.medical?d.medical_note:null,injury:d.injury,injury_note:d.injury?d.injury_note:null,meds:d.meds,meds_note:d.meds?d.meds_note:null,
-    white_card:d.white_card,comps:comps,ack:d.ack,docs_read:Object.keys(d.docs_opened),driving:d.driving,rego:d.driving?d.rego:null,signed_name:d.signed_name,signature:pads.indPad.data(),submitted_at:new Date().toISOString()};
+    white_card:d.white_card,comps:comps,ack:d.ack,docs_read:Object.keys(d.docs_opened).concat(d.polread?["confirmed-read"]:[]),driving:null,rego:null,signed_name:d.signed_name,signature:pads.indPad.data(),submitted_at:new Date().toISOString()};
   var ok=enqueue({t:"post",table:"site_worker",row:row});
   ups.forEach(function(u){ok=enqueue({t:"post",table:"site_upload",row:u})&&ok;});
   if(!ok){$("inMsg").textContent="This phone is out of storage for the photos. Get to signal and tap Sign and send again.";var q=queue().filter(function(j){return !(j.row&&(j.row.client_id===id||j.row.ref_id===id));});ls(K_Q,q);return;}
