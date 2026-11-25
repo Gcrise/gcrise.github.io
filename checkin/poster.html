@@ -5,41 +5,75 @@
 <title>ELISE Sign-in Poster</title>
 <link rel="stylesheet" href="../board/fonts.css">
 <style>
-@page{size:A4 portrait;margin:12mm}
+@page{size:A3 portrait;margin:8mm}
 *{box-sizing:border-box}
-html,body{margin:0;background:#fff;color:#23271A;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.sheet{max-width:186mm;margin:0 auto;padding:16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
-.logo{width:180px;height:42px;background:#23271A;-webkit-mask:url(elise-logo.png) center/contain no-repeat;mask:url(elise-logo.png) center/contain no-repeat;margin-top:6px}
-h1{font-family:"Archivo Narrow","Archivo",system-ui,sans-serif;font-weight:700;font-size:76px;line-height:1;margin:18px 0 0;letter-spacing:.02em;text-transform:uppercase}
-.sub{font-size:17px;margin:0;color:#4E5340;text-transform:uppercase;letter-spacing:.04em}
-#qr{width:118mm;max-width:100%;aspect-ratio:1;margin:18px 0 6px}
+:root{--ink:#23271A;--olive:#2D3221;--gold:#B8913A;--ink2:#4E5340;--ink3:#717462}
+html,body{margin:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.sheet{width:194mm;max-width:calc(100% - 16px);min-height:279mm;margin:8px auto;border:5mm solid var(--olive);padding:3mm;display:flex}
+.inner{flex:1;border:1.2mm solid var(--gold);padding:8mm 10mm 5mm;display:flex;flex-direction:column;align-items:center;text-align:center}
+.logo{width:62mm;height:auto;display:block}
+.tag{margin:3mm 0 0;font:700 13px "Archivo Narrow",sans-serif;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:"Archivo Narrow","Archivo",system-ui,sans-serif;font-weight:700;font-size:84px;line-height:.95;margin:5mm 0 0;letter-spacing:.02em;text-transform:uppercase}
+.sub{font-size:16px;margin:3mm 0 0;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+.qrwrap{margin:7mm 0 3mm;padding:5mm;border:1mm solid var(--ink);border-radius:6mm;background:#fff;position:relative}
+.qrwrap::before,.qrwrap::after{content:"";position:absolute;left:50%;transform:translateX(-50%);background:#fff;padding:0 3mm;font:700 12px "Archivo Narrow",sans-serif;letter-spacing:.3em;color:var(--ink)}
+.qrwrap::before{content:"SCAN ME";top:-2.6mm}
+#qr{width:90mm;max-width:72vw;aspect-ratio:1}
 #qr svg{width:100%;height:100%;display:block}
-.url{font-size:15px;color:#4E5340;word-break:break-all}
-ol{text-transform:uppercase;letter-spacing:.02em;text-align:left;font-size:19px;line-height:1.5;margin:14px 0 0;padding-left:28px}
-.foot{text-transform:uppercase;letter-spacing:.04em;margin-top:18px;font-size:13px;color:#717462;border-top:2px solid #23271A;padding-top:10px;width:100%}
-.noprint{margin:14px auto;text-align:center;font-size:14px}
-.noprint button{text-transform:uppercase;letter-spacing:.06em;font:inherit;font-weight:700;padding:10px 18px;border-radius:6px;border:0;background:#23271A;color:#fff;cursor:pointer}
-@media print{.noprint{display:none}}
+.url{font-size:14px;color:var(--ink2);letter-spacing:.02em}
+.steps{list-style:none;margin:6mm 0 4mm;padding:0;display:flex;flex-direction:column;gap:2.5mm;text-align:left;width:100%;max-width:150mm}
+.steps li{display:flex;align-items:center;gap:4mm;font-size:18px;letter-spacing:.03em;text-transform:uppercase;line-height:1.25}
+.steps i{flex:none;font-style:normal;width:10mm;height:10mm;border-radius:50%;background:var(--olive);color:#fff;display:grid;place-items:center;font:700 18px "Archivo Narrow",sans-serif}
+.foot{margin-top:auto;padding-top:3mm;width:100%;border-top:.6mm solid var(--ink);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);line-height:1.5}
+.foot b{color:var(--ink)}
+.noprint{margin:14px auto 0;text-align:center}
+.noprint button{text-transform:uppercase;letter-spacing:.06em;font:700 14px "Archivo Narrow",sans-serif;padding:11px 20px;border-radius:6px;border:0;background:var(--ink);color:#fff;cursor:pointer}
+@media print{.noprint{display:none}html,body{height:auto}.sheet{margin:0 auto;max-width:none;zoom:1.41;min-height:282mm;height:282mm}}
+@media (max-width:600px){h1{font-size:52px}.steps li{font-size:15px}.sheet{min-height:0}}
 </style></head><body>
-<div class="noprint"><button type="button" onclick="window.print()">Print this poster</button></div>
-<div class="sheet">
-  <div class="logo" role="img" aria-label="ELISE"></div>
+<div class="noprint"><button type="button" onclick="window.print()">Print this poster (A3)</button></div>
+<div class="sheet"><div class="inner">
+  <img class="logo" src="elise-logo-dark.png" alt="ELISE">
+  <p class="tag">Site sign-in</p>
   <h1>Sign in here</h1>
-  <p class="sub">Every worker, every day. Scan with your phone camera.</p>
-  <div id="qr" role="img" aria-label="QR code to the ELISE site sign-in"></div>
+  <p class="sub">Every worker &middot; every day &middot; scan with your phone camera</p>
+  <div class="qrwrap"><div id="qr" role="img" aria-label="QR code to the ELISE site sign-in"></div></div>
   <div class="url" id="url"></div>
-  <ol>
-    <li>Scan the code and sign in when you arrive.</li>
-    <li>Foremen: sign your whole crew in at the prestart.</li>
-    <li>Scan again and tap <b>Sign out</b> when you leave.</li>
+  <ol class="steps">
+    <li><i>1</i><span>Scan the code and sign in when you arrive</span></li>
+    <li><i>2</i><span>Read and sign today's prestart</span></li>
+    <li><i>3</i><span>Foremen: sign your whole crew in by name</span></li>
+    <li><i>4</i><span>Scan again and tap <b>Sign out</b> when you leave</span></li>
   </ol>
-  <div class="foot">Project ELISE &middot; 3 Twenty Fifth Ave, Palm Beach &middot; First time on site? You do the induction on your phone.</div>
-</div>
+  <div class="foot"><b>Project ELISE</b> &middot; 3 Twenty Fifth Ave, Palm Beach<br>First time on site? You do the induction on your phone.</div>
+</div></div>
 <script src="../board/vendor/qrcode.js"></script>
 <script>
-var u=new URL("./",location.href).href;
-document.getElementById("url").textContent=u;
-var q=qrcode(0,"M");q.addData(u);q.make();
-document.getElementById("qr").innerHTML=q.createSvgTag({cellSize:8,margin:2,scalable:true});
+(function(){
+  var u="https://gcrise.github.io/checkin/";
+  document.getElementById("url").textContent=u.replace(/^https?:\/\//,"");
+  /* high error correction so the logo in the middle doesn't stop it scanning */
+  var q=qrcode(0,"H");q.addData(u);q.make();
+  var n=q.getModuleCount(),m=2,S=n+m*2,ink="#23271A",olive="#2D3221";
+  var hole=Math.ceil(n*0.26);if((n-hole)%2)hole++;var h0=(n-hole)/2,h1=h0+hole;
+  function finder(r,c){return (r<7&&c<7)||(r<7&&c>=n-7)||(r>=n-7&&c<7);}
+  var p=[];
+  for(var r=0;r<n;r++)for(var c=0;c<n;c++){
+    if(!q.isDark(r,c)||finder(r,c))continue;
+    if(r>=h0-1&&r<h1+1&&c>=h0-1&&c<h1+1)continue;
+    p.push('<rect x="'+(c+m+.08)+'" y="'+(r+m+.08)+'" width=".84" height=".84" rx=".38"/>');
+  }
+  function eye(r,c){var x=c+m,y=r+m;
+    return '<rect x="'+(x+.5)+'" y="'+(y+.5)+'" width="6" height="6" rx="1.6" fill="none" stroke="'+olive+'" stroke-width="1"/>'+
+           '<rect x="'+(x+2)+'" y="'+(y+2)+'" width="3" height="3" rx=".9" fill="'+olive+'"/>';}
+  var lx=h0+m,ly=h0+m;
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+S+' '+S+'" shape-rendering="geometricPrecision">'+
+    '<rect width="'+S+'" height="'+S+'" fill="#fff"/><g fill="'+ink+'">'+p.join("")+'</g>'+
+    eye(0,0)+eye(0,n-7)+eye(n-7,0)+
+    '<rect x="'+(lx-.2)+'" y="'+(ly-.2)+'" width="'+(hole+.4)+'" height="'+(hole+.4)+'" rx="1.4" fill="'+olive+'"/>'+
+    '<image href="elise-logo.png" x="'+(lx+.9)+'" y="'+(ly+hole/2-(hole-1.8)*110/420/2)+'" width="'+(hole-1.8)+'" height="'+((hole-1.8)*110/420)+'"/>'+
+    '</svg>';
+  document.getElementById("qr").innerHTML=svg;
+})();
 </script>
 </body></html>
