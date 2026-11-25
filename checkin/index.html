@@ -201,7 +201,7 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
     <li><b>First time on site</b>Do the ELISE Constructions induction on this page - about 10 minutes, once only. Elise approves it.</li>
     <li><b>Every day</b>Scan the gate QR, tap SIGN IN, read and sign today's site prestart, and your company's SWMS when there's a new one.</li>
     <li><b>Leaving site</b>Tap SIGN OUT. Anyone still signed in at 6pm is signed out automatically.</li>
-    <li><b>Crew</b>A foreman can sign the whole crew in with MY CREW - each person still does their own induction once.</li>
+    <li><b>Everyone signs in</b>Each person signs in on their own phone - no signing in for the crew.</li>
     <li><b>No signal</b>It still works. It saves on your phone and sends when you're back on the network.</li>
     <li><b>Permits &amp; plant</b>Request a permit or register plant from the tiles. Elise approves it and you see it here.</li>
   </ol>
@@ -242,7 +242,6 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
 <div class="card" id="vForm" hidden>
   <div class="seg" role="group" aria-label="Signing in">
     <button type="button" data-k="gate" aria-pressed="true">Myself</button>
-    <button type="button" data-k="crew" aria-pressed="false">My crew</button>
     <button type="button" data-k="visitor" aria-pressed="false">Visitor</button>
   </div>
   <label for="fName" id="lName">Your name</label>
@@ -486,7 +485,7 @@ function render(){
   renderIndLine();renderMine();
 }
 var me=ls(K_ME);
-if(me){$("fName").value=me.name||"";$("fCo").value=me.co||"";$("fPhone").value=me.phone||"";if(me.kind)setKind(me.kind);}else setKind("gate");
+if(me){$("fName").value=me.name||"";$("fCo").value=me.co||"";$("fPhone").value=me.phone||"";setKind(me.kind==="visitor"?"visitor":"gate");}else setKind("gate");
 
 /* ---------- documents (SWMS, and the optional induction pack) ---------- */
 var K_DOCS="elise_ci_docs";
@@ -696,7 +695,7 @@ $("goIn").addEventListener("click",async function(){
     if(others.length+1>n){n=Math.min(99,others.length+1);$("fN").value=n;}
     if(!tick){$("msg").textContent="Everyone in your crew needs the ELISE induction first - each person does it on their own phone from this page.";return;}}
   if(kind==="visitor"&&!tick){$("msg").textContent="Visitors stay with their Elise host - tick the box.";return;}
-  var m=ls(K_ME)||{};m.name=name;m.co=co;m.phone=phone;m.kind=kind==="crew"?"crew":"gate";ls(K_ME,m);
+  var m=ls(K_ME)||{};m.name=name;m.co=co;m.phone=phone;m.kind="gate";ls(K_ME,m);
   var p={name:name,co:co,phone:phone,n:n,names:names,kind:kind};
   if(kind==="visitor"){finishSignIn(p);return;}
   var w=m.worker;
