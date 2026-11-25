@@ -229,8 +229,10 @@ function realtime(){
 function watch(table, filters, cb, errcb){
   var alive = true, timer = null, chan = null;
 
+  var lastPull = 0, rtLive = false;
   async function pull(){
     if(!alive) return;
+    lastPull = Date.now();
     try{ cb(snapOf(await fetchRows(table, filters), table)); }
     catch(e){ if(errcb) errcb(e); }
   }
@@ -249,8 +251,15 @@ function watch(table, filters, cb, errcb){
      the wifi drops, and nothing reconnects it - the board then sat frozen on
      whatever it had. Polling every 30s, and the moment the page comes back
      to the front, keeps it current whatever the socket is doing. */
-  timer = setInterval(pull, 30000);
-  function onVis(){ if(document.visibilityState==="visible") pull(); }
+  /* Keep the data bill down (Supabase free plan = 5 GB a month out): nothing is
+     pulled while the board is in the background, and while the live feed is
+     connected the safety re-check is every 3 minutes instead of every 30s. */
+  timer = setInterval(function(){
+    if(document.visibilityState !== "visible") return;
+    if(rtLive && Date.now() - lastPull < 180000) return;
+    pull();
+  }, 30000);
+  function onVis(){ if(document.visibilityState==="visible" && Date.now()-lastPull>20000) pull(); }
   document.addEventListener("visibilitychange", onVis);
   window.addEventListener("online", pull);
   if(c){
@@ -258,8 +267,8 @@ function watch(table, filters, cb, errcb){
       chan = c.channel("rt_"+table+"_"+Math.random().toString(36).slice(2))
         .on("postgres_changes", {event:"*", schema:"public", table:table}, pull)
         .subscribe(function(st){
-          if(st === "SUBSCRIBED"){ settled = true; return; }
-          if(st === "CHANNEL_ERROR" || st === "TIMED_OUT" || st === "CLOSED") fallback(st);
+          if(st === "SUBSCRIBED"){ settled = true; rtLive = true; return; }
+          if(st === "CHANNEL_ERROR" || st === "TIMED_OUT" || st === "CLOSED"){ rtLive = false; fallback(st); }
         });
       setTimeout(function(){ fallback("timeout"); }, 8000);
     }catch(e){ fallback("threw"); }
@@ -3038,7 +3047,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 25 Nov 11:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 26 Nov 06:50</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5975,7 +5984,7 @@ function pullJobLog(){
     })
     .catch(function(){ jobLogBusy=false; });
 }
-setTimeout(pullJobLog,1500); setInterval(pullJobLog,20000);
+setTimeout(pullJobLog,1500); setInterval(function(){if(document.visibilityState==="visible")pullJobLog();},60000);
 document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") pullJobLog(); });
 
 function jobOverlay(items,date){
@@ -10505,7 +10514,7 @@ function renderTester(){
   if(!signed){el("tbSds").textContent=el("tbPol").textContent=el("tbNotice").textContent="";return;}
   renderTsAdmin();renderTsNotice();
   if(tsv==="hist")renderAh();
-  if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester"){tsFetch();tsaFetch();}},30000);}
+  if(!ts.timer){ts.timer=setInterval(function(){if(state.view==="tester"&&document.visibilityState==="visible"){tsFetch();tsaFetch();}},30000);}
   if(ts.rows==null){el("tsOn").innerHTML='<div class="lp-none">Loading&hellip;</div>';if(!ts.loading){ts.loading=1;tsFetch().then(function(){ts.loading=0;});}return;}
   var rows=ts.rows,on=rows.filter(function(x){return !x.out_at;}),off=rows.filter(function(x){return x.out_at;}),by={},tot=0;
   on.forEach(function(x){(by[x.co]=by[x.co]||[]).push(x);tot+=x.n;});
@@ -10842,7 +10851,7 @@ function renderFrontSign(){
   if(flag)h+='<button type="button" class="fs-alert soft" data-tsv="att"><i>'+flag+"</i>On site without an approved ELISE induction</button>";
   b.innerHTML=h;
 }
-setInterval(function(){if(state.view==="today"&&tsSigned()){tsFetch();tsaFetch();}},60000);
+setInterval(function(){if(state.view==="today"&&tsSigned()&&document.visibilityState==="visible"){tsFetch();tsaFetch();}},60000);
 
 /* ---------- site announcements (Tester tab) ---------- */
 var tsn={list:null};

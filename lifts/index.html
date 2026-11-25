@@ -704,7 +704,8 @@ function load(){
 }
 
 load();
-setInterval(load, 20000);
+setInterval(function(){if(document.visibilityState==="visible")load();}, 60000);
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")load();});
 document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") load(); });
 window.addEventListener("hashchange",function(){
   var d=dayFromHash();
