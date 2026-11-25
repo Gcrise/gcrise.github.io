@@ -243,7 +243,7 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
   <div id="crewBox" hidden>
     <label for="fN">How many in your crew today, including you</label>
     <input id="fN" type="number" min="1" max="99" inputmode="numeric">
-    <label for="fNames">Their names <span class="opt">- one per line, optional</span></label>
+    <label for="fNames">Crew first names <span class="opt">- one per line, each one gets signed in</span></label>
     <textarea id="fNames" rows="4"></textarea>
   </div>
   <label class="check" id="indBox" hidden><input type="checkbox" id="fInd"> <span id="indTxt"></span></label>
@@ -681,7 +681,10 @@ $("goIn").addEventListener("click",async function(){
   if(kind!=="visitor"&&!phoneOk(phone)){$("msg").textContent="Put your mobile in - it links you to your ELISE induction.";return;}
   var n=1,names=null;
   if(kind==="crew"){n=parseInt($("fN").value,10);if(!(n>=1&&n<=99)){$("msg").textContent="How many in your crew today?";return;}
-    names=$("fNames").value.split(/\n/).map(function(s){return s.trim();}).filter(Boolean).slice(0,99);
+    names=$("fNames").value.split(/[\n,]/).map(function(s){return s.trim();}).filter(Boolean).slice(0,98);
+    /* every name listed gets signed in on their own - make sure the head count covers them */
+    var fn=function(x){return x.split(" ")[0].toLowerCase();},others=names.filter(function(x){return fn(x)!==fn(name);});
+    if(others.length+1>n){n=Math.min(99,others.length+1);$("fN").value=n;}
     if(!tick){$("msg").textContent="Everyone in your crew needs the ELISE induction first - each person does it on their own phone from this page.";return;}}
   if(kind==="visitor"&&!tick){$("msg").textContent="Visitors stay with their Elise host - tick the box.";return;}
   var m=ls(K_ME)||{};m.name=name;m.co=co;m.phone=phone;m.kind=kind==="crew"?"crew":"gate";ls(K_ME,m);
