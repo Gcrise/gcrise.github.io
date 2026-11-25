@@ -152,6 +152,10 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
 .cop-list{position:absolute;left:0;right:0;top:100%;z-index:30;max-height:260px;overflow-y:auto;background:var(--bg);border:1px solid var(--rule);border-radius:8px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .cop-list button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);color:inherit;padding:12px 14px;font:inherit;text-transform:uppercase;cursor:pointer}
 .cop-list button:hover,.cop-list button:focus{background:rgba(255,255,255,.06)}
+.geo-ask{margin-top:14px;border:1px solid var(--gold,#C9A75C);border-radius:10px;padding:12px}
+.geo-ask b{display:block;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.geo-ask p{margin:0 0 10px;font-size:14px;line-height:1.4}
+.geo-line{margin:10px 16px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.75;text-align:center}
 </style></head><body><div class="wrap">
 <div class="top"><div class="logo" role="img" aria-label="ELISE"></div><div class="net" id="net"><i></i><span>Online</span></div></div>
 <h1>Site sign-in</h1>
@@ -225,7 +229,13 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
   <button class="big out" id="goOut" type="button">Sign out</button>
   <div class="ind-line" id="onInd"></div>
   <div class="pend" id="pend1" hidden></div>
+  <div class="geo-ask" id="geoAsk" hidden>
+    <b>Auto sign in and out</b>
+    <p>Turn on location and this page signs you in when you open it on site, and out when you open it after you've left.</p>
+    <div class="navrow"><button class="big alt" type="button" id="geoNo">Not now</button><button class="big in" type="button" id="geoYes">Turn on location</button></div>
+  </div>
 </div>
+<div class="geo-line" id="geoLine" hidden></div>
 
 <div class="card note-out" id="vNote" hidden></div>
 <!-- signed out / first time -->
@@ -462,7 +472,7 @@ function render(){
   var note=ls(K_NOTE);
   if(note&&note.day!==today())note=null;
   $("vNote").hidden=!(note&&!cur);
-  if(note)$("vNote").textContent=note.by==="auto"?"You were signed out automatically at 6pm. Please sign out yourself when you leave site.":note.by==="team"?"The Elise site team signed you out at "+clock(note.at)+".":"";
+  if(note)$("vNote").textContent=note.by==="auto"?"You were signed out automatically at 6pm. Please sign out yourself when you leave site.":note.by==="team"?"The Elise site team signed you out at "+clock(note.at)+".":note.by==="location"?"You left site - signed out automatically at "+clock(note.at)+".":"";
   var q=queue(),pend=q.length;
   $("vOn").hidden=!cur;$("vForm").hidden=!!cur;
   if(cur){
@@ -723,12 +733,12 @@ function finishSignIn(p){
   ls(K_CUR,{id:row.client_id,token:row.token,day:row.day,kind:p.kind,name:p.name,n:p.n,at:at});
   enqueue({t:"in",row:row});
   $("fInd").checked=false;$("fNames").value="";$("fN").value="";
-  render();
+  render();setTimeout(function(){geoAskShow();geoCheck();},300);
 }
 $("goOut").addEventListener("click",function(){
   var cur=ls(K_CUR);if(!cur)return;
   enqueue({t:"out",id:cur.id,token:cur.token,at:new Date().toISOString()});
-  ls(K_CUR,null);render();
+  ls(K_CUR,null);ls(K_GEOOUT,Date.now());render();
 });
 
 /* =====================================================================
@@ -877,6 +887,56 @@ async function refreshStatus(){
 }
 
 
+
+/* ---------- location: auto sign in on site, auto sign out once you've left ----------
+   Only checked while this page is open - nothing runs in the background and the
+   position is never sent anywhere or stored. Site = 50 m around 3 Twenty Fifth Ave. */
+var SITE={lat:-28.104242,lon:153.463840,r:50},K_GEO="elise_ci_geo",K_GEOOUT="elise_ci_geoout",geoWatch=null,geoBusy=false;
+function geoOn(){return ls(K_GEO)==="on";}
+function geoDist(a,b,c,d){var R=6371000,t=Math.PI/180,x=(c-a)*t,y=(d-b)*t,h=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*t)*Math.cos(c*t)*Math.sin(y/2)*Math.sin(y/2);return 2*R*Math.asin(Math.sqrt(h));}
+function geoAskShow(){
+  var cur=ls(K_CUR);
+  $("geoAsk").hidden=!(cur&&cur.kind!=="visitor"&&navigator.geolocation&&!geoOn()&&ls(K_GEO)!=="no:"+today());
+}
+function geoMsg(t){var g=$("geoLine");g.textContent=t||"";g.hidden=!t;}
+function geoAct(pos){
+  var c=pos.coords,d=geoDist(c.latitude,c.longitude,SITE.lat,SITE.lon),acc=Math.min(c.accuracy||0,100);
+  var onSite=d-acc<=SITE.r, offSite=d-acc>SITE.r;
+  var cur=ls(K_CUR);
+  if(cur&&offSite&&cur.day===today()){
+    enqueue({t:"out",id:cur.id,token:cur.token,at:new Date().toISOString()});
+    ls(K_CUR,null);ls(K_GEOOUT,Date.now());ls(K_NOTE,{day:today(),by:"location",at:new Date().toISOString()});render();
+    geoMsg("Signed out automatically - you've left site");return;
+  }
+  if(!cur&&onSite){
+    var m=ls(K_ME)||{},last=+ls(K_GEOOUT)||0;
+    /* individuals only, with a current induction, and not straight after signing out */
+    if(m.kind==="gate"&&m.name&&m.co&&workerValid(m.worker)&&Date.now()-last>20*60000&&$("vMain")&&!$("vMain").hidden){
+      geoMsg("On site - signing you in");
+      afterInduction({name:m.name,co:m.co,phone:m.phone||"",n:1,names:null,kind:"gate"});
+      return;
+    }
+  }
+  geoMsg(onSite?"Location on - you're on site":"Location on - auto sign in and out");
+}
+function geoCheck(){
+  if(!geoOn()||!navigator.geolocation||geoBusy||document.visibilityState!=="visible")return;
+  geoBusy=true;
+  navigator.geolocation.getCurrentPosition(function(p){geoBusy=false;geoAct(p);},function(e){geoBusy=false;
+    if(e&&e.code===1){ls(K_GEO,null);geoMsg("Location is off for this page - turn it back on in your phone settings");geoAskShow();}},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+  if(!geoWatch&&ls(K_CUR))geoWatch=navigator.geolocation.watchPosition(function(p){if(ls(K_CUR))geoAct(p);},function(){},{enableHighAccuracy:true,maximumAge:60000});
+}
+$("geoYes").addEventListener("click",function(){
+  if(!navigator.geolocation){geoMsg("This phone can't share location with the page");return;}
+  $("geoYes").disabled=true;
+  navigator.geolocation.getCurrentPosition(function(p){$("geoYes").disabled=false;ls(K_GEO,"on");$("geoAsk").hidden=true;geoAct(p);},
+    function(){$("geoYes").disabled=false;geoMsg("Location wasn't allowed - you can still sign in and out with the buttons");$("geoAsk").hidden=true;ls(K_GEO,"no:"+today());},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+});
+$("geoNo").addEventListener("click",function(){ls(K_GEO,"no:"+today());$("geoAsk").hidden=true;});
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")setTimeout(geoCheck,800);});
+setTimeout(function(){geoAskShow();geoCheck();},1200);
 /* ---------- today's site prestart: every worker reads and signs it before signing in, once a day ---------- */
 var K_PRE="elise_ci_pre",K_PRESIGNED="elise_ci_presigned";
 function getJ(u){return fetch(URL_+"/rest/v1/"+u,{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}}).then(function(r){return r.ok?r.json():[];});}
