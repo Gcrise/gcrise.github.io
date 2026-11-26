@@ -400,11 +400,12 @@ var URL_="https://glusxwsivbbzmgwizkfs.supabase.co", KEY="eyJhbGciOiJIUzI1NiIsIn
 var H={apikey:KEY,Authorization:"Bearer "+KEY};
 var JH={apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"};
 var BUCKET="job-photos";
-var view=null;
-var day=dayFromHash(), rows=[], me="", pending=null, shotFile=null, daily=null, dlog={}, crew=[], priWant=false;
+var view=/fork/i.test(location.hash||"")?"fork":null;
+var day=dayFromHash(), rows=[], me="", pending=null, shotFile=null, daily=null, fork=null, forkDel=[], dlog={}, crew=[], priWant=false;
 var trades=null;
 
 function p2(n){return ("0"+n).slice(-2)}
+function coName(c){var t=(trades||[]).filter(function(x){return x[0]===c;})[0];return t?t[1]:c;}
 function iso(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
 function dateFor(o){var d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+o);return d}
 /* The board links here with the day it is showing on the end - #2026-11-14 -
@@ -480,7 +481,7 @@ function load(){
       .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }),
     /* the daily run-through's ticks for these two days */
     fetch(URL_+"/rest/v1/job_log?job_date=gte."+from+"&job_date=lte."+to+
-          "&item_id=like.daily-*&select=item_id,action,who,note,photo_id,at,job_date"+
+          "&or=(item_id.like.daily-*,item_id.like.fork-*)&select=item_id,action,who,note,photo_id,at,job_date"+
           "&order=at.desc",{headers:H}).then(function(r){ return r.ok?r.json():[]; }),
     /* photos taken on the board against each job - the last month, since a
        carried job keeps its photos from the day they were taken */
@@ -490,11 +491,14 @@ function load(){
     fetch(URL_+"/rest/v1/v_labour_day?job_date=gte."+from+"&job_date=lte."+to+
           "&select=*",{headers:H}).then(function(r){ return r.ok?r.json():[]; })
   ];
-  var needCfg = (!daily || !trades);
-  if(needCfg) jobs.push(
-    fetch(URL_+"/rest/v1/config?id=in.(daily,board)&select=id,data",{headers:H})
+  /* forklift deliveries off the crane board for these two days */
+  jobs.push(fetch(URL_+"/rest/v1/lifts?date=gte."+from+"&date=lte."+to+"&type=eq.del&kind=eq.FORK&select=id,date,start_min,co,descr&order=start_min",{headers:H})
       .then(function(r){ return r.ok?r.json():[]; }));
-  var cfgAt = needCfg ? 4 : -1;
+  var needCfg = (!daily || !fork || !trades);
+  if(needCfg) jobs.push(
+    fetch(URL_+"/rest/v1/config?id=in.(daily,forklift,board)&select=id,data",{headers:H})
+      .then(function(r){ return r.ok?r.json():[]; }));
+  var cfgAt = needCfg ? 5 : -1;
   Promise.all(jobs).then(function(res){
     rows=res[0]||[];
     dlog={};
@@ -508,8 +512,10 @@ function load(){
       });
     });
     crew=res[3]||[];
+    forkDel=res[4]||[];
     if(cfgAt>0 && res[cfgAt]) res[cfgAt].forEach(function(c){
       if(c.id==="daily") daily=c.data;
+      if(c.id==="forklift") fork=c.data;
       if(c.id==="board" && c.data && c.data.trades) trades=c.data.trades;
     });
     render();
@@ -538,6 +544,19 @@ function dailyFor(dateStr){
   });
 }
 
+/* Forklift: the standing daily forklift list plus every forklift delivery booked
+   on the crane board for that day. Same per-day ids as the daily list. */
+function forkFor(dateStr){
+  var mk=function(id,text){var l=dlog[id],dn=!!(l&&l.action==="done");
+    return {item_id:id,item_text:text,job_date:dateStr,priority:false,assigned:null,carried_from:null,crew_added:false,isDaily:true,isFork:true,
+      done:dn,done_by:dn?l.who:null,done_at:dn?l.at:null,done_note:dn?(l.note||null):null,done_photo:dn?(l.photo_id||null):null};};
+  var std=((fork&&fork.items)||[]).map(function(it){return mk("fork-"+it.n+"-"+dateStr,it.text);});
+  var del=forkDel.filter(function(d){return d.date===dateStr;}).map(function(d){
+    var h=Math.floor(d.start_min/60),m=d.start_min%60,t=(h%12||12)+":"+p2(m)+(h<12?"am":"pm");
+    return mk("fork-del-"+d.id,"Unload "+t+" - "+(coName(d.co)||d.co)+" - "+d.descr);});
+  return del.concat(std);
+}
+function extraFor(dateStr){return dailyFor(dateStr).concat(forkFor(dateStr));}
 function shortDay(d){
   var x = (d instanceof Date) ? d : new Date(d);
   return x.getDate()+" "+MONS[x.getMonth()];
@@ -584,9 +603,9 @@ function jobRow(j){
     '<button class="'+cls+'" data-id="'+esc(j.item_id)+'" type="button">'+
       '<span class="box">&#10003;</span>'+
       '<span><span class="jt">'+esc(j.item_text)+'</span>'+
-      ((meta.length||!(j.done||/^daily-/.test(j.item_id)))?'<span class="meta'+(!(j.done||/^daily-/.test(j.item_id))?' withpri':'')+'">'+meta.join("")+'</span>':'')+ev+'</span>'+
+      ((meta.length||!(j.done||/^(daily|fork)-/.test(j.item_id)))?'<span class="meta'+(!(j.done||/^(daily|fork)-/.test(j.item_id))?' withpri':'')+'">'+meta.join("")+'</span>':'')+ev+'</span>'+
     '</button>'+
-    ((j.done||/^daily-/.test(j.item_id))?'':'<select class="prisel'+(j.priority?' on':'')+'" data-star="'+esc(j.item_id)+'" aria-label="Priority">'+
+    ((j.done||/^(daily|fork)-/.test(j.item_id))?'':'<select class="prisel'+(j.priority?' on':'')+'" data-star="'+esc(j.item_id)+'" aria-label="Priority">'+
       '<option value="1"'+(j.priority?' selected':'')+'>Priority</option>'+
       '<option value="0"'+(j.priority?'':' selected')+'>Non-pri</option></select>')+
     '</div>'+
@@ -600,7 +619,7 @@ function jobRow(j){
 async function starJob(id, btn){
   if(!me){ askWho(); return; }
   var j=rows.filter(function(x){return x.item_id===id})[0]
-        || dailyFor(iso(dateFor(day))).filter(function(x){return x.item_id===id})[0];
+        || extraFor(iso(dateFor(day))).filter(function(x){return x.item_id===id})[0];
   if(!j) return;
   var want=btn.value==="1";
   if(want===!!j.priority) return;
@@ -657,6 +676,7 @@ function render(){
   var done=mine.filter(function(j){return j.done});
   var dl  =dailyFor(want);
   var dDone=dl.filter(function(x){return x.done}).length;
+  var fl  =forkFor(want), fDone=fl.filter(function(x){return x.done}).length;
 
   var html="";
   /* home is a set of tiles, like the board; tap one to see just that list */
@@ -664,6 +684,7 @@ function render(){
     pri:{t:"Priority",n:pri.length,sub:pri.length?pri.length+" to do":"None",body:'<div class="dwrap pwrap">'+pri.map(jobRow).join("")+'</div>',cls:"pri"},
     todo:{t:"Non-priority",n:todo.length,sub:todo.length?todo.length+" to do":"None",body:'<div class="dwrap nwrap">'+todo.map(jobRow).join("")+'</div>',cls:""},
     daily:{t:"Daily",n:dl.length,sub:dl.length?dDone+" of "+dl.length+" done":"None today",body:'<div class="dwrap">'+dl.map(jobRow).join("")+'</div>',cls:"daily",hint:(daily&&daily.note)||""},
+    fork:{t:"Forklift",n:fl.length,sub:fl.length?fDone+" of "+fl.length+" done":"None today",body:'<div class="dwrap">'+fl.map(jobRow).join("")+'</div>',cls:"daily",hint:(fork&&fork.note)||""},
     done:{t:"Completed",n:done.length,sub:done.length?done.length+" done":"Nothing yet",body:done.map(jobRow).join(""),cls:""}
   };
   var onToday=crew.filter(function(c){return c.job_date===want;}).length;
@@ -672,8 +693,9 @@ function render(){
     var IC={pri:'<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>',
       todo:'<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/>',
       daily:'<path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/><path d="M12 8v4l3 2"/>',
+      fork:'<path d="M4 19V6h5l3 6v7"/><circle cx="7" cy="19" r="1.8"/><circle cx="13" cy="19" r="1.8"/><path d="M16 4v15h5M16 12h4"/>',
       done:'<circle cx="12" cy="12" r="8.5"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/>'};
-    html='<div class="tiles">'+["pri","todo","daily","done"].map(function(k){var S=SECS[k];
+    html='<div class="tiles">'+["pri","todo","daily","fork","done"].map(function(k){var S=SECS[k];
       return '<button type="button" class="tile'+(k==="pri"&&S.n?" hot":"")+'" data-view="'+k+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+IC[k]+'</svg><b>'+esc(S.t)+'</b><span>'+esc(S.sub)+'</span>'+(k==="pri"&&S.n?'<i>'+S.n+'</i>':'')+'</button>';}).join("")+
       '<button type="button" class="tile" data-view="add"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg><b>Add a job</b><span>Shows on the board</span></button>'+
       '<button type="button" class="tile" data-view="crew"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M2.5 19c0-3.2 2.5-5.5 5.5-5.5s5.5 2.3 5.5 5.5M14 14.2c3.3-.6 6.5 1.3 7 4.8"/></svg><b>On site</b><span>'+(onToday?onToday+" logged":"Nobody yet")+'</span></button></div>';
@@ -681,7 +703,7 @@ function render(){
     html='<button type="button" class="backbtn" data-view="home">&larr; All jobs</button>';
     if(view==="crew") html+='';
     else{var S=SECS[view];
-      html+='<div class="sec '+S.cls+'"><h2>'+esc(S.t)+'</h2><span class="n">'+(view==="daily"?S.sub:S.n)+'</span>'+(S.hint?'<span class="hint">'+esc(S.hint)+'</span>':'')+'</div>'+
+      html+='<div class="sec '+S.cls+'"><h2>'+esc(S.t)+'</h2><span class="n">'+(view==="daily"||view==="fork"?S.sub:S.n)+'</span>'+(S.hint?'<span class="hint">'+esc(S.hint)+'</span>':'')+'</div>'+
         (S.n?S.body:'<div class="empty"><b>Nothing here</b></div>');}
   }
   el("crew").hidden=view!=="crew";
@@ -748,14 +770,14 @@ function paintCrew(want){
 function openJob(id){
   if(!me){ askWho(); return; }
   var j=rows.filter(function(x){return x.item_id===id})[0]
-        || dailyFor(iso(dateFor(day))).filter(function(x){return x.item_id===id})[0];
+        || extraFor(iso(dateFor(day))).filter(function(x){return x.item_id===id})[0];
   if(!j) return;
   pending=j; shotFile=null;
   el("jobHead").textContent = j.done ? "Reopen this job" : "Mark it done";
   el("jobText").textContent = j.item_text;
   el("jobNote").value=""; el("jobMsg").textContent="";
   el("shotImg").hidden=true; el("shotImg").removeAttribute("src");
-  el("shotLab").textContent = j.done ? "Photo (optional)" : "Photo (required)";
+  el("shotLab").textContent = (j.done||j.isFork) ? "Photo (optional)" : "Photo (required)";
   el("shotWrap").classList.remove("need");
   el("jobDone").textContent = j.done ? "Reopen it" : "Mark done";
   el("jobDone").className = j.done ? "btn" : "btn go";
@@ -832,7 +854,7 @@ function shrink(file){
 el("jobDone").addEventListener("click", async function(){
   if(!pending) return;
   /* No photo, no close-out. Reopening is exempt - there is nothing to show. */
-  if(!pending.done && !shotFile){
+  if(!pending.done && !shotFile && !pending.isFork){
     el("jobMsg").style.color="var(--stop)";
     el("jobMsg").textContent="Take a photo of the finished job before you close it out.";
     el("shotWrap").classList.add("need");
