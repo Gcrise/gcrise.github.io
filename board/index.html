@@ -3066,7 +3066,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 26 Nov 21:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 26 Nov 21:40</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -3245,7 +3245,28 @@ function autoQty(v){
     });
     return out;
   }
+  /* The crane bounces between trades, so every lift is its own booking: 5 lifts
+     come in as 5 single lifts, each dropped into the next free gap on the hook. */
+  function liftDur(r){var q=Math.max(1,+r.qty||1);return Math.max(5,Math.round((r.dur||10)/q/5)*5);}
+  function singles(recs){
+    var out=[];
+    recs.forEach(function(r){
+      var q=+r.qty||0;
+      if(r.type!=="lift"||r.crane==="none"||q<2||q>60){out.push(r);return;}
+      var d=liftDur(r),kg=+r.kg||0;
+      for(var i=0;i<q;i++){
+        var c={},k;for(k in r)if(Object.prototype.hasOwnProperty.call(r,k))c[k]=r[k];
+        c.qty=1;c.dur=d;c.kg=kg?Math.round(kg/q):0;c.pair=i===0?(r.pair||""):"";
+        c.desc=(r.desc||"")+" ("+(i+1)+"/"+q+")";
+        c.start=i===0?r.start:out[out.length-1].start+d;
+        out.push(c);
+      }
+    });
+    recs.splice.apply(recs,[0,recs.length].concat(out));
+    return recs;
+  }
   function slideAll(recs){
+    singles(recs);
     var placed=[],moved=0;
     recs.forEach(function(r){
       var was=r.start;
@@ -5062,6 +5083,22 @@ function autoQty(v){
     if(rec.type==="lift"&&pairTrade(rec.co)&&$("fSemi").value==="1"){
       mref=rec.pair?db.collection("lifts").doc(rec.pair):db.collection("lifts").doc();
       rec.pair=mref.id;
+    }
+    if(!editing&&rec.type==="lift"&&rec.crane!=="none"&&(+rec.qty||0)>1&&(+rec.qty||0)<=60){
+      rec.start=asked;var many=[rec];slideAll(many);
+      var ch0=Promise.resolve(),ids=[];
+      if(mref){many[0].pair=mref.id;}
+      many.forEach(function(r,i){ch0=ch0.then(function(){var rf=i===0?ref:db.collection("lifts").doc();ids.push(rf.id);return rf.set(r);});});
+      if(mref)ch0=ch0.then(function(){ids.push(mref.id);return db.collection("lifts").doc(mref.id).set(mate(many[0],ref.id));});
+      ch0.then(function(){
+        pushUndoCreate("booking",ids);
+        var jump=rec.date!==cur;cur=rec.date;closeSheet();if(jump)subscribe();
+        var ts=many.map(function(r){return r.start}).sort(function(a,b){return a-b});
+        toast(many.length+" lifts slotted in · "+hhmm(ts[0])+" to "+hhmm(ts[ts.length-1]));
+      },function(e){
+        toast(e&&e.code==="invalid_argument"?"Not saved — sign in again (padlock, top right)":"Not saved — try again");
+      }).then(function(){locked=false;$("saveBtn").disabled=canWrite===false});
+      return;
     }
     var room=editing?makeRoom(rec,ref.id,rec.pair):[];
     pushUndo(editing?"edit":"booking",[ref.id].concat(room.map(function(m){return m.id})));
