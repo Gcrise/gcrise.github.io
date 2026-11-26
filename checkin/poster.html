@@ -42,7 +42,7 @@ h1{font-family:"Archivo Narrow","Archivo",system-ui,sans-serif;font-weight:700;f
   <ol class="steps">
     <li><i>1</i><span>Scan the code and sign in when you arrive</span></li>
     <li><i>2</i><span>Read and sign today's prestart</span></li>
-    <li><i>3</i><span>Foremen: sign your whole crew in by name</span></li>
+    <li><i>3</i><span>Everyone signs in on their own phone</span></li>
     <li><i>4</i><span>Scan again and tap <b>Sign out</b> when you leave</span></li>
   </ol>
   <div class="foot"><b>Project ELISE</b> &middot; 3 Twenty Fifth Ave, Palm Beach<br>First time on site? You do the induction on your phone.</div>
@@ -52,27 +52,12 @@ h1{font-family:"Archivo Narrow","Archivo",system-ui,sans-serif;font-weight:700;f
 (function(){
   var u="https://gcrise.github.io/checkin/";
   document.getElementById("url").textContent=u.replace(/^https?:\/\//,"");
-  /* high error correction so the logo in the middle doesn't stop it scanning */
-  var q=qrcode(0,"H");q.addData(u);q.make();
-  var n=q.getModuleCount(),m=2,S=n+m*2,ink="#23271A",olive="#2D3221";
-  var hole=Math.ceil(n*0.26);if((n-hole)%2)hole++;var h0=(n-hole)/2,h1=h0+hole;
-  function finder(r,c){return (r<7&&c<7)||(r<7&&c>=n-7)||(r>=n-7&&c<7);}
-  var p=[];
-  for(var r=0;r<n;r++)for(var c=0;c<n;c++){
-    if(!q.isDark(r,c)||finder(r,c))continue;
-    if(r>=h0-1&&r<h1+1&&c>=h0-1&&c<h1+1)continue;
-    p.push('<rect x="'+(c+m+.08)+'" y="'+(r+m+.08)+'" width=".84" height=".84" rx=".38"/>');
-  }
-  function eye(r,c){var x=c+m,y=r+m;
-    return '<rect x="'+(x+.5)+'" y="'+(y+.5)+'" width="6" height="6" rx="1.6" fill="none" stroke="'+olive+'" stroke-width="1"/>'+
-           '<rect x="'+(x+2)+'" y="'+(y+2)+'" width="3" height="3" rx=".9" fill="'+olive+'"/>';}
-  var lx=h0+m,ly=h0+m;
-  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+S+' '+S+'" shape-rendering="geometricPrecision">'+
-    '<rect width="'+S+'" height="'+S+'" fill="#fff"/><g fill="'+ink+'">'+p.join("")+'</g>'+
-    eye(0,0)+eye(0,n-7)+eye(n-7,0)+
-    '<rect x="'+(lx-.2)+'" y="'+(ly-.2)+'" width="'+(hole+.4)+'" height="'+(hole+.4)+'" rx="1.4" fill="'+olive+'"/>'+
-    '<image href="elise-logo.png" x="'+(lx+.9)+'" y="'+(ly+hole/2-(hole-1.8)*110/420/2)+'" width="'+(hole-1.8)+'" height="'+((hole-1.8)*110/420)+'"/>'+
-    '</svg>';
+  /* plain square modules, standard eyes, no logo over it - every phone camera reads it */
+  var q=qrcode(0,"M");q.addData(u);q.make();
+  var n=q.getModuleCount(),m=4,S=n+m*2,ink="#000",d="";
+  for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(q.isDark(r,c))d+="M"+(c+m)+" "+(r+m)+"h1v1h-1z";
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+S+' '+S+'" shape-rendering="crispEdges">'+
+    '<rect width="'+S+'" height="'+S+'" fill="#fff"/><path fill="'+ink+'" d="'+d+'"/></svg>';
   document.getElementById("qr").innerHTML=svg;
 })();
 </script>
