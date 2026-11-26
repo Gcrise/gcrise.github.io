@@ -3066,7 +3066,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 26 Nov 20:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 26 Nov 21:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5050,7 +5050,9 @@ function autoQty(v){
     if(!rec.desc){$("fDesc").focus();return toast("Say what's being lifted or delivered")}
     if(!db)return toast("Board is offline — nothing saved");
     var asked=rec.start;
-    if(rec.crane!=="none")rec.start=pushBreak(rec.start,rec.dur,rec.date);
+    /* a new booking never moves what's already booked - it takes the first gap
+       at or after the time asked. Editing an existing one still slides the rest. */
+    if(rec.crane!=="none")rec.start=editing?pushBreak(rec.start,rec.dur,rec.date):nextFree(rec);
     var shifted=rec.start!==asked;
     locked=true;$("saveBtn").disabled=true;
     var ref=editing?db.collection("lifts").doc(editing.id):db.collection("lifts").doc();
@@ -5061,7 +5063,7 @@ function autoQty(v){
       mref=rec.pair?db.collection("lifts").doc(rec.pair):db.collection("lifts").doc();
       rec.pair=mref.id;
     }
-    var room=makeRoom(rec,ref.id,rec.pair);
+    var room=editing?makeRoom(rec,ref.id,rec.pair):[];
     pushUndo(editing?"edit":"booking",[ref.id].concat(room.map(function(m){return m.id})));
     ref.set(rec).then(function(){
       if(!mref)return null;
@@ -5076,7 +5078,7 @@ function autoQty(v){
     }).then(function(){
       var jump=rec.date!==cur;cur=rec.date;closeSheet();
       if(jump)subscribe();
-      var t=shifted?"Crane break — moved to "+hhmm(rec.start):(mref?(editing?"Updated with the semi":"Booked with the semi"):(editing?"Updated":"Booked"));
+      var t=shifted?(editing?"Crane break — moved to ":"Slotted in at ")+hhmm(rec.start):(mref?(editing?"Updated with the semi":"Booked with the semi"):(editing?"Updated":"Booked"));
       if(room.length)t+=" · "+room.length+(room.length===1?" slid back":" slid back");
       toast(t);
     },function(e){
