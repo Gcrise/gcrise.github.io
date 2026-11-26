@@ -401,7 +401,7 @@ var H={apikey:KEY,Authorization:"Bearer "+KEY};
 var JH={apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"};
 var BUCKET="job-photos";
 var view=/fork/i.test(location.hash||"")?"fork":null;
-var day=dayFromHash(), rows=[], me="", pending=null, shotFile=null, daily=null, fork=null, forkDel=[], dlog={}, crew=[], priWant=false;
+var day=dayFromHash(), rows=[], me="", pending=null, shotFile=null, daily=null, fork=null, dlog={}, crew=[], priWant=false;
 var trades=null;
 
 function p2(n){return ("0"+n).slice(-2)}
@@ -491,12 +491,12 @@ function load(){
     fetch(URL_+"/rest/v1/v_labour_day?job_date=gte."+from+"&job_date=lte."+to+
           "&select=*",{headers:H}).then(function(r){ return r.ok?r.json():[]; })
   ];
-  /* forklift deliveries off the crane board for these two days */
-  jobs.push(fetch(URL_+"/rest/v1/lifts?date=gte."+from+"&date=lte."+to+"&type=eq.del&kind=eq.FORK&select=id,date,start_min,co,descr&order=start_min",{headers:H})
-      .then(function(r){ return r.ok?r.json():[]; }));
-  var needCfg = (!daily || !fork || !trades);
+  /* the forklift list changes on the board, so it's read every load */
+  jobs.push(fetch(URL_+"/rest/v1/config?id=eq.forklift&select=data",{headers:H})
+      .then(function(r){ return r.ok?r.json():null; }).catch(function(){return null;}));
+  var needCfg = (!daily || !trades);
   if(needCfg) jobs.push(
-    fetch(URL_+"/rest/v1/config?id=in.(daily,forklift,board)&select=id,data",{headers:H})
+    fetch(URL_+"/rest/v1/config?id=in.(daily,board)&select=id,data",{headers:H})
       .then(function(r){ return r.ok?r.json():[]; }));
   var cfgAt = needCfg ? 5 : -1;
   Promise.all(jobs).then(function(res){
@@ -512,10 +512,9 @@ function load(){
       });
     });
     crew=res[3]||[];
-    forkDel=res[4]||[];
+    if(res[4]&&res[4][0]) fork=res[4][0].data;
     if(cfgAt>0 && res[cfgAt]) res[cfgAt].forEach(function(c){
       if(c.id==="daily") daily=c.data;
-      if(c.id==="forklift") fork=c.data;
       if(c.id==="board" && c.data && c.data.trades) trades=c.data.trades;
     });
     render();
@@ -544,17 +543,14 @@ function dailyFor(dateStr){
   });
 }
 
-/* Forklift: the standing daily forklift list plus every forklift delivery booked
-   on the crane board for that day. Same per-day ids as the daily list. */
+/* Forklift: Harry's own list off the board. "Every day" items come up daily,
+   "this day only" items only on their day. Per-day ids so ticks reset daily. */
 function forkFor(dateStr){
   var mk=function(id,text){var l=dlog[id],dn=!!(l&&l.action==="done");
     return {item_id:id,item_text:text,job_date:dateStr,priority:false,assigned:null,carried_from:null,crew_added:false,isDaily:true,isFork:true,
       done:dn,done_by:dn?l.who:null,done_at:dn?l.at:null,done_note:dn?(l.note||null):null,done_photo:dn?(l.photo_id||null):null};};
-  var std=((fork&&fork.items)||[]).map(function(it){return mk("fork-"+it.n+"-"+dateStr,it.text);});
-  var del=forkDel.filter(function(d){return d.date===dateStr;}).map(function(d){
-    var h=Math.floor(d.start_min/60),m=d.start_min%60,t=(h%12||12)+":"+p2(m)+(h<12?"am":"pm");
-    return mk("fork-del-"+d.id,"Unload "+t+" - "+(coName(d.co)||d.co)+" - "+d.descr);});
-  return del.concat(std);
+  return ((fork&&fork.items)||[]).filter(function(it){return it.every!==false||it.date===dateStr;})
+    .map(function(it){return mk("fork-"+it.n+"-"+dateStr,it.text);});
 }
 function extraFor(dateStr){return dailyFor(dateStr).concat(forkFor(dateStr));}
 function shortDay(d){
