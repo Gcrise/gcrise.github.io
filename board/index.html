@@ -1713,6 +1713,13 @@ footer{padding-block:18px;border-top:1px solid var(--line);margin-top:10px;font-
 #cbapp .f .sub{font-size:11px;color:var(--ink-3)}
 #cbapp .row{display:flex;gap:9px;flex-wrap:wrap}
 #cbapp .row>.f{flex:1 1 140px}
+/* booking sheet on phones: two even columns, and iOS date/time boxes kept
+   inside their column (Safari gives them a fixed width otherwise) */
+#cbapp .sheet .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px}
+#cbapp .sheet .row>.f[hidden]{display:none}
+#cbapp .f input[type=date],#cbapp .f input[type=time]{-webkit-appearance:none;appearance:none;display:block;max-width:100%;min-height:40px;text-align:left}
+#cbapp .f input::-webkit-date-and-time-value{text-align:left}
+#cbapp .f textarea.what{min-height:0;height:auto;resize:none;font:inherit;font-size:16px;line-height:1.35;text-transform:inherit}
 #cbapp .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 #cbapp .acts .grow{flex:1 1 auto}
 #cbapp .btn.danger{color:var(--crit)}
@@ -2605,7 +2612,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
         <div class="f"><label for="cb-fFrom">Lift from</label><select id="cb-fFrom"></select></div>
         <div class="f"><label for="cb-fTo">Lift to</label><select id="cb-fTo"></select></div>
       </div>
-      <div class="f"><label for="cb-fDesc">What</label><input type="text" id="cb-fDesc" placeholder="Reo bundles, L7 beams" maxlength="90"></div>
+      <div class="f"><label for="cb-fDesc">What</label><textarea id="cb-fDesc" class="what" rows="2" placeholder="Reo bundles, L7 beams" maxlength="90"></textarea></div>
       <div class="row">
         <div class="f" id="cb-fSemiWrap" hidden><label for="cb-fSemi">Semi trailer</label><select id="cb-fSemi"><option value="1">Add the semi</option><option value="0">No semi</option></select></div>
         <div class="f"><label for="cb-fStatus">Status</label><select id="cb-fStatus"></select></div>
@@ -3075,7 +3082,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 17:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 21:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -8026,6 +8033,10 @@ document.addEventListener("focusout",function(e){
   var v=(e.target.textContent||"").trim(),hit=null;(MEET.items||[]).forEach(function(m){if(m.id===t)hit=m;});if(!hit)return;
   if(!v){e.target.textContent=hit.text;return;} if(v!==hit.text){hit.text=v;saveMeet();}
 });
+
+/* "What" wraps onto two lines so the whole description shows; Enter finishes it */
+document.addEventListener("keydown",function(e){if(e.target&&e.target.id==="cb-fDesc"&&e.key==="Enter"){e.preventDefault();e.target.blur();}});
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="cb-fDesc"&&/\n/.test(e.target.value))e.target.value=e.target.value.replace(/\s*\n\s*/g," ");});
 /* site-set pour dates, over the programme's - config "pours" {ov:{name:date}} */
 var POURS={ov:{}}, poursRef=null, poursSeen="";
 if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
