@@ -195,6 +195,19 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
   <div class="navrow"><button class="big alt" id="f2Back" type="button">Cancel</button><button class="big in" id="f2Go" type="button">Send to Elise</button></div>
 </div>
 
+<div class="card" id="vGeo" hidden>
+  <div class="step-n">Before you sign in</div>
+  <h2 class="step-h">Turn on location</h2>
+  <p class="step-p">Location has to be on to sign in at ELISE. It signs you in and out on site. Your location is only checked on your phone while this page is open - it is never sent or stored.</p>
+  <div class="msg" id="gtMsg" role="alert"></div>
+  <div class="geo-help" id="gtHelp" hidden>
+    <p class="step-p"><b>iPhone:</b> Settings &gt; Privacy &amp; Security &gt; Location Services - turn it ON, then scroll to Safari Websites &gt; While Using the App. Then on this page tap the AA in the address bar &gt; Website Settings &gt; Location &gt; Allow.</p>
+    <p class="step-p"><b>Android:</b> pull down from the top and turn Location ON. In Chrome tap the icon left of the web address &gt; Permissions &gt; Location &gt; Allow.</p>
+    <p class="step-p">Then come back and tap TRY AGAIN.</p>
+  </div>
+  <button class="big in" type="button" id="gtGo">Turn on location</button>
+  <button class="link" type="button" id="gtBack">Back</button>
+</div>
 <div class="card" id="vFind" hidden>
   <div class="step-n">ELISE induction</div>
   <h2 class="step-h">Done the induction before?</h2>
@@ -432,7 +445,7 @@ function ynHtml(key,val){return '<div class="yn" data-yn="'+key+'"><button type=
 
 /* ---------- screens ---------- */
 function show(which){
-  ["vInd","vStep","vForm2","vHelp","vPre","vFind"].forEach(function(v){$(v).hidden=v!==which;});
+  ["vInd","vStep","vForm2","vHelp","vPre","vFind","vGeo"].forEach(function(v){$(v).hidden=v!==which;});
   $("vMain").hidden=!!which;window.scrollTo(0,0);
   if(!which)render();
 }
@@ -745,7 +758,40 @@ $("fdGo").addEventListener("click",async function(){
   }catch(e){msg("Couldn't check right now - try again.");}
   $("fdGo").disabled=false;
 });
+/* location is required to sign in - no location, no sign-in */
+var gtP=null;
+function geoGate(){
+  if(!navigator.geolocation)return Promise.resolve(true);
+  var perm=(navigator.permissions&&navigator.permissions.query)?navigator.permissions.query({name:"geolocation"}).then(function(r){return r.state;},function(){return "";}):Promise.resolve("");
+  return perm.then(function(st){
+    if(st==="granted"){ls(K_GEO,"on");return true;}
+    if(st==="denied")return false;
+    return geoOn()&&st!=="prompt"?true:false;
+  });
+}
+function geoAskNow(){
+  return new Promise(function(res){
+    navigator.geolocation.getCurrentPosition(function(pos){ls(K_GEO,"on");res({ok:true,pos:pos});},
+      function(e){ if(e&&e.code===1){ls(K_GEO,null);res({ok:false});} else {ls(K_GEO,"on");res({ok:true});} },
+      {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+  });
+}
+function showGeoGate(p){gtP=p;$("gtMsg").textContent="";$("gtGo").textContent="Turn on location";$("gtGo").disabled=false;show("vGeo");}
+$("gtBack").addEventListener("click",function(){gtP=null;show(null);});
+$("gtGo").addEventListener("click",function(){
+  var p=gtP;if(!p)return show(null);
+  $("gtGo").disabled=true;$("gtMsg").textContent="";
+  geoAskNow().then(function(r){
+    $("gtGo").disabled=false;
+    if(r.ok){gtP=null;afterInduction2(p);return;}
+    $("gtMsg").textContent="Location is blocked on this phone. Turn it on using the steps below, then try again.";
+    $("gtHelp").hidden=false;$("gtGo").textContent="Try again";
+  });
+});
 function afterInduction(p){
+  geoGate().then(function(ok){ if(ok)afterInduction2(p); else showGeoGate(p); });
+}
+function afterInduction2(p){
   var ns=p.kind==="gate"?needSwms(p.co):[];
   if(ns.length){showSwms(p,ns);return;}
   beforeSignIn(p);
@@ -973,6 +1019,7 @@ $("geoYes").addEventListener("click",function(){
     {enableHighAccuracy:true,timeout:15000,maximumAge:0});
 });
 $("geoNo").addEventListener("click",function(){ls(K_GEO,"no:"+today());$("geoAsk").hidden=true;});
+$("geoNo").hidden=true;
 document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")setTimeout(geoCheck,800);});
 setTimeout(function(){geoAskShow();geoCheck();},1200);
 /* ---------- today's site prestart: every worker reads and signs it before signing in, once a day ---------- */
