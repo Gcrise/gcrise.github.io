@@ -3082,7 +3082,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 21:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 21:35</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5046,6 +5046,7 @@ function autoQty(v){
     relabelDur();
     $("fDate").value=L?L.date:cur;
     $("fCrane").value=L?L.crane:"tower";
+    if(L&&L.type!=="lift"&&L.crane==="none")$("fCrane").value="del";
     $("fStart").value=L?clock(L.start):clock(cfg.open+60);
     $("fKg").value=L&&L.kg?L.kg:"";
     $("fQty").value=L?(L.qty||0):1;
@@ -5075,7 +5076,7 @@ function autoQty(v){
   }
   function readForm(){
     return {
-      date:$("fDate").value||cur,type:$("fType").value,kind:$("fKind").value,crane:$("fCrane").value,
+      date:$("fDate").value||cur,type:$("fType").value,kind:$("fKind").value,crane:($("fCrane").value==="del"?"none":$("fCrane").value),
       start:mins($("fStart").value||clock(cfg.open+60)),dur:+$("fDur").value,qty:+$("fQty").value||0,kg:+$("fKg").value||0,
       co:$("fCo").value,co2:co2Val(),from:$("fFrom").value,to:$("fTo").value,desc:$("fDesc").value.trim(),
       status:$("fStatus").value,notes:$("fNotes").value.trim(),by:uid||"",ts:Date.now()
@@ -5277,7 +5278,7 @@ function autoQty(v){
     },function(){});
   }
 
-  fill($("fType"),TYPES);fill($("fCrane"),CRANES);fill($("fStatus"),STATUSES);
+  fill($("fType"),TYPES);fill($("fCrane"),CRANES);$("fCrane").insertAdjacentHTML("beforeend",'<option value="del">Delivery (no crane)</option>');fill($("fStatus"),STATUSES);
   applyCfg();
   $("prev").onclick=function(){cur=addDays(cur,-1);subscribe()};
   $("next").onclick=function(){cur=addDays(cur,1);subscribe()};
@@ -5437,8 +5438,12 @@ function autoQty(v){
   $("fType").onchange=function(){
     fillKinds(false);
     var isLift=$("fType").value==="lift";
-    if(!isLift&&$("fCrane").value==="tower")$("fCrane").value="none";
-    if(isLift&&$("fCrane").value==="none")$("fCrane").value="tower";
+    if(!isLift&&($("fCrane").value==="tower"||$("fCrane").value==="none"))$("fCrane").value="del";
+    if(isLift&&($("fCrane").value==="none"||$("fCrane").value==="del"))$("fCrane").value="tower";
+  };
+  /* picking "Delivery" in the crane box makes it a delivery straight away */
+  $("fCrane").onchange=function(){
+    if($("fCrane").value==="del"&&$("fType").value==="lift"){$("fType").value="del";fillKinds(false);}
   };
   $("qAdd").onclick=quickAdd;
   $("sheetCam").onclick=function(){$("sheetCamIn").click()};
