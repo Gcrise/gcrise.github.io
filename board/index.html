@@ -2417,6 +2417,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div class="ts-tiles">
       <button type="button" class="ts-tile" data-go="crane"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4M6 4h14M6 4l-3 3h3M9 4l3 3M12 4l3 3M15 4l3 3"/><path d="M18 4v6"/><rect x="15.5" y="12" width="5" height="4"/><path d="M18 10v2M3 21h6"/></svg><b>Crane lifts</b><span id="lgCrane"></span><i class="ts-badge" id="lgCraneN" hidden></i></button>
       <button type="button" class="ts-tile" data-go="crane"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><b>Deliveries</b><span id="lgDel"></span></button>
+      <button type="button" class="ts-tile" data-cps="meet"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 19c0-3 2.2-5 5-5s5 2 5 5M11 19c0-3 2.2-5 5-5s5 2 5 5"/></svg><b>Subbie meeting</b><span id="cpTMeet">Structures &amp; finishes</span></button>
       <button type="button" class="ts-tile" data-go="lplan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9h18M8 4v16M12 13h6M12 16h4"/></svg><b>Lifting plan</b><span id="lgPlan"></span></button>
       <button type="button" class="ts-tile" data-go="lrec"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Lift records</b><span id="lgRec"></span></button>
       <button type="button" class="ts-tile" data-go="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><b>Site orders</b><span id="lgOrd"></span><i class="ts-badge" id="lgOrdN" hidden></i></button>
@@ -3035,6 +3036,14 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
       <button class="addbtn" id="cpMileGo" type="button">Add</button>
     </div>
     </div>
+    <div data-cpg="meet">
+      <div class="subhead" data-acc="path"><span>Structures</span><span><span id="mtStrN"></span> <button class="mini" type="button" id="mtCopy" style="margin-left:8px">Copy list</button></span></div>
+      <div id="mtStr"></div>
+      <div class="addrow cpadd mt-add" data-mt-add="str"><input placeholder="Add a structures item" autocomplete="off" maxlength="300"><button class="addbtn" type="button">Add</button></div>
+      <div class="subhead" data-acc="path"><span>Finishes</span><span id="mtFinN"></span></div>
+      <div id="mtFin"></div>
+      <div class="addrow cpadd mt-add" data-mt-add="fin"><input placeholder="Add a finishes item" autocomplete="off" maxlength="300"><button class="addbtn" type="button">Add</button></div>
+    </div>
     <div class="cphero" id="cpHero" data-cpg="hero"></div>
     <div data-cpg="pours"><div class="subhead" data-acc="path"><span>Pour dates</span><span>Off the programme</span></div>
     <div id="cpPours"></div></div>
@@ -3066,7 +3075,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 26 Nov 21:40</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 14:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7955,6 +7964,68 @@ function addMile(){
   el("cpMileTxt").value=""; renderMiles(); saveMiles();
 }
 
+
+/* Subbie meeting: Harry's running list for the weekly subcontractor meeting,
+   split structures / finishes. Items stay until ticked off; ticked ones show
+   for the week they were closed, then drop off. config "meeting" {items:[...]} */
+var MEET={items:[]},meetRef=null,meetSeen="";
+if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
+  if(!db) return; meetRef=db.collection("config").doc("meeting");
+  meetRef.onSnapshot(function(sn){var d=sn&&sn.data&&sn.data();if(!d)return;var j=JSON.stringify(d);if(j===meetSeen)return;meetSeen=j;MEET=d;if(!MEET.items)MEET.items=[];renderMeet();});
+}).catch(function(){});
+function saveMeet(){
+  if(!meetRef||!(window.eliseAuth&&window.eliseAuth.canWrite())){toast("Sign in to change the meeting list");return;}
+  MEET.ts=Date.now();meetSeen=JSON.stringify(MEET);
+  meetRef.set(MEET).catch(function(){toast("Meeting list not saved - try again");});
+}
+function meetList(sec){var wk=weekMon();return (MEET.items||[]).filter(function(m){return m.sec===sec&&(!m.done||weekMon(m.doneAt||"2000-01-03")===wk);})
+  .sort(function(a,b){return (a.done?1:0)-(b.done?1:0)||(a.added<b.added?-1:a.added>b.added?1:0);});}
+function renderMeet(){
+  if(!el("mtStr"))return;
+  var canW=!!(window.eliseAuth&&window.eliseAuth.canWrite()),wk=weekMon();
+  document.querySelectorAll("[data-mt-add]").forEach(function(a){a.hidden=!canW;});
+  [["str","mtStr","mtStrN"],["fin","mtFin","mtFinN"]].forEach(function(x){
+    var L=meetList(x[0]),open=L.filter(function(m){return !m.done;}).length;
+    el(x[2]).textContent=open?open+" open":"";
+    el(x[1]).innerHTML=L.length?L.map(function(m){
+      var nw=weekMon(m.added)===wk;
+      return '<div class="cpmile'+(m.done?" done":"")+'"><input type="checkbox" data-mt="'+esc(m.id)+'"'+(m.done?" checked":"")+(canW?"":" disabled")+' aria-label="Closed out">'+
+        '<span class="t"><span class="mt"'+(canW?' contenteditable="true" data-mt-txt="'+esc(m.id)+'" spellcheck="true"':'')+'>'+esc(m.text)+'</span></span><span class="ctl">'+
+        '<span class="dd">'+(m.done?"Closed "+mileLabel(m.doneAt):(nw?"New this week":"Since "+mileLabel(m.added)))+'</span>'+
+        (canW?'<button class="mdel" data-mt-del="'+esc(m.id)+'" type="button" aria-label="Delete item">Delete</button>':'')+'</span></div>';
+    }).join(""):'<p class="empty" style="padding:8px 14px">Nothing yet - add items below before the meeting.</p>';
+  });
+  var t=el("cpTMeet"),n=(MEET.items||[]).filter(function(m){return !m.done;}).length;if(t)t.textContent=n?n+" item"+(n>1?"s":"")+" for the meeting":"Structures & finishes";
+}
+function meetAdd(box){
+  var inp=box.querySelector("input"),t=(inp.value||"").trim();if(!t)return;
+  (MEET.items=MEET.items||[]).push({id:"mt"+Date.now().toString(36),sec:box.getAttribute("data-mt-add"),text:t,added:iso(new Date()),done:false});
+  inp.value="";renderMeet();saveMeet();
+}
+document.addEventListener("click",function(e){
+  var a=e.target.closest&&e.target.closest("[data-mt-add] .addbtn");if(a){meetAdd(a.parentNode);return;}
+  var d=e.target.closest&&e.target.closest("[data-mt-del]");
+  if(d){ if(!d.dataset.arm){d.dataset.arm="1";d.textContent="Sure?";d.classList.add("arm");setTimeout(function(){if(d.isConnected){delete d.dataset.arm;d.textContent="Delete";d.classList.remove("arm");}},2500);return;}
+    var id=d.getAttribute("data-mt-del");MEET.items=(MEET.items||[]).filter(function(m){return m.id!==id;});renderMeet();saveMeet();return;}
+  if(e.target.closest&&e.target.closest("#mtCopy")){
+    var txt="SUBCONTRACTOR MEETING - WEEK OF "+shortDate(weekMon()).toUpperCase();
+    [["str","STRUCTURES"],["fin","FINISHES"]].forEach(function(x){var L=meetList(x[0]).filter(function(m){return !m.done;});txt+="\n\n"+x[1]+(L.length?"":"\n- Nothing listed");L.forEach(function(m){txt+="\n- "+m.text;});});
+    try{navigator.clipboard.writeText(txt).then(function(){toast("Meeting list copied");},function(){toast("Couldn't copy");});}catch(x){toast("Couldn't copy");}
+  }
+});
+document.addEventListener("keydown",function(e){
+  var b=e.target.closest&&e.target.closest("[data-mt-add]");if(b&&e.key==="Enter"){e.preventDefault();meetAdd(b);}
+  if(e.target&&e.target.getAttribute&&e.target.getAttribute("data-mt-txt")&&e.key==="Enter"){e.preventDefault();e.target.blur();}
+});
+document.addEventListener("change",function(e){
+  var c=e.target.closest&&e.target.closest("[data-mt]");if(!c)return;
+  var id=c.getAttribute("data-mt");(MEET.items||[]).forEach(function(m){if(m.id===id){m.done=c.checked;m.doneAt=c.checked?iso(new Date()):"";}});renderMeet();saveMeet();
+});
+document.addEventListener("focusout",function(e){
+  var t=e.target&&e.target.getAttribute&&e.target.getAttribute("data-mt-txt");if(!t)return;
+  var v=(e.target.textContent||"").trim(),hit=null;(MEET.items||[]).forEach(function(m){if(m.id===t)hit=m;});if(!hit)return;
+  if(!v){e.target.textContent=hit.text;return;} if(v!==hit.text){hit.text=v;saveMeet();}
+});
 /* site-set pour dates, over the programme's - config "pours" {ov:{name:date}} */
 var POURS={ov:{}}, poursRef=null, poursSeen="";
 if(window.claude&&window.claude.use) window.claude.use("db").then(function(db){
@@ -10478,8 +10549,8 @@ document.addEventListener("click",function(e){var g=e.target.closest&&e.target.c
 document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-cps]");if(t){cpSec=t.getAttribute("data-cps");applyCpSec();window.scrollTo(0,0);}});
 function applyCpSec(){
   var v=el("v-path");if(!v)return;
-  el("cpTiles").hidden=!!cpSec;
-  v.querySelectorAll("[data-cpg]").forEach(function(g){var k=g.getAttribute("data-cpg");g.hidden=cpSec?k!==cpSec:(k==="pours"||k==="works");});
+  el("cpTiles").hidden=!!cpSec; try{renderMeet();}catch(x){}
+  v.querySelectorAll("[data-cpg]").forEach(function(g){var k=g.getAttribute("data-cpg");g.hidden=cpSec?k!==cpSec:(k==="pours"||k==="works"||k==="meet");});
   el("lgBack").hidden=!cpSec;
   if(cpSec){el("lgBackBtn").setAttribute("data-go","path");el("lgBackBtn").innerHTML="&larr; Critical path";}
   try{var h=el("cpHero").firstChild;el("cpTPour").textContent=h&&h.querySelector(".v")?("Next "+h.querySelector(".v").firstChild.textContent):"Off the programme";}catch(x){}
