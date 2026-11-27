@@ -1719,6 +1719,7 @@ footer{padding-block:18px;border-top:1px solid var(--line);margin-top:10px;font-
 #cbapp .sheet .row>.f[hidden]{display:none}
 #cbapp .f input[type=date],#cbapp .f input[type=time]{-webkit-appearance:none;appearance:none;display:block;max-width:100%;min-height:40px;text-align:left}
 #cbapp .f input::-webkit-date-and-time-value{text-align:left}
+#cbapp .mvrow{display:flex;gap:8px}#cbapp .mvrow select{flex:1 1 auto}
 #cbapp .f textarea.what{min-height:0;height:auto;resize:none;font:inherit;font-size:16px;line-height:1.35;text-transform:inherit}
 #cbapp .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 #cbapp .acts .grow{flex:1 1 auto}
@@ -2618,6 +2619,8 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
         <div class="f"><label for="cb-fStatus">Status</label><select id="cb-fStatus"></select></div>
         <div class="f"><label for="cb-fNotes">Notes</label><input type="text" id="cb-fNotes" placeholder="Dogman, truck, gear" maxlength="90"></div>
       </div>
+      <div class="f" id="cb-moveWrap" hidden><label for="cb-fMove">Move to another day</label>
+        <div class="mvrow"><select id="cb-fMove"></select><button class="btn" type="button" id="cb-moveBtn">Move</button></div></div>
       <div class="acts">
         <button class="btn primary grow" id="cb-saveBtn">Save</button>
         <button class="btn" id="cb-sheetCam" hidden>Photo</button>
@@ -3082,7 +3085,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 21:35</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 21:45</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5040,6 +5043,7 @@ function autoQty(v){
     editing=L||null;
     $("sheetTitle").textContent=L?"Edit booking":"Add a booking";
     $("delBtn").hidden=!L;$("repBtn").hidden=!L;$("dupBtn").hidden=!L;
+    $("moveWrap").hidden=!L;if(L)fillMove(L);
     $("fType").value=L?L.type:"lift";
     fillKinds(false);
     if(L)$("fKind").value=kind(L.type,L.kind)[0];
@@ -5164,6 +5168,56 @@ function autoQty(v){
     rref.set(rec).then(function(){
       closeSheet();cur=rec.date;subscribe();toast("Copied to "+DOW[fromIso(rec.date).getDay()]);
     },function(){toast("Not copied — try again")}).then(function(){locked=false});
+  }
+  /* Move a booking to another day, keeping its time. A set of single lifts
+     ("(1/5)" ... "(5/5)") moves together, and so does its semi. On the new day
+     nothing already booked moves - the lifts slot into the free gaps. */
+  function fillMove(L){
+    var h="",DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    for(var n=-14;n<=14;n++){if(!n){h+='<option value="0" selected>Pick a day</option>';continue;}
+      var d=fromIso(addDays(L.date,n));
+      h+='<option value="'+n+'">'+(n>0?"+":"\u2212")+Math.abs(n)+(Math.abs(n)>1?" days":" day")+" \u00b7 "+DN[d.getDay()]+" "+d.getDate()+" "+MN[d.getMonth()]+'</option>';}
+    $("fMove").innerHTML=h;
+  }
+  function moveGroup(L){
+    var m=/^(.*) \((\d+)\/(\d+)\)$/.exec(L.desc||""),g=[L];
+    if(m)g=items.filter(function(i){var k=/^(.*) \((\d+)\/(\d+)\)$/.exec(i.desc||"");return i.date===L.date&&i.co===L.co&&k&&k[1]===m[1]&&k[3]===m[3];});
+    var ids={};g.forEach(function(i){ids[i.id]=1;});
+    items.forEach(function(i){if(i.date===L.date&&!ids[i.id]&&g.some(function(x){return x.pair===i.id||i.pair===x.id;})){g.push(i);ids[i.id]=1;}});
+    return g;
+  }
+  function dayRowsFetch(d){
+    var C=window.ELISE_CONFIG||{},k=C.key||"",tok="";
+    try{var se=JSON.parse(localStorage.getItem("elise_sb_session")||"null");tok=se&&se.access_token||"";}catch(e){}
+    return fetch((C.url||"").replace(/\/+$/,"")+"/rest/v1/lifts?date=eq."+d+"&select=id,date,crane,start_min,dur,status,type",
+      {headers:{apikey:k,Authorization:"Bearer "+(tok||k)}}).then(function(r){return r.ok?r.json():[];})
+      .then(function(a){return a.map(function(v){return{id:v.id,date:v.date,crane:v.crane||"tower",start:+v.start_min||0,dur:+v.dur||60,status:v.status||"con",type:v.type||"lift"};});})
+      .catch(function(){return [];});
+  }
+  function moveDays(){
+    if(!editing||!db||locked)return;
+    var n=+$("fMove").value||0;if(!n)return toast("Pick how many days to move it");
+    var grp=moveGroup(editing),to=addDays(editing.date,n),ids={};
+    grp.forEach(function(i){ids[i.id]=1;});
+    locked=true;
+    var have=items.some(function(i){return i.date===to;})||winOf(cur)[0]<=to&&to<=winOf(cur)[1];
+    (have?Promise.resolve([]):dayRowsFetch(to)).then(function(extra){
+      var keep=items;items=items.concat(extra.filter(function(x){return !ids[x.id];}));
+      var placed=[],out=grp.slice().sort(function(a,b){return a.start-b.start;}).map(function(i){
+        var rec=recOf(i);rec.date=to;
+        if(rec.crane!=="none"){rec.start=nextFree(rec,placed,ids);placed.push({date:to,crane:rec.crane,start:rec.start,dur:rec.dur});}
+        return {id:i.id,rec:rec,was:i.start};
+      });
+      items=keep;
+      pushUndo("move",Object.keys(ids));
+      var ch=Promise.resolve();
+      out.forEach(function(o){ch=ch.then(function(){return db.collection("lifts").doc(o.id).set(o.rec);});});
+      return ch.then(function(){
+        var shifted=out.filter(function(o){return o.rec.start!==o.was;}).length;
+        closeSheet();cur=to;subscribe();
+        toast((out.length>1?out.length+" bookings":"Booking")+" moved to "+DOW[fromIso(to).getDay()]+" "+fromIso(to).getDate()+(shifted?" \u00b7 "+shifted+" slotted into free gaps":""));
+      });
+    }).catch(function(){toast("Not moved — try again");}).then(function(){locked=false;});
   }
   function del(){
     if(!editing||!db||locked)return;
@@ -5457,7 +5511,7 @@ function autoQty(v){
   $("qInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();quickAdd()}});
   $("addBtn").onclick=function(){openSheet(null)};
   $("cancelBtn").onclick=closeSheet;
-  $("saveBtn").onclick=save;$("repBtn").onclick=repeat;$("delBtn").onclick=del;
+  $("saveBtn").onclick=save;$("moveBtn").onclick=moveDays;$("repBtn").onclick=repeat;$("delBtn").onclick=del;
   $("setBtn").onclick=openSetup;$("setCancel").onclick=function(){$("setScrim").hidden=true};
   $("setSave").onclick=saveSetup;
   $("scrim").onclick=function(e){if(e.target===$("scrim"))closeSheet()};
