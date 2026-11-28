@@ -2271,7 +2271,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
   <a class="mm-it" id="lnkJobs" href="../jobs/" target="_blank" rel="noopener" role="menuitem"><span>Labour</span><i>&#8599;</i></a>
   <a class="mm-it" id="lnkLifts" href="../lifts/" target="_blank" rel="noopener" role="menuitem"><span>Lifts &amp; deliveries</span><i>&#8599;</i></a>
   <!-- Eufy retired 17 Nov: <button class="mm-it" type="button" data-go="eufy" role="menuitem"><span>Eufy cameras</span></button> -->
-      <button class="mm-it" type="button" data-go="camera" role="menuitem"><span>Live view</span><i>&rsaquo;</i></button>
+      <button class="mm-it" type="button" data-go="camera" role="menuitem"><span>Deck camera</span><i>&rsaquo;</i></button>
   <span class="mm-lab">Print</span>
   <button class="mm-it" type="button" id="pdfBtn" data-pdf="all" role="menuitem"><span>Site prestart</span><i>PDF</i></button>
   <button class="mm-it" type="button" data-pdf="team" role="menuitem"><span>Team prestart</span><i>PDF</i></button>
@@ -2399,7 +2399,6 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
       <button type="button" class="ts-tile" data-hubjump="delays"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg><b>Delays</b><span id="dyDel"></span></button>
       <button type="button" class="ts-tile" data-tsv="att"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="m15.5 11.5 2 2 4-4"/></svg><b>Who's on site</b><span id="dyOn"></span></button>
       <button type="button" class="ts-tile" data-go="weather"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 10.5 3.8 3.8 0 0 0 7 18z"/></svg><b>Weather</b><span>Wind for the crane</span></button>
-      <button type="button" class="ts-tile" data-go="camera"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1.5"/><path d="m16 10 5-3v10l-5-3"/></svg><b>Live view</b><span>Deck camera</span></button>
     </div>
   </div>
 </section>
@@ -2780,7 +2779,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 
 <section id="v-camera" class="view" hidden>
   <div class="panel">
-    <div class="phead" data-acc="camera"><h2>Live view</h2><span class="dcband" id="deckCount" hidden></span>
+    <div class="phead" data-acc="camera"><h2>Deck camera</h2><span class="dcband" id="deckCount" hidden></span>
     </div>
     <div class="ts-tiles" id="camTiles">
       <button type="button" class="ts-tile" data-camsec="browser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b>Camera</b><span>Every shot</span></button>
@@ -3085,7 +3084,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 27 Nov 21:45</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 12:10</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5565,7 +5564,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["logi","Logistics"],["log0","Completed works"],["dly","Daily"],["lab0","Labour & jobs"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["lplan","Lifting plan"],["lrec","Lift records"],["orders","Site orders"],["weather","Weather"],["camera","Live view"],["log","Completed works"],["tester","Tester"]];
+var VIEWS=[["today","Today"],["logi","Logistics"],["log0","Completed works"],["dly","Daily"],["lab0","Labour & jobs"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["lplan","Lifting plan"],["lrec","Lift records"],["orders","Site orders"],["weather","Weather"],["camera","Deck camera"],["log","Completed works"],["tester","Tester"]];
 /* Eufy tab retired 17 Nov at Harry's call - the section, its code and the camera
    settings are all kept; put ["eufy","Eufy"] back after "camera" above to re-add it. */
 var CUT=1260;      /* one cut a day, 9pm */
@@ -5630,7 +5629,7 @@ function go(v){
   state.view=v;
   try{if(location.hash.slice(1)!==v)location.hash=v;}catch(e){}
   VIEWS.forEach(function(x){var s=el("v-"+x[0]);if(s)s.hidden=x[0]!==v;});
-  var hub=TAB_GROUPS.logistics.items.indexOf(v)>=0?["logi","Logistics"]:(TAB_GROUPS.daily.items.indexOf(v)>=0||v==="weather"||v==="camera")?["dly","Daily"]:v==="labour"?["lab0","Labour & jobs"]:v==="log"?["log0","Completed works"]:null;
+  var hub=TAB_GROUPS.logistics.items.indexOf(v)>=0?["logi","Logistics"]:(TAB_GROUPS.daily.items.indexOf(v)>=0||v==="weather")?["dly","Daily"]:v==="labour"?["lab0","Labour & jobs"]:v==="log"?["log0","Completed works"]:null;
   el("lgBack").hidden=!hub;if(hub){el("lgBackBtn").setAttribute("data-go",hub[0]);el("lgBackBtn").innerHTML="&larr; "+esc(hub[1]);}
   if(v==="labour")applyLabSec();else labSec=null;
   if(v==="log")applyLogSec();else logSec=null;
@@ -5657,7 +5656,7 @@ function renderTabs(){
     if(x[0]==="log")return '<button class="tab" type="button" data-go="log0" aria-current="'+(state.view==="log"||state.view==="log0")+'">'+esc(x[1])+'</button>';
     if(tabGroupOf(x[0])==="daily"){
       if(done.daily)return "";done.daily=1;
-      var don=state.view==="dly"||state.view==="weather"||state.view==="camera"||TAB_GROUPS.daily.items.indexOf(state.view)>=0,dt=0,da=false;
+      var don=state.view==="dly"||state.view==="weather"||TAB_GROUPS.daily.items.indexOf(state.view)>=0,dt=0,da=false;
       TAB_GROUPS.daily.items.forEach(function(v){var c=tabCount(v);if(c){dt+=c.n;da=da||!!c.alert;}});
       return '<button class="tab" type="button" data-go="dly" aria-current="'+don+'">Daily'+(dt?'<b class="'+(da?"alert":"")+'">'+dt+'</b>':'')+'</button>';
     }
@@ -5666,7 +5665,8 @@ function renderTabs(){
       if(done.logistics)return "";done.logistics=1;
       var lon=state.view==="logi"||TAB_GROUPS.logistics.items.indexOf(state.view)>=0,lt=0,la=false;
       TAB_GROUPS.logistics.items.forEach(function(v){var c=tabCount(v);if(c){lt+=c.n;la=la||!!c.alert;}});
-      return '<button class="tab" type="button" data-go="logi" aria-current="'+lon+'">Logistics'+(la?'<b class="alert">!</b>':'')+'</button>';
+      return '<button class="tab" type="button" data-go="logi" aria-current="'+lon+'">Logistics'+(la?'<b class="alert">!</b>':'')+'</button>'+
+        '<button class="tab" type="button" data-go="camera" aria-current="'+(state.view==="camera")+'">Deck camera</button>';
     }
     if(x[0]==="tester"){
       var sn=window.__tsPend||0;
