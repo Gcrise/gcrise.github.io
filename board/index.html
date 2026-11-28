@@ -1945,6 +1945,8 @@ a.ts-tile{text-decoration:none}
 .ts-links a{color:var(--ink)}
 .ts-row-off{padding-left:14px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:0 14px 0 0}
 .ts-ph{font-variant-numeric:tabular-nums}
+.ts-drop-sp{visibility:hidden}
+@media (max-width:640px){.ts-drop-sp{display:none!important}}
 .ts-drop{border:2px dashed var(--line-hard);border-radius:6px;padding:18px 12px;text-align:center;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;background:var(--surface-2)}
 .ts-drop small{font-weight:400;color:var(--ink-3);font-size:12px}
 .ts-drop.over,.ts-drop:hover{border-color:var(--ink);background:var(--surface)}
@@ -3023,6 +3025,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
           </div>
           <div class="ts-card">
             <h3>Induction pack <span>optional - site rules, CHSP, H&amp;S policy</span></h3>
+            <label class="ts-drop-sp" aria-hidden="true">Company<select tabindex="-1" disabled><option>&nbsp;</option></select></label>
             <div class="ts-drop" data-drop="induction" tabindex="0" role="button" aria-label="Add files to the induction pack">Drop files here<br><small>workers must open each one before the acknowledgement</small></div>
             <div id="tsIndList"></div>
           </div>
@@ -3092,7 +3095,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 12:25</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 12:30</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
