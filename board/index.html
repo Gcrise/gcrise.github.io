@@ -1013,7 +1013,7 @@ a.mini,a.mini:visited{color:var(--ink-2);text-decoration:none}
 #v-labour .item.done .txt,.cpmile.done .mt{font-weight:400}
 #v-labour .item .jmeta{flex-wrap:wrap;row-gap:6px;min-width:0}
 #v-labour .item .jmeta .who{max-width:120px;min-width:70px}
-@media (max-width:560px){.ordrow{flex-wrap:wrap;row-gap:6px}.ordrow .t{flex:1 1 100%}.ordrow .due{margin-left:0;margin-right:auto;text-align:left}}
+@media (max-width:560px){.ordrow{flex-wrap:wrap;row-gap:6px}.ordrow .t{flex:1 1 calc(100% - 44px)}.ordrow .due{margin-left:0;margin-right:auto;text-align:left}}
 .cpmile .ctl .mdel{margin-left:auto}
 #cpMileAdd{flex-wrap:wrap}
 #cpMileAdd #cpMileTxt{flex:1 1 100%}
@@ -2253,6 +2253,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 .mt-box{display:flex;flex-direction:column;gap:6px;min-width:0}
 .mt-box>span{font-family:var(--f-cond,inherit);font-size:14px;letter-spacing:.1em;text-transform:uppercase;text-decoration:underline;text-underline-offset:4px;color:var(--gold,inherit)}
 .mt-box textarea{width:100%;min-height:52vh;padding:12px;border:1px solid var(--line-hard,var(--line));border-radius:6px;background:var(--surface-2,transparent);color:var(--ink);font:inherit;font-size:16px;line-height:1.5;resize:vertical}
+.ordrow .ordck{flex:none;width:22px;height:22px;margin:0 10px 0 0;accent-color:var(--gold);cursor:pointer}
 </style>
 </head>
 <body>
@@ -2863,7 +2864,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="ordList0"></div>
     <div class="subhead" data-acc="orders"><span>Ordered - waiting on it</span><span id="ordN1"></span></div>
     <div id="ordList1"></div>
-    <div class="subhead" data-acc="orders"><span>Arrived</span><span>Last 14 days</span></div>
+    <div class="subhead" data-acc="orders"><span>On site</span><span>Ticked off - last 14 days</span></div>
     <div id="ordList2"></div>
   </div>
 </section>
@@ -3106,7 +3107,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 19:50</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 19:55</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -7927,12 +7928,13 @@ function renderOrders(){
     var late=o.st!=="arr"&&o.by&&o.by<today, sub=[];
     if(o.sup) sub.push(o.sup); if(o.for) sub.push("for "+o.for);
     if(o.st==="ord"&&o.ordAt) sub.push("ordered "+shortDate(o.ordAt)+((o.ordBy&&o.ordBy.indexOf("@")<0)?" by "+o.ordBy:""));
-    if(o.st==="arr"&&o.arrAt) sub.push("arrived "+shortDate(o.arrAt));
+    if(o.st==="arr"&&o.arrAt) sub.push("on site "+shortDate(o.arrAt));
     var nm=function(w){ return (w&&w.indexOf("@")<0)?w:""; };
     if(o.added) sub.push("added "+shortDate(o.added)+(nm(o.addBy)?" by "+o.addBy:""));
     var sel='<select class="prisel'+(o.st==="to"?' on':'')+'" data-ord-st="'+esc(o.id)+'"'+(canW?'':' disabled')+' aria-label="Status">'+
-      [["to","To order"],["ord","Ordered"],["arr","Arrived"]].map(function(x){return '<option value="'+x[0]+'"'+(o.st===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join("")+'</select>';
-    return '<div class="ordrow'+(o.st==="arr"?" arr":"")+'"><span class="t"><b>'+esc(o.item)+'</b>'+(sub.length?'<small>'+esc(sub.join(" \u00b7 "))+'</small>':'')+'</span>'+
+      [["to","To order"],["ord","Ordered"],["arr","On site"]].map(function(x){return '<option value="'+x[0]+'"'+(o.st===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join("")+'</select>';
+    var nx=o.st==="arr"?"Not on site":"On site";
+    return '<div class="ordrow'+(o.st==="arr"?" arr":"")+'"><input type="checkbox" class="ordck" data-ord-ck="'+esc(o.id)+'"'+(o.st==="arr"?" checked":"")+(canW?'':' disabled')+' title="Tick: '+nx+'" aria-label="Tick to mark '+nx+'"><span class="t"><b>'+esc(o.item)+'</b>'+(sub.length?'<small>'+esc(sub.join(" \u00b7 "))+'</small>':'')+'</span>'+
       (o.by&&o.st!=="arr"?'<span class="due'+(late?" late":"")+'">'+(late?"Was due ":"By ")+shortDate(o.by)+'</span>':'')+sel+
       (canW?'<button class="x" data-ord-del="'+esc(o.id)+'" title="Remove" aria-label="Remove">&times;</button>':'')+'</div>';
   }
@@ -7961,10 +7963,13 @@ document.addEventListener("click",function(e){
     else { d.dataset.arm="1"; d.textContent="Sure?"; setTimeout(function(){ delete d.dataset.arm; d.innerHTML="&times;"; },2500); } }
 });
 document.addEventListener("change",function(e){
-  var c=e.target.closest&&e.target.closest("[data-ord-st]"); if(!c) return;
-  var id=c.getAttribute("data-ord-st"), st=c.value;
+  var k=e.target.closest&&e.target.closest("[data-ord-ck]"), c=e.target.closest&&e.target.closest("[data-ord-st]"); if(!c&&!k) return;
+  var id=k?k.getAttribute("data-ord-ck"):c.getAttribute("data-ord-st"), st=c?c.value:"";
+  /* ticked = it's on site (Arrived). Unticking sends it back to where it was. */
+  if(k){ var cur0=((ORDERS.items||[]).filter(function(o){return o.id===id;})[0]||{}).st; var o0=(ORDERS.items||[]).filter(function(o){return o.id===id;})[0]||{}; st=cur0!=="arr"?"arr":(o0.ordAt?"ord":"to");
+    if(!(window.eliseAuth&&window.eliseAuth.canWrite())){ k.checked=cur0==="arr"; toast("Sign in to change site orders"); return; } }
   (ORDERS.items||[]).forEach(function(o){ if(o.id!==id) return; o.st=st;
-    if(st==="ord"){ o.ordAt=iso(new Date()); o.ordBy=whoAmI()||""; }
+    if(st==="ord"&&!(k&&o.ordAt)){ o.ordAt=iso(new Date()); o.ordBy=whoAmI()||""; }
     if(st==="arr"){ o.arrAt=iso(new Date()); } });
   renderOrders(); saveOrders();
 });
