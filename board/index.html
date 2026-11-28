@@ -2418,7 +2418,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
       <button type="button" class="ts-tile" data-go="safety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.2v.3"/></svg><b>Safety</b><span id="dySafe"></span><i class="ts-badge" id="dySafeN" hidden></i></button>
       <button type="button" class="ts-tile" data-hubjump="delays"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg><b>Delays</b><span id="dyDel"></span></button>
       <button type="button" class="ts-tile" data-tsv="att"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="m15.5 11.5 2 2 4-4"/></svg><b>Who's on site</b><span id="dyOn"></span></button>
-      <button type="button" class="ts-tile" data-go="meet"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 19c0-3 2.2-5 5-5s5 2 5 5M11 19c0-3 2.2-5 5-5s5 2 5 5"/></svg><b>Subbie meeting</b><span id="dyMeet">Notes for this week</span></button>
+      <button type="button" class="ts-tile" data-go="meet"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 19c0-3 2.2-5 5-5s5 2 5 5M11 19c0-3 2.2-5 5-5s5 2 5 5"/></svg><b>Subcontractor meeting</b><span id="dyMeet">Notes for this week</span></button>
       <button type="button" class="ts-tile" data-go="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><b>Site orders</b><span id="lgOrd"></span><i class="ts-badge" id="lgOrdN" hidden></i></button>
       <button type="button" class="ts-tile" data-go="weather"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 10.5 3.8 3.8 0 0 0 7 18z"/></svg><b>Weather</b><span>Wind for the crane</span></button>
     </div>
@@ -2770,7 +2770,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 
 <section id="v-meet" class="view" hidden>
   <div class="panel">
-    <div class="phead" data-acc="prestart"><h2>Subbie meeting</h2><span class="meta" id="mtState"></span>
+    <div class="phead" data-acc="prestart"><h2>Subcontractor meeting</h2><span class="meta" id="mtState"></span>
       <span class="right"><button class="mini" type="button" id="mtCopy">Copy</button> <button class="mini" type="button" id="mtClear">Clear</button></span></div>
     <div class="mt-grid">
       <label class="mt-box"><span>Structures</span><textarea id="mtStr" placeholder="Type structures items for this week's meeting" spellcheck="true"></textarea></label>
@@ -3107,7 +3107,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 19:55</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 20:00</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -5587,7 +5587,7 @@ var SUPPLIERS={ELISE:"#3A3835",WORKCON:"#0073EA",HARWELL:"#00C875"};
 var SKIND={CRIT:["Critical","#9E3F2B"],NCR:["NCR","#9C7220"]};
 var DCAUSE={WX:["Weather","#0073EA"],ACC:["Access","#9C7220"],SUB:["Subcontractor","#784BD1"],
   MAT:["Materials","#1E4FA3"],PLANT:["Plant","#5A6670"],DSN:["Design / RFI","#D92B20"],OTH:["Other","#8C8C8C"]};
-var VIEWS=[["today","Today"],["logi","Logistics"],["log0","Completed works"],["dly","Daily"],["meet","Subbie meeting"],["lab0","Labour & jobs"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["lplan","Lifting plan"],["lrec","Lift records"],["orders","Site orders"],["weather","Weather"],["camera","Deck camera"],["log","Completed works"],["tester","Tester"]];
+var VIEWS=[["today","Today"],["logi","Logistics"],["log0","Completed works"],["dly","Daily"],["meet","Subcontractor meeting"],["lab0","Labour & jobs"],["path","Critical path"],["prestart","Prestart"],["safety","Safety"],["crane","Crane & deliveries"],["labour","Labour & jobs"],["lplan","Lifting plan"],["lrec","Lift records"],["orders","Site orders"],["weather","Weather"],["camera","Deck camera"],["log","Completed works"],["tester","Tester"]];
 /* Eufy tab retired 17 Nov at Harry's call - the section, its code and the camera
    settings are all kept; put ["eufy","Eufy"] back after "camera" above to re-add it. */
 var CUT=1260;      /* one cut a day, 9pm */
@@ -8076,7 +8076,7 @@ function addMile(){
 }
 
 
-/* Subbie meeting: two plain notes boxes (structures / finishes) Harry types
+/* Subcontractor meeting: two plain notes boxes (structures / finishes) Harry types
    into through the week. Always typable; kept on this device as you type and
    saved to the board (config "meeting") a moment after you stop. */
 var MEET={str:"",fin:""},meetRef=null,meetSeen="",meetT=null,MT_K="elise_meeting_draft";
