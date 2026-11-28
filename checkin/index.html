@@ -310,7 +310,7 @@ input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;displa
 <script>
 "use strict";
 var CFG=window.ELISE_CONFIG||{},URL_=(CFG.url||"").replace(/\/+$/,""),KEY=CFG.key||"";
-var TRADES=window.ELISE_COMPANIES||[["EC","Elise"],["GLF","G+L Form"],["ECC","East Coast Concrete"],["BUT","Butlers"],["EEC","Encon PT"],["AP","Advanced Precast"],["NEU","Neumann Steel"],["RZE","Rize Reinforcements"],["NS","Newnham Scaffolding"],["EVS","Evolution Shotcrete"],["MDP","Matt Dyce Plumbing"],["MC","Multicool Mechanical"],["LRC","LRC Electrical"],["ACF","Auscoast Fire"],["CC","Classic Corp"],["BAY","Bayleys"],["EMP","Empire"],["S4U","Skips 4 U"],["DAV","Davos Cranes"],["LIN","Lindores (crane crew)"],["SHORE","Shore Plumbing"],["HAR","Harwell"],["OTH","Other / visitor"]];
+var TRADES=window.ELISE_COMPANIES||[["EC","Elise"],["GLF","G & L Formwork"],["ECC","East Coast Concrete"],["BUT","Butlers"],["EEC","Encon PT"],["AP","Advanced Precast"],["NEU","Neumann Steel"],["RZE","Rize Reinforcements"],["NS","Newnham Scaffolding"],["EVS","Evolution Shotcrete"],["MDP","Matt Dyce Plumbing"],["MC","Multicool Mechanical"],["LRC","LRC Electrical"],["ACF","Auscoast Fire"],["CC","Classic Corp"],["BAY","Bayleys"],["EMP","Empire"],["S4U","Skips 4 U"],["DAV","Davos Cranes"],["LIN","Lindores (crane crew)"],["SHORE","Shore Plumbing"],["HAR","Harwell"],["OTH","Other / visitor"]];
 var K_ME="elise_ci_me",K_CUR="elise_ci_cur",K_Q="elise_ci_queue",K_MY="elise_ci_my";
 var lsFull=false;
 function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"null");if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){if(v!==undefined)lsFull=true;return v===undefined?null:false;}}

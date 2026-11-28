@@ -363,7 +363,8 @@ function chipBg(r){
   if(!r.co2) return c;
   return "linear-gradient(100deg,"+c+" 0 50%,"+trade(r.co2).colour+" 50% 100%)";
 }
-function chipTxt(r){ return r.co2 ? r.co+"/"+r.co2 : r.co; }
+var CO_LBL={GLF:"G & L"};function coL(c){return CO_LBL[c]||c;}
+function chipTxt(r){ return r.co2 ? coL(r.co)+"/"+coL(r.co2) : coL(r.co); }
 
 function rowHtml(r, piece){
   var qty=(+r.qty||0), kg=(+r.kg||0), tr=trade(r.co), bits=[];

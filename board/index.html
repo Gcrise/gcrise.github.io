@@ -18,6 +18,9 @@
 <script src="config.js"></script>
 <script src="vendor/supabase.js"></script>
 <script>
+/* codes stay as keys in the data; this is only what is SHOWN for a trade code */
+window.CO_LBL={GLF:"G & L"};window.coL=function(c){return window.CO_LBL[c]||c;};
+
 /* ============================================================
    ELISE DAY BOARD - SUPABASE SHIM
    ------------------------------------------------------------
@@ -2468,7 +2471,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     </div>
     <div class="hrow week" id="cb-week"></div>
     <div class="hrow qbar" id="cb-qbar">
-      <input type="text" id="cb-qInput" placeholder="7am GLF 6 lifts reo bundles to L7" autocomplete="off" enterkeyhint="done">
+      <input type="text" id="cb-qInput" placeholder="7am G&amp;L 6 lifts reo bundles to L7" autocomplete="off" enterkeyhint="done">
       <button class="btn" id="cb-camBtn" title="Photo of a load list or docket" hidden>Photo</button>
       <button class="btn" id="cb-albBtn" title="Pick a photo you already took" hidden>Album</button>
       <button class="btn primary" id="cb-qAdd">Add</button>
@@ -3095,7 +3098,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 12:30</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 19:05</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -3140,7 +3143,7 @@ function autoQty(v){
     per:10, per15:["AP"], bundleKg:1000, bundleTrades:["RZE","NEU"], pairTrades:["AP","NEU"], open:360, close:1080, cut1:840, cut2:1200,
     breaks:[[600,30],[780,30]],
     trades:[
-      ["EC","Elise","#3A3835"],["GLF","G+L Form","#FF8A00"],
+      ["EC","Elise","#3A3835"],["GLF","G & L Formwork","#FF8A00"],
       ["ECC","East Coast Concrete","#5A6670"],["EEC","Encon PT","#D92B20"],["AP","Advanced Precast","#00C875"],
       ["NEU","Neumann Steel","#1E4FA3"],
       ["NS","Newnham Scaffolding","#FFCB00"],["EVS","Evolution Shotcrete","#7F5347"],["MDP","Matt Dyce Plumbing","#0073EA"],["MC","Multicool Mechanical","#1BC5C5"],
@@ -3380,7 +3383,7 @@ function autoQty(v){
        and on a phone it closes the picker mid-tap - so wait until the sheet is shut */
     if(!$("scrim").hidden){cfgPending=true;return}
     cfgPending=false;
-    fill($("fCo"),cfg.trades.map(function(t){return[t[0],t[0]+" — "+t[1]]}),true);
+    fill($("fCo"),cfg.trades.map(function(t){return[t[0],coL(t[0])+" — "+t[1]]}),true);
     /* A one-up-one-down swap is one booking on the hook, not two, so the second
        trade rides on the same row and the bar is drawn half in each colour. */
     fill($("fCo2"),[["","One trade only"]].concat(
@@ -3809,7 +3812,7 @@ function autoQty(v){
         out+='<div class="wvr'+(L.status==="req"?" tbc":"")+(L.type==="del"?" del":"")+
           '" data-id="'+L.id+'" style="--tc:'+c+';--tci:'+onColour(c)+'">'+
           '<span class="tt">'+hhmm(L.start)+'</span>'+
-          '<span class="cc">'+esc(t[0])+'</span>'+
+          '<span class="cc">'+esc(coL(t[0]))+'</span>'+
           '<span class="dd">'+esc(L.desc||"Booking")+'</span>'+
           (L.qty?'<span class="qq">'+L.qty+'</span>':'')+'</div>';
       });
@@ -3896,8 +3899,8 @@ function autoQty(v){
     var step=Math.max(5,cfg.per||10);
     var nowSlot=cur===iso(new Date())?Math.floor((new Date().getHours()*60+new Date().getMinutes())/step)*step:-1;
     function coChip(L){
-      return '<span class="c-tr">'+esc(L.co)+
-        (L.co2?'<span class="c2">'+esc(L.co2)+'</span>':'')+'</span>';
+      return '<span class="c-tr">'+esc(coL(L.co))+
+        (L.co2?'<span class="c2">'+esc(coL(L.co2))+'</span>':'')+'</span>';
     }
     function bkRow(L,extra){
       var v=vars(L);
@@ -4138,7 +4141,7 @@ function autoQty(v){
           ' style="'+v.s+';top:'+y(L.start)+'px;height:'+hh+'px;left:calc('+lpc+'% + 2px);'+
           'width:calc('+wpc+'% - 4px)">'+
           (q?'<span class="q">'+esc(q)+'</span>':'')+
-          '<span class="co">'+esc(L.co)+(L.co2?'<i>'+esc(L.co2)+'</i>':'')+'</span> '+
+          '<span class="co">'+esc(coL(L.co))+(L.co2?'<i>'+esc(coL(L.co2))+'</i>':'')+'</span> '+
           /* as many whole lines as the card has room for, never a sliced one */
           '<span class="ds"'+(hh>=30?' style="-webkit-line-clamp:'+
             Math.max(1,Math.floor((hh-18)/14.5))+'"':'')+'>'+esc(L.desc||"")+'</span></button>';
@@ -4618,7 +4621,7 @@ function autoQty(v){
     var byWork=false;
     if(!co){
       var WORK=[["NS",/\bscaff(?:old(?:ing|ers?)?|y|ies)?\b|\bnewnhams?\b/],
-        ["GLF",/\bform\s?work\b|\bformies?\b|\bply(?:wood)?\b|\bprops?\b|\bstrip(?:ping)?\b|\btables?\b|\bg\s?\+\s?l\b/],
+        ["GLF",/\bform\s?work\b|\bformies?\b|\bply(?:wood)?\b|\bprops?\b|\bstrip(?:ping)?\b|\btables?\b|\bg\s?[+&]\s?l\b/],
         ["RZE",/\brize\b|\breo\b|\brebar\b|\bsteel\s?fix(?:ers?|ing)?\b|\bmesh\b|\bbar\s?chairs?\b|\bbundles?\b|\bstarters?\b/],
         ["EEC",/\bpt\b|\bpost\s?tension(?:ing)?\b|\bstrand\b|\bstress(?:ing)?\b|\bducts?\b|\bducting\b|\bcoils?\b|\banchors?\b/],
         ["AP",/\bprecast\b|\bpanels?\b|\bspin\s?ups?\b/],
@@ -4783,7 +4786,7 @@ function autoQty(v){
       var ds={}; recs.forEach(function(r){ds[r.date]=1});
       var keys=Object.keys(ds);
       if(keys.length===1&&keys[0]!==cur){cur=keys[0];subscribe()}
-      toast((recs.length===1?"Booked "+hhmm(recs[0].start)+" "+recs[0].co+" — "+recs[0].desc
+      toast((recs.length===1?"Booked "+hhmm(recs[0].start)+" "+coL(recs[0].co)+" — "+recs[0].desc
                             :"Booked "+recs.length+" items")+(slid?" · "+slid+" slid clear of the hook":""));
     }).catch(function(e){
       toast(e&&e.code==="invalid_argument"?"Not saved — sign in with the padlock first":"Couldn't save that one");
@@ -4826,7 +4829,7 @@ function autoQty(v){
             items.push({co:lCo, co2:"", start:quick.start+10, qty:nL, kg:quick.kg||0, type:"lift",
               kind:(lCo==="RZE"?"DECK":(lCo==="GLF"?"LOAD":"")), crane:"tower",
               from:"GROUND", to:quick.to||"LIVE DECK", date:quick.date, status:quick.status,
-              desc:quick.desc, notes:"Lifts off the "+quick.co+" truck - "+nL+" x "+perCo(lCo)+" min"});
+              desc:quick.desc, notes:"Lifts off the "+coL(quick.co)+" truck - "+nL+" x "+perCo(lCo)+" min"});
           }
         }
         if(quick.noTime) setTimeout(function(){
@@ -4874,7 +4877,7 @@ function autoQty(v){
         var ds={};recs.forEach(function(r){ds[r.date]=1});
         var keys=Object.keys(ds);
         if(keys.length===1&&keys[0]!==cur){cur=keys[0];subscribe()}
-        toast((recs.length===1?"Booked "+hhmm(recs[0].start)+" "+recs[0].co+" — "+recs[0].desc:"Booked "+recs.length+" items")+(slid?" · "+slid+" slid clear of the hook":""));
+        toast((recs.length===1?"Booked "+hhmm(recs[0].start)+" "+coL(recs[0].co)+" — "+recs[0].desc:"Booked "+recs.length+" items")+(slid?" · "+slid+" slid clear of the hook":""));
       });
     }).catch(function(e){
       var c=e&&e.code;
@@ -4918,7 +4921,7 @@ function autoQty(v){
     places().forEach(function(l){if(!seenP[l]){seenP[l]=1;opts.push([l,l])}});
     fill($("pFrom"),opts);fill($("pTo"),opts);
     var r0=recs[0]||{},t0=r0.type||"lift";
-    fill($("pCo"),[["","As read"]].concat(cfg.trades.map(function(t){return[t[0],t[0]+" — "+t[1]]})));
+    fill($("pCo"),[["","As read"]].concat(cfg.trades.map(function(t){return[t[0],coL(t[0])+" — "+t[1]]})));
     fill($("pKind"),[["","As read"]].concat(kindList(t0).map(function(k){return[k[0],k[1]]})));
     $("pKindLab").textContent=t0==="del"?"Delivery type":"Lift type";
     $("pCo").value="";$("pKind").value="";
@@ -5559,7 +5562,7 @@ function autoQty(v){
 "use strict";
 
 var DEF_TRADES={
- EC:["Elise","#3A3835"],GLF:["G+L Form","#FF8A00"],ECC:["East Coast Concrete","#5A6670"],
+ EC:["Elise","#3A3835"],GLF:["G & L Formwork","#FF8A00"],ECC:["East Coast Concrete","#5A6670"],
  EEC:["Encon PT","#D92B20"],AP:["Advanced Precast","#00C875"],NEU:["Neumann Steel","#1E4FA3"],
  NS:["Newnham Scaffolding","#FFCB00"],EVS:["Evolution Shotcrete","#7F5347"],
  MDP:["Matt Dyce Plumbing","#0073EA"],MC:["Multicool Mechanical","#1BC5C5"],
@@ -5620,7 +5623,7 @@ function kindMap(type){
   return type==="del"?DEF_DKIND:DEF_LKIND;
 }
 function colourOf(co){var t=trades()[co];return (t&&t[1])||"#B9B2A6";}
-function chip(co){var t=trades()[co];return '<span class="chip" style="--c:'+colourOf(co)+'" title="'+esc(t?t[0]:co)+'"><i></i>'+esc(co)+'</span>';}
+function chip(co){var t=trades()[co];return '<span class="chip" style="--c:'+colourOf(co)+'" title="'+esc(t?t[0]:co)+'"><i></i>'+esc(coL(co))+'</span>';}
 /* a one-up-one-down run is two trades on one booking, so the card shows both */
 function coChips(b){ return chip(b.co)+(b.co2?chip(b.co2):""); }
 function supChip(s){return '<span class="chip" style="--c:'+((SUPPLIERS[s])||colourOf(s))+'"><i></i>'+esc(s||"—")+'</span>';}
@@ -6791,7 +6794,7 @@ function renderPrestart(){
     var w=String(b.desc||"").split(/\s+-\s+|\(/)[0].trim(); if(w&&g.what.indexOf(w)<0) g.what.push(w);
   });
   var liftHtml=Object.keys(byCo).map(function(k){return byCo[k];}).sort(function(a,b){return a.s-b.s;}).map(function(g){
-    return '<div class="pcline"><span class="tm">'+esc(hhmmB(g.s))+'\u2013'+esc(hhmmB(g.e))+'</span><span class="co">'+esc(g.co)+'</span>'+
+    return '<div class="pcline"><span class="tm">'+esc(hhmmB(g.s))+'\u2013'+esc(hhmmB(g.e))+'</span><span class="co">'+esc(coL(g.co))+'</span>'+
       '<span class="ds">'+esc(g.what.join(", "))+'</span><span class="n">'+g.n+(g.n===1?" lift":" lifts")+'</span></div>';
   }).join("");
   preRows(delHtml,"preDels","No deliveries booked for today.");
@@ -8568,7 +8571,7 @@ function sectionText(which){
     out.push("CRANE LIFTS - "+lifts.length);
     if(!lifts.length)out.push("Nothing on the hook.");
     lifts.forEach(function(it){
-      out.push("- "+fmtClock(it.t)+"  "+it.row.co+"  "+(it.row.desc||"")+
+      out.push("- "+fmtClock(it.t)+"  "+coL(it.row.co)+"  "+(it.row.desc||"")+
         (it.of>1?" ("+it.n+"/"+it.of+")":"")+(it.clash?"  [IN THE BREAK]":"")+
         (it.row.status==="req"?"  [TBC]":""));
     });
@@ -10298,11 +10301,11 @@ function renderNowStrip(){
     '<span class="nsdot" style="background:'+c+'"></span>'+
     '<span class="nsmain nshook"><span class="nslab">'+esc(p.lab)+'</span>'+
     '<div class="nstxt"><span class="t">'+fmtClock(toMin(p.live.start))+'</span>'+
-    '<span class="co">'+esc(p.live.co)+'</span>'+
+    '<span class="co">'+esc(coL(p.live.co))+'</span>'+
     '<span class="nswrap"><span class="nsroll">'+esc(p.live.desc||"")+'</span></span></div></span>'+
     (p.next?'<span class="nsnext"><span class="nslab">Then</span>'+
       '<div class="nstxt"><span class="t">'+fmtClock(toMin(p.next.start))+'</span>'+
-      '<span class="co">'+esc(p.next.co)+'</span></div></span>':'');
+      '<span class="co">'+esc(coL(p.next.co))+'</span></div></span>':'');
   rollText();
 }
 setInterval(tickClock,1000);
@@ -10494,7 +10497,7 @@ function lpDates(start,n){
 function lpTag(c){
   var T=trades(),tr=T[c]||DEF_TRADES[c]||["",""],col=tr[1]||"#8C8C8C";
   var dark=/^#(FF(CB|8A)|9CD3|1BC5|00C8)/i.test(col);
-  return '<span class="lp-tag'+(dark?' dark':'')+'" style="--c:'+col+'" title="'+esc(tr[0]||c)+'">'+esc(c==="OTH"?"—":c)+"</span>";
+  return '<span class="lp-tag'+(dark?' dark':'')+'" style="--c:'+col+'" title="'+esc(tr[0]||c)+'">'+esc(c==="OTH"?"—":coL(c))+"</span>";
 }
 function renderLPlan(){
   var start=lp.start||lpAutoStart(),D=LP_DAYS[lp.c],dates=lpDates(start,D.length),today=iso(new Date());
