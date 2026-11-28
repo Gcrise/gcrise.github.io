@@ -2237,6 +2237,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
 .fk-add input{flex:1 1 200px;min-width:0;text-transform:uppercase}
 
 /* crane wind limit warning on the Today page */
+.k3-t small.k3-wover{display:block;margin-top:4px;color:var(--crit,#e5605b);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .windwarn{display:flex;gap:14px;align-items:flex-start;margin:0 0 14px;padding:12px 16px;border:2px solid #d9534f;border-radius:6px;background:rgba(217,83,79,.14);color:var(--ink)}
 .windwarn svg{flex:none;width:30px;height:30px;stroke:#e5605b;fill:none;stroke-width:1.8;stroke-linecap:round}
 .windwarn b{display:block;font-family:var(--f-cond,inherit);font-size:20px;letter-spacing:.06em;text-transform:uppercase;color:#e5605b;text-decoration:underline;text-underline-offset:4px}
@@ -3091,7 +3092,7 @@ button:not(.ts-li):not(.item):not(.lp-day),.mini,.tab,.addbtn,.ts-backbtn,.ts-si
     <div id="logList"></div>
     <div class="addrow" id="logExport">
       <span class="exp-lab">Take it with you<b id="expMeta"></b></span>
-      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 12:20</span>
+      <span class="buildstamp" title="Which version of the board this device is running. If it does not match what Claude just shipped, the phone is holding an old copy.">Build 28 Nov 12:25</span>
       <button class="mini" id="expJson">Everything (JSON)</button>
       <button class="mini" id="expCsv">Spreadsheets (CSV)</button>
     </div>
@@ -6008,11 +6009,11 @@ function renderK3(){
   var H=[];try{if(WX.state==="idle")wxFetch();H=wxDayHours(state.date);}catch(e){}
   if(H.length>1){
     var cn=H.filter(function(x){return x.h===(isToday?d.getHours():9);})[0]||H[0],pk=H.reduce(function(a,x){return (x.g||0)>(a.g||0)?x:a;},H[0]);
-    var mxw=Math.max(40,pk.g||0),pts=H.map(function(x,i){return (i/(H.length-1)*100).toFixed(1)+" "+(30-(x.w/mxw)*28).toFixed(1);}).join(" L");
+    var ov=windOver(state.date),mxw=Math.max(CRANE_WIND+6,pk.g||0,pk.w||0),pts=H.map(function(x,i){return (i/(H.length-1)*100).toFixed(1)+" "+(30-(x.w/mxw)*28).toFixed(1);}).join(" L");
     var nx=isToday?((d.getHours()+d.getMinutes()/60-H[0].h)/(H[H.length-1].h-H[0].h)*100):-5;
-    var lim=30-(38/mxw)*28;
+    var lim=30-(CRANE_WIND/mxw)*28;
     var hr=function(x){var a=x%12||12;return a+(x<12?"am":"pm");};
-    T.push('<button type="button" class="k3-t'+((pk.g||0)>=38?" red":"")+'" data-go="weather"><div class="hd"><b>Wind</b><i>'+Math.round(cn.w)+'</i></div><svg class="k3-sp" viewBox="0 0 100 30" preserveAspectRatio="none"><line x1="0" y1="'+lim.toFixed(1)+'" x2="100" y2="'+lim.toFixed(1)+'" stroke="var(--crit)" stroke-dasharray="3 3" stroke-width="1" vector-effect="non-scaling-stroke"/><path d="M'+pts+'" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/>'+(nx>=0&&nx<=100?'<line x1="'+nx.toFixed(1)+'" y1="0" x2="'+nx.toFixed(1)+'" y2="30" stroke="var(--alarm)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>':'')+'</svg><small>Gust '+Math.round(pk.g||0)+' @ '+hr(pk.h)+'</small></button>');
+    T.push('<button type="button" class="k3-t'+(ov.txt?" red":"")+'" data-go="weather"><div class="hd"><b>Wind</b><i>'+Math.round(cn.w)+'</i></div><svg class="k3-sp" viewBox="0 0 100 30" preserveAspectRatio="none"><line x1="0" y1="'+lim.toFixed(1)+'" x2="100" y2="'+lim.toFixed(1)+'" stroke="var(--crit)" stroke-dasharray="3 3" stroke-width="1" vector-effect="non-scaling-stroke"/><path d="M'+pts+'" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/>'+(nx>=0&&nx<=100?'<line x1="'+nx.toFixed(1)+'" y1="0" x2="'+nx.toFixed(1)+'" y2="30" stroke="var(--alarm)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>':'')+'</svg><small>Gust '+Math.round(pk.g||0)+' @ '+hr(pk.h)+'</small>'+(ov.txt?'<small class="k3-wover">'+esc(ov.txt)+'</small>':'')+'</button>');
   }else T.push('<button type="button" class="k3-t" data-go="weather"><div class="hd"><b>Wind</b><i>&ndash;</i></div><small>'+(WX.state==="loading"?"Reading forecast":"No forecast")+'</small></button>');
   /* prestart signatures */
   if(!SIGNS[state.date]&&!signBusy[state.date])try{loadSigns(state.date);}catch(e){}
@@ -6387,28 +6388,25 @@ function wxFetch(force){
     try{ renderWind(); }catch(e){}
     try{ renderWeather(); }catch(e){}
     try{ renderWindWarn(); }catch(e){}
+    try{ if(state.view==="today")renderK3(); }catch(e){}
   });
 }
 setInterval(function(){ wxFetch(true); },300000);
 /* Crane wind limit: flag the Today page when wind or gusts reach 54 km/h -
    right now (today), and the hours across the site day (6am-6pm) it's forecast to. */
 var CRANE_WIND=54;
-function renderWindWarn(){
-  var box=el("windWarn");if(!box)return;
-  var d=state.date,isToday=d===iso(new Date()),nowH=new Date().getHours(),lines=[],head="";
+/* the over-limit reading for the Wind tile: now (today) and forecast hours 6am-6pm */
+function windOver(d){
+  var isToday=d===iso(new Date()),nowH=new Date().getHours(),bits=[],nowOver=false;
   var pk=function(o){return Math.max(o.w||0,o.g||0);};
-  if(isToday&&WX.now){var nw=Math.max(WX.now.wind||0,WX.now.gust||0);
-    if(nw>=CRANE_WIND){head="Over crane wind limit now";lines.push("Wind "+Math.round(WX.now.wind||0)+" km/h \u00b7 gusts "+Math.round(WX.now.gust||0)+" km/h \u00b7 limit "+CRANE_WIND+" km/h");}}
-  var H=(WX.hourly&&WX.hourly[d]||[]).filter(function(o){return o.h>=6&&o.h<=18&&(!isToday||o.h>=nowH)&&pk(o)>=CRANE_WIND;});
-  if(H.length){
-    var runs=[],c=null;H.forEach(function(o){if(c&&o.h===c.to+1){c.to=o.h;c.max=Math.max(c.max,pk(o));}else{c={from:o.h,to:o.h,max:pk(o)};runs.push(c);}});
-    var hh=function(h){return (h%12||12)+(h<12?"am":"pm");};
-    if(!head)head=(isToday?"Wind over crane limit later today":"Wind over crane limit forecast");
-    lines.push(runs.map(function(r){return (r.from===r.to?hh(r.from):hh(r.from)+"\u2013"+hh(r.to+1))+" up to "+Math.round(r.max)+" km/h";}).join(" \u00b7 ")+(lines.length?"":" \u00b7 limit "+CRANE_WIND+" km/h"));
-  }
-  box.hidden=!head;
-  if(head)box.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/></svg><div><b>'+esc(head)+'</b>'+lines.map(function(t){return "<span>"+esc(t)+"</span>";}).join("")+'</div>';
+  if(isToday&&WX.now){var nw=Math.max(WX.now.wind||0,WX.now.gust||0);if(nw>=CRANE_WIND){nowOver=true;bits.push("Now "+Math.round(nw));}}
+  var H=(WX.hourly&&WX.hourly[d]||[]).filter(function(o){return o.h>=6&&o.h<=18&&(!isToday||o.h>nowH||(!nowOver&&o.h===nowH))&&pk(o)>=CRANE_WIND;});
+  var runs=[],c=null;H.forEach(function(o){if(c&&o.h===c.to+1){c.to=o.h;c.max=Math.max(c.max,pk(o));}else{c={from:o.h,to:o.h,max:pk(o)};runs.push(c);}});
+  var hh=function(h){return (h%12||12)+(h<12?"am":"pm");};
+  runs.forEach(function(r){bits.push((r.from===r.to?hh(r.from):hh(r.from)+"\u2013"+hh(r.to+1))+" up to "+Math.round(r.max));});
+  return {now:nowOver,txt:bits.length?"Over "+CRANE_WIND+" km/h: "+bits.join(" \u00b7 "):""};
 }
+function renderWindWarn(){var box=el("windWarn");if(box)box.hidden=true;}
 
 
 /* ---------- the wind, hour by hour ----------
